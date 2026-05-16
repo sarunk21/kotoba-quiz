@@ -1,0 +1,65 @@
+'use client'
+
+export interface GameStats {
+  totalXP: number
+  currentStreak: number
+  longestStreak: number
+  lastPlayedDate: string
+  totalSessions: number
+  totalCorrect: number
+  totalAnswered: number
+}
+
+const DEFAULT_STATS: GameStats = {
+  totalXP: 0,
+  currentStreak: 0,
+  longestStreak: 0,
+  lastPlayedDate: '',
+  totalSessions: 0,
+  totalCorrect: 0,
+  totalAnswered: 0,
+}
+
+export function loadStats(): GameStats {
+  if (typeof window === 'undefined') return DEFAULT_STATS
+  try {
+    const raw = localStorage.getItem('kotoba_stats')
+    if (!raw) return DEFAULT_STATS
+    return { ...DEFAULT_STATS, ...JSON.parse(raw) }
+  } catch {
+    return DEFAULT_STATS
+  }
+}
+
+export function saveStats(stats: GameStats) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem('kotoba_stats', JSON.stringify(stats))
+}
+
+export function updateAfterSession(correct: number, total: number, xpGained: number): GameStats {
+  const stats = loadStats()
+  const today = new Date().toDateString()
+  
+  let newDayStreak = stats.currentStreak
+  if (stats.lastPlayedDate !== today) {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    if (stats.lastPlayedDate === yesterday.toDateString()) {
+      newDayStreak = stats.currentStreak + 1
+    } else {
+      newDayStreak = 1
+    }
+  }
+
+  const updated: GameStats = {
+    totalXP: stats.totalXP + xpGained,
+    currentStreak: newDayStreak,
+    longestStreak: Math.max(stats.longestStreak, newDayStreak),
+    lastPlayedDate: today,
+    totalSessions: stats.totalSessions + 1,
+    totalCorrect: stats.totalCorrect + correct,
+    totalAnswered: stats.totalAnswered + total,
+  }
+  saveStats(updated)
+  return updated
+}
