@@ -9,6 +9,7 @@ import {
   buildQueue, getWordProgress, SRS_INTERVALS, MASTERED_LEVEL,
   type SRSStore
 } from '@/lib/srs'
+import { pushToCloud } from '@/lib/cloud'
 import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish } from '@/lib/sounds'
 
 type Phase = 'loading' | 'question' | 'feedback' | 'result'
@@ -108,6 +109,7 @@ export default function QuizPage() {
     if (!state) return
     if (state.lives <= 0 || state.current + 1 >= state.queue.length) {
       saveSRS(srsRef.current)
+      pushToCloud(srsRef.current) // fire-and-forget
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, xp: state.sessionXP, srsStore: srsRef.current }
       setFinalStats(fs); updateAfterSession(fs.correct, fs.total, fs.xp)
       playFinish(); setPhase('result'); return

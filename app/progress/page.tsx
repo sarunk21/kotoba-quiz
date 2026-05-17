@@ -24,7 +24,8 @@ export default function ProgressPage() {
       let v = DEFAULT_VOCAB
       if (url) {
         try {
-          const parsed = parseCSVToVocab(await (await fetch(url)).text())
+          const res = await fetch(`/api/sheets?url=${encodeURIComponent(url)}`)
+          const parsed = parseCSVToVocab(await res.text())
           if (parsed.length >= 4) v = parsed
         } catch { }
       }
