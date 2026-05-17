@@ -102,7 +102,10 @@ function QuizContent() {
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, xp: state.sessionXP }
       setFinalStats(fs)
       updateAfterSession(fs.correct, fs.total, fs.xp)
-      await pushToCloud() // sync to drive (Wajib await biar ga ilang)
+      
+      const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
+      if (isAuto) await pushToCloud() // sync ke drive (Wajib await biar ga ilang)
+      
       setPhase('result')
       return
     }

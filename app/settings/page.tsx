@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
 import { parseCSVToVocab } from '@/lib/vocab'
-import { fetchVocabCSV, pushToCloud, resetCloudData } from '@/lib/cloud'
+import { fetchVocabCSV, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud } from '@/lib/cloud'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -18,6 +18,8 @@ export default function SettingsPage() {
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [syncMode, setSyncMode] = useState<'auto' | 'manual'>('auto')
+  const [syncActionStatus, setSyncActionStatus] = useState<string>('')
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/')
@@ -32,6 +34,9 @@ export default function SettingsPage() {
       setTheme(isDark ? 'dark' : 'light')
     }
 
+    const savedSync = localStorage.getItem('kotoba_sync_mode') as 'auto' | 'manual' | null
+    if (savedSync) setSyncMode(savedSync)
+
     const url = localStorage.getItem('kotoba_sheets_url') || ''
     setUrlInput(url)
     if (typeof Notification !== 'undefined') {
@@ -39,6 +44,25 @@ export default function SettingsPage() {
       else if (Notification.permission === 'denied') setNotifStatus('denied')
     }
   }, [])
+
+  function toggleSyncMode(mode: 'auto' | 'manual') {
+    setSyncMode(mode)
+    localStorage.setItem('kotoba_sync_mode', mode)
+  }
+
+  async function handleManualPull() {
+    setSyncActionStatus('pulling')
+    const result = await pullFromCloud()
+    setSyncActionStatus(result ? 'Pull Berhasil ✓' : 'Pull Gagal ✗')
+    setTimeout(() => setSyncActionStatus(''), 3000)
+  }
+
+  async function handleManualPush() {
+    setSyncActionStatus('pushing')
+    const ok = await forcePushToCloud()
+    setSyncActionStatus(ok ? 'Push Berhasil ✓' : 'Push Gagal ✗')
+    setTimeout(() => setSyncActionStatus(''), 3000)
+  }
 
   function toggleTheme(newTheme: 'light' | 'dark') {
     setTheme(newTheme)
@@ -137,6 +161,55 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Sync Section */}
+          <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Sinkronisasi</p>
+            
+            <div className="flex gap-2 mb-5">
+              {[
+                { key: 'auto',   label: 'Otomatis', icon: '⚡' },
+                { key: 'manual', label: 'Manual',   icon: '🔘' },
+              ].map(m => (
+                <button key={m.key} onClick={() => toggleSyncMode(m.key as any)}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold transition-all active:scale-95"
+                  style={{
+                    background: syncMode === m.key ? 'var(--color-accent)' : 'var(--color-bg)',
+                    color: syncMode === m.key ? '#fff' : 'var(--color-text-2)',
+                    boxShadow: syncMode === m.key ? '0 4px 12px rgba(91,94,244,0.25)' : 'none',
+                  }}>
+                  <span>{m.icon}</span> {m.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <button onClick={handleManualPull} disabled={!!syncActionStatus}
+                  className="flex-1 rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all"
+                  style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
+                  {syncActionStatus === 'pulling' ? '⏳ Pulling...' : '📥 Tarik Data (Pull)'}
+                </button>
+                <button onClick={handleManualPush} disabled={!!syncActionStatus}
+                  className="flex-1 rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all"
+                  style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
+                  {syncActionStatus === 'pushing' ? '⏳ Pushing...' : '📤 Kirim Data (Push)'}
+                </button>
+              </div>
+              
+              {syncActionStatus && !['pulling', 'pushing'].includes(syncActionStatus) && (
+                <p className="text-center text-[10px] font-bold text-[var(--color-accent)] animate-fade-in">
+                  {syncActionStatus}
+                </p>
+              )}
+            </div>
+            
+            <p className="text-[10px] text-center mt-3 font-semibold" style={{ color: 'var(--color-text-3)' }}>
+              {syncMode === 'auto' 
+                ? 'Sync jalan otomatis pas buka app & abis kuis.' 
+                : 'Pake tombol di atas buat sinkron manual.'}
+            </p>
           </div>
 
           {/* Google Sheets Section */}

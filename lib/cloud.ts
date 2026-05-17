@@ -117,6 +117,23 @@ export async function syncToCloud(): Promise<boolean> {
   }
 }
 
+/** Push local data directly to cloud without pulling first (Danger: can overwrite) */
+export async function forcePushToCloud(): Promise<boolean> {
+  try {
+    const data = collectLocalData()
+    const res = await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      cache: 'no-store',
+    })
+    return res.ok
+  } catch (e) {
+    console.error('[ForcePush] Error:', e)
+    return false
+  }
+}
+
 /** Legacy alias for pushToCloud, now uses syncToCloud for safety */
 export const pushToCloud = syncToCloud
 

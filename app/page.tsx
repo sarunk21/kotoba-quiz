@@ -94,7 +94,8 @@ export default function Home() {
   }, [session?.accessToken, loadVocabData])
 
   useEffect(() => {
-    if (session?.accessToken) doSync()
+    const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
+    if (session?.accessToken && isAuto) doSync()
   }, [session?.accessToken, doSync])
 
   const onTouchStart = (e: React.TouchEvent) => {
