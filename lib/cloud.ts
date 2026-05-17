@@ -92,9 +92,10 @@ export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats
 }
 
 /** Fetch CSV vocab via server-side proxy (bypass CORS) */
-export async function fetchVocabCSV(sheetsUrl: string): Promise<string | null> {
+export async function fetchVocabCSV(sheetsUrl: string, force = false): Promise<string | null> {
   try {
-    const res = await fetch(`/api/sheets?url=${encodeURIComponent(sheetsUrl)}`, { cache: 'no-store' })
+    const t = force ? `&t=${Date.now()}` : ''
+    const res = await fetch(`/api/sheets?url=${encodeURIComponent(sheetsUrl)}${t}`, { cache: 'no-store' })
     if (!res.ok) return null
     return await res.text()
   } catch {

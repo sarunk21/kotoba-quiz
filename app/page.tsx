@@ -48,7 +48,7 @@ export default function Home() {
     }
   }
 
-  const loadVocabData = useCallback(async (url: string): Promise<VocabItem[]> => {
+  const loadVocabData = useCallback(async (url: string, force = false): Promise<VocabItem[]> => {
     setVocabError('')
     
     // Validasi format URL
@@ -57,7 +57,7 @@ export default function Home() {
       setVocab([]); return []
     }
 
-    const csv = await fetchVocabCSV(url)
+    const csv = await fetchVocabCSV(url, force)
     if (!csv) {
       setVocabError('Gagal ambil data. Cek koneksi atau status "Publish" di Sheets.')
       setVocab([]); return []
@@ -118,16 +118,16 @@ export default function Home() {
       setSrsStore(loadSRS())
       setStats(loadStats())
       const cloudUrl = localStorage.getItem('kotoba_sheets_url')
-      if (cloudUrl && cloudUrl !== savedUrl) {
+      if (cloudUrl) {
         setSavedUrl(cloudUrl); setUrlInput(cloudUrl)
-        await loadVocabData(cloudUrl)
+        await loadVocabData(cloudUrl, true) // Force refresh CSV dari cloud
       }
       setSyncStatus('ok')
     } else {
       setSyncStatus('error')
     }
     setTimeout(() => setSyncStatus('idle'), 2500)
-  }, [session?.accessToken, savedUrl, loadVocabData])
+  }, [session?.accessToken, loadVocabData])
 
   // Auto-pull saat login
   useEffect(() => {
@@ -154,7 +154,7 @@ export default function Home() {
       setIsRefreshing(true)
       // Refresh: pull cloud + reload vocab + hard refresh
       if (session?.accessToken) await doSync('pull')
-      if (savedUrl) await loadVocabData(savedUrl)
+      if (savedUrl) await loadVocabData(savedUrl, true)
       setIsRefreshing(false)
       window.location.reload() // Hard refresh
     }
