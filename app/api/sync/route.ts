@@ -88,3 +88,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
+
+// DELETE — hapus file data dari Drive
+export async function DELETE() {
+  const session = await auth()
+  if (!session?.accessToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  try {
+    const fileId = await findFile(session.accessToken)
+    if (!fileId) return NextResponse.json({ ok: true })
+
+    const res = await fetch(`${DRIVE_API}/files/${fileId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    })
+    return NextResponse.json({ ok: res.ok })
+  } catch (e: unknown) {
+    const error = e as Error
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}

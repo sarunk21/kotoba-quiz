@@ -101,3 +101,21 @@ export async function fetchVocabCSV(sheetsUrl: string): Promise<string | null> {
     return null
   }
 }
+
+/** Reset total: hapus di cloud dan lokal */
+export async function resetCloudData(): Promise<boolean> {
+  try {
+    // 1. Hapus di Drive
+    const res = await fetch('/api/sync', { method: 'DELETE' })
+    if (!res.ok) return false
+    
+    // 2. Bersihin lokal
+    localStorage.removeItem('kotoba_srs')
+    localStorage.removeItem('kotoba_stats')
+    localStorage.removeItem('kotoba_sheets_url')
+    
+    return true
+  } catch {
+    return false
+  }
+}

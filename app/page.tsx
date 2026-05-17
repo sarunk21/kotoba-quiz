@@ -6,7 +6,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, type GameStats } from '@/lib/stats'
 import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
 import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
-import { fetchVocabCSV, pushToCloud, syncToCloud } from '@/lib/cloud'
+import { fetchVocabCSV, pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
@@ -26,6 +26,8 @@ export default function Home() {
   const [urlInput, setUrlInput] = useState('')
   const [saving, setSaving] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [resetting, setResetting] = useState(false)
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0)
@@ -33,6 +35,18 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const touchStartY = useRef(0)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  async function handleResetAccount() {
+    setResetting(true)
+    const ok = await resetCloudData()
+    if (ok) {
+      window.location.reload()
+    } else {
+      alert('Gagal hapus data di cloud. Cek koneksi lo.')
+      setResetting(false)
+      setShowResetConfirm(false)
+    }
+  }
 
   const loadVocabData = useCallback(async (url: string): Promise<VocabItem[]> => {
     setVocabError('')
@@ -488,12 +502,21 @@ export default function Home() {
                           style={{ background: 'var(--color-amber-light)', color: 'var(--color-amber)' }}>
                           Aktifkan
                         </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+                        )}
+                        </div>
+
+                        <div className="my-4" style={{ height: 1, background: 'var(--color-border)' }} />
+                        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-red)' }}>Zona Bahaya</p>
+                        <button onClick={() => setShowResetConfirm(true)}
+                        className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold active:scale-95 transition-transform"
+                        style={{ background: 'var(--color-red-light)', color: 'var(--color-red)' }}>
+                        <span>⚠️</span> Reset Semua Data Akun
+                        </button>
+                        </div>
+                        )}
+                        </div>
+                        )}
+
           </>
         )}
 
@@ -524,6 +547,32 @@ export default function Home() {
               <button onClick={() => setShowLogoutConfirm(false)}
                 className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform"
                 style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)' }}>
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Reset Data Modal ── */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !resetting && setShowResetConfirm(false)} />
+          <div className="bg-white rounded-[32px] p-8 w-full max-w-xs relative anim-pop shadow-2xl text-center">
+            <div className="text-5xl mb-4">🧨</div>
+            <h3 className="text-xl font-extrabold mb-2" style={{ color: 'var(--color-text-1)' }}>Hapus Semua?</h3>
+            <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+              Aksi ini bakal hapus data latihan lo secara permanen baik di <span className="text-red-500">lokal</span> maupun di <span className="text-red-500">Google Drive</span>.
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <button onClick={handleResetAccount} disabled={resetting}
+                className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform"
+                style={{ background: 'var(--color-red)', color: '#fff', opacity: resetting ? 0.7 : 1, boxShadow: '0 8px 20px rgba(239,68,68,0.25)' }}>
+                {resetting ? '⏳ Menghapus...' : 'Ya, Hapus Permanen 🧨'}
+              </button>
+              <button onClick={() => setShowResetConfirm(false)} disabled={resetting}
+                className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform"
+                style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)', opacity: resetting ? 0.5 : 1 }}>
                 Batal
               </button>
             </div>
