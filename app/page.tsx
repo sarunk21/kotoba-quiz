@@ -3,10 +3,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useSession, signIn, signOut } from 'next-auth/react'
-import { loadStats, saveStats, type GameStats } from '@/lib/stats'
-import { loadSRS, type SRSStore } from '@/lib/srs'
+import { loadStats, type GameStats } from '@/lib/stats'
+import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
 import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
-import { getSRSSummary } from '@/lib/srs'
 import { fetchVocabCSV, pushToCloud, pullFromCloud } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 
@@ -19,7 +18,6 @@ export default function Home() {
   const [stats, setStats] = useState<GameStats | null>(null)
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [vocab, setVocab] = useState<VocabItem[]>([])
-  const [sheetsUrl, setSheetsUrl] = useState('')
   const [savedUrl, setSavedUrl] = useState('')
   const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
   const [showSettings, setShowSettings] = useState(false)
@@ -47,10 +45,19 @@ export default function Home() {
     if (url) loadVocabData(url)
   }, [])
 
+  async function handleSignOut() {
+    if (confirm('Yakin mau logout? Data lokal di browser ini bakal diapus (tapi yang di cloud tetep aman).')) {
+      localStorage.removeItem('kotoba_srs')
+      localStorage.removeItem('kotoba_stats')
+      localStorage.removeItem('kotoba_sheets_url')
+      await signOut()
+    }
+  }
+
   // Auto-pull saat login
   useEffect(() => {
     if (session?.accessToken) doSync('pull')
-  }, [session?.accessToken])
+  }, [session?.accessToken, doSync])
 
   async function loadVocabData(url: string): Promise<VocabItem[]> {
     setVocabError('')
@@ -68,7 +75,7 @@ export default function Home() {
     return parsed
   }
 
-  async function doSync(direction: 'push' | 'pull' = 'push') {
+  const doSync = useCallback(async (direction: 'push' | 'pull' = 'push') => {
     if (!session?.accessToken) return
     setSyncStatus('syncing')
     if (direction === 'pull') {
@@ -92,7 +99,7 @@ export default function Home() {
       setSyncStatus(ok ? 'ok' : 'error')
     }
     setTimeout(() => setSyncStatus('idle'), 2500)
-  }
+  }, [session?.accessToken, savedUrl])
 
   // Pull-to-refresh handlers
   const onTouchStart = (e: React.TouchEvent) => {
@@ -148,6 +155,7 @@ export default function Home() {
   const accuracy = stats && stats.totalAnswered > 0
     ? Math.round((stats.totalCorrect / stats.totalAnswered) * 100) : 0
   const srs = vocab.length > 0 ? getSRSSummary(vocab.map(v => v.id), srsStore) : null
+  const kanaSrs = getKanaSummary(KANA, srsStore)
 
   const syncLabel = syncStatus === 'syncing' ? '⏳ Syncing...'
     : syncStatus === 'ok' ? '✓ Tersinkron!' : syncStatus === 'error' ? '✗ Gagal' : '☁ Sync'
@@ -194,7 +202,7 @@ export default function Home() {
             {status === 'loading' ? (
               <div className="w-10 h-10 rounded-full" style={{ background: 'var(--color-subtle)' }} />
             ) : session ? (
-              <button onClick={() => signOut()} title="Logout"
+              <button onClick={handleSignOut} title="Logout"
                 className="w-10 h-10 rounded-full overflow-hidden border-2 active:scale-95 transition-transform"
                 style={{ borderColor: 'var(--color-accent)' }}>
                 {session.user?.image
@@ -379,6 +387,29 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* ── Kana status ── */}
+        <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+          <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+            <p className="font-bold" style={{ color: 'var(--color-text-1)' }}>Status Kana</p>
+            <Link href="/kana" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>
+              Lanjut belajar →
+            </Link>
+          </div>
+          <div className="grid grid-cols-4 gap-2 px-3 pb-4">
+            {[
+              { label: 'Review', val: kanaSrs.dueCount,     color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
+              { label: 'Baru',   val: kanaSrs.newCount,     color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+              { label: 'Proses', val: kanaSrs.learningCount,color: '#a855f7',             bg: '#faf0ff' },
+              { label: 'Hafal',  val: kanaSrs.masteredCount,color: 'var(--color-green)',  bg: 'var(--color-green-light)' },
+            ].map(s => (
+              <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}>
+                <p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p>
+                <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* ── Settings ── */}
         {!noVocab && (

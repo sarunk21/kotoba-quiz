@@ -65,8 +65,9 @@ export async function GET() {
     if (!res.ok) return NextResponse.json({ data: null })
     const data = await res.json()
     return NextResponse.json({ data })
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 })
+  } catch (e: unknown) {
+    const error = e as Error
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
@@ -82,7 +83,8 @@ export async function POST(req: NextRequest) {
     const fileId = await findFile(token)
     const ok = await upsertFile(token, fileId, JSON.stringify(body))
     return NextResponse.json({ ok })
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 })
+  } catch (e: unknown) {
+    const error = e as Error
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

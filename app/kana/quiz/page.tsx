@@ -10,6 +10,7 @@ import {
 } from '@/lib/srs'
 import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playFinish } from '@/lib/sounds'
 import { updateAfterSession } from '@/lib/stats'
+import { pushToCloud } from '@/lib/cloud'
 
 type Phase = 'question' | 'feedback' | 'result'
 type QuizMode = 'kana→romaji' | 'romaji→kana'
@@ -101,6 +102,7 @@ function QuizContent() {
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, xp: state.sessionXP }
       setFinalStats(fs)
       updateAfterSession(fs.correct, fs.total, fs.xp)
+      pushToCloud() // sync to drive (after stats updated)
       setPhase('result')
       return
     }
@@ -172,7 +174,7 @@ function QuizContent() {
       {/* Header */}
       <div className="px-4 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => { saveSRS(srsRef.current); router.push('/kana') }}
+          <button onClick={() => { saveSRS(srsRef.current); pushToCloud(); router.push('/kana') }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 active:scale-95 transition-transform"
             style={{ background: 'var(--color-white)', color: 'var(--color-text-2)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             ✕

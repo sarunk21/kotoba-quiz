@@ -161,3 +161,13 @@ export function getSRSSummary(vocabIds: string[], store: SRSStore) {
 
   return { dueCount, newCount, masteredCount, learningCount, total: vocabIds.length }
 }
+
+/** Stats summary for all kana */
+export function getKanaSummary(kanaCards: { id: string }[], store: SRSStore) {
+  const ids: string[] = []
+  for (const c of kanaCards) {
+    ids.push(`kana_hiragana_${c.id}`)
+    ids.push(`kana_katakana_${c.id}`)
+  }
+  return getSRSSummary(ids, store)
+}

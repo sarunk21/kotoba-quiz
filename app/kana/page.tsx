@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { KANA, kanaId, type KanaType, type KanaCard } from '@/lib/kana'
-import { loadSRS, saveSRS, MASTERED_LEVEL, getWordProgress, type SRSStore } from '@/lib/srs'
+import { useSession } from 'next-auth/react'
+import { KANA, kanaId, type KanaType } from '@/lib/kana'
+import { loadSRS, MASTERED_LEVEL, getWordProgress, type SRSStore } from '@/lib/srs'
+import { pullFromCloud } from '@/lib/cloud'
 
 const GROUPS = [
   { key: 'vowel',   label: 'Vokal',     short: 'あア' },
@@ -23,12 +25,20 @@ const GROUPS = [
 
 export default function KanaPage() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [activeType, setActiveType] = useState<KanaType>('hiragana')
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set())
   const [mode, setMode] = useState<'all' | 'custom' | 'refresh'>('all')
 
-  useEffect(() => { setSrsStore(loadSRS()) }, [])
+  useEffect(() => {
+    setSrsStore(loadSRS())
+    if (session?.accessToken) {
+      pullFromCloud().then(result => {
+        if (result) setSrsStore(result.srs)
+      })
+    }
+  }, [session?.accessToken])
 
   // Stats per group per type
   function groupStats(groupKey: string, type: KanaType) {
@@ -62,7 +72,8 @@ export default function KanaPage() {
   function toggleGroup(key: string) {
     setSelectedGroups(prev => {
       const next = new Set(prev)
-      next.has(key) ? next.delete(key) : next.add(key)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
       return next
     })
   }

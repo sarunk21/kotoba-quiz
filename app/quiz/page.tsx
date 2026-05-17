@@ -9,7 +9,7 @@ import {
   buildQueue, getWordProgress, SRS_INTERVALS, MASTERED_LEVEL,
   type SRSStore
 } from '@/lib/srs'
-import { pushToCloud } from '@/lib/cloud'
+import { fetchVocabCSV, pushToCloud } from '@/lib/cloud'
 import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish } from '@/lib/sounds'
 
 type Phase = 'loading' | 'question' | 'feedback' | 'result'
@@ -59,8 +59,11 @@ export default function QuizPage() {
       let v: VocabItem[] = []
       if (url) {
         try {
-          const parsed = parseCSVToVocab(await (await fetch(url)).text())
-          if (parsed.length >= 4) v = parsed
+          const csv = await fetchVocabCSV(url)
+          if (csv) {
+            const parsed = parseCSVToVocab(csv)
+            if (parsed.length >= 4) v = parsed
+          }
         } catch { }
       }
       if (v.length > 0) setVocab(v)
@@ -109,9 +112,10 @@ export default function QuizPage() {
     if (!state) return
     if (state.lives <= 0 || state.current + 1 >= state.queue.length) {
       saveSRS(srsRef.current)
-      pushToCloud() // fire-and-forget
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, xp: state.sessionXP, srsStore: srsRef.current }
-      setFinalStats(fs); updateAfterSession(fs.correct, fs.total, fs.xp)
+      updateAfterSession(fs.correct, fs.total, fs.xp)
+      pushToCloud() // sync to drive (after stats updated)
+      setFinalStats(fs)
       playFinish(); setPhase('result'); return
     }
     const next = state.current + 1
@@ -154,7 +158,7 @@ export default function QuizPage() {
       <div className="px-4 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-5">
           {/* Close */}
-          <button onClick={() => { saveSRS(srsRef.current); router.push('/') }}
+          <button onClick={() => { saveSRS(srsRef.current); pushToCloud(); router.push('/') }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 active:scale-95 transition-transform"
             style={{ background: 'var(--color-white)', color: 'var(--color-text-2)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             ✕
