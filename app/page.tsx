@@ -54,12 +54,7 @@ export default function Home() {
     }
   }
 
-  // Auto-pull saat login
-  useEffect(() => {
-    if (session?.accessToken) doSync('pull')
-  }, [session?.accessToken, doSync])
-
-  async function loadVocabData(url: string): Promise<VocabItem[]> {
+  const loadVocabData = useCallback(async (url: string): Promise<VocabItem[]> => {
     setVocabError('')
     const csv = await fetchVocabCSV(url)
     if (!csv) {
@@ -73,7 +68,7 @@ export default function Home() {
     }
     setVocab(parsed)
     return parsed
-  }
+  }, [])
 
   const doSync = useCallback(async (direction: 'push' | 'pull' = 'push') => {
     if (!session?.accessToken) return
@@ -99,7 +94,12 @@ export default function Home() {
       setSyncStatus(ok ? 'ok' : 'error')
     }
     setTimeout(() => setSyncStatus('idle'), 2500)
-  }, [session?.accessToken, savedUrl])
+  }, [session?.accessToken, savedUrl, loadVocabData])
+
+  // Auto-pull saat login
+  useEffect(() => {
+    if (session?.accessToken) doSync('pull')
+  }, [session?.accessToken, doSync])
 
   // Pull-to-refresh handlers
   const onTouchStart = (e: React.TouchEvent) => {
