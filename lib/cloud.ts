@@ -49,20 +49,34 @@ function applyCloudData(cloud: CloudData) {
   return { srs: merged, stats: useCloud ? cloud.stats : localStats, sheetsUrl: cloud.sheetsUrl }
 }
 
-/** Push semua data ke cloud */
-export async function pushToCloud(): Promise<boolean> {
+/** Sync data: pull, merge with local, then push back */
+export async function syncToCloud(): Promise<boolean> {
   try {
-    const data = collectLocalData()
-    const res = await fetch('/api/sync', {
+    // 1. Pull latest from cloud
+    const res = await fetch('/api/sync', { cache: 'no-store' })
+    if (res.ok) {
+      const { data } = await res.json()
+      if (data) {
+        // 2. Merge cloud into local
+        applyCloudData(data as CloudData)
+      }
+    }
+    
+    // 3. Push merged result back to cloud
+    const dataToPush = collectLocalData()
+    const pushRes = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(dataToPush),
     })
-    return res.ok
+    return pushRes.ok
   } catch {
     return false
   }
 }
+
+/** Legacy alias for pushToCloud, now uses syncToCloud for safety */
+export const pushToCloud = syncToCloud
 
 /** Pull dari cloud + merge ke lokal */
 export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats; sheetsUrl: string } | null> {

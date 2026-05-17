@@ -6,7 +6,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, type GameStats } from '@/lib/stats'
 import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
 import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
-import { fetchVocabCSV, pushToCloud, pullFromCloud } from '@/lib/cloud'
+import { fetchVocabCSV, pushToCloud, syncToCloud } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
@@ -36,14 +36,21 @@ export default function Home() {
 
   const loadVocabData = useCallback(async (url: string): Promise<VocabItem[]> => {
     setVocabError('')
+    
+    // Validasi format URL
+    if (url.includes('/edit') || !url.includes('output=csv')) {
+      setVocabError('Link salah! Pake link "Publish to web" format CSV ya (cek cara setup di bawah).')
+      setVocab([]); return []
+    }
+
     const csv = await fetchVocabCSV(url)
     if (!csv) {
-      setVocabError('Gagal fetch dari Sheets. Cek URL atau koneksi lo.')
+      setVocabError('Gagal ambil data. Cek koneksi atau status "Publish" di Sheets.')
       setVocab([]); return []
     }
     const parsed = parseCSVToVocab(csv)
-    if (parsed.length < 4) {
-      setVocabError('Format Sheets salah atau isinya kosong.')
+    if (parsed.length === 0) {
+      setVocabError('Data kosong! Pastiin kolom kategori, hiragana, kanji, arti udah bener.')
       setVocab([]); return []
     }
     setVocab(parsed)
@@ -90,25 +97,20 @@ export default function Home() {
   const doSync = useCallback(async (direction: 'push' | 'pull' = 'push') => {
     if (!session?.accessToken) return
     setSyncStatus('syncing')
-    if (direction === 'pull') {
-      const result = await pullFromCloud()
-      if (result) {
-        setSrsStore(result.srs)
-        setStats(loadStats())
-        // Sync sheetsUrl dari cloud kalau lokal kosong
-        const cloudUrl = result.sheetsUrl
-        if (cloudUrl && !localStorage.getItem('kotoba_sheets_url')) {
-          localStorage.setItem('kotoba_sheets_url', cloudUrl)
-          setSavedUrl(cloudUrl); setUrlInput(cloudUrl)
-          await loadVocabData(cloudUrl)
-        }
-        setSyncStatus('ok')
-      } else {
-        setSyncStatus('error')
+    
+    // Gunakan syncToCloud yang baru (pull -> merge -> push)
+    const ok = await syncToCloud()
+    if (ok) {
+      setSrsStore(loadSRS())
+      setStats(loadStats())
+      const cloudUrl = localStorage.getItem('kotoba_sheets_url')
+      if (cloudUrl && cloudUrl !== savedUrl) {
+        setSavedUrl(cloudUrl); setUrlInput(cloudUrl)
+        await loadVocabData(cloudUrl)
       }
+      setSyncStatus('ok')
     } else {
-      const ok = await pushToCloud()
-      setSyncStatus(ok ? 'ok' : 'error')
+      setSyncStatus('error')
     }
     setTimeout(() => setSyncStatus('idle'), 2500)
   }, [session?.accessToken, savedUrl, loadVocabData])
