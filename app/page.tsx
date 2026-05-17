@@ -119,10 +119,11 @@ export default function Home() {
     if (pullY >= PULL_THRESHOLD) {
       setPullY(40)
       setIsRefreshing(true)
-      // Refresh: pull cloud + reload vocab
+      // Refresh: pull cloud + reload vocab + hard refresh
       if (session?.accessToken) await doSync('pull')
       if (savedUrl) await loadVocabData(savedUrl)
       setIsRefreshing(false)
+      window.location.reload() // Hard refresh
     }
     setPullY(0)
   }
@@ -196,7 +197,7 @@ export default function Home() {
                 {session ? `おかえり、${session.user?.name?.split(' ')[0]} 👋` : 'おはようございます 👋'}
               </p>
               <h1 className="text-2xl font-extrabold leading-tight" style={{ color: 'var(--color-text-1)' }}>
-                Siap latihan hari ini?
+                {session ? 'Siap latihan hari ini?' : 'Kuasai Kosakata Jepang'}
               </h1>
             </div>
             {status === 'loading' ? (
@@ -210,271 +211,279 @@ export default function Home() {
                   : <div className="w-full h-full flex items-center justify-center font-bold text-white"
                       style={{ background: 'var(--color-accent)' }}>{session.user?.name?.[0]}</div>}
               </button>
-            ) : (
+            ) : null}
+          </div>
+        </div>
+
+        {!session && status !== 'loading' ? (
+          <div className="anim-up d1">
+            <div className="rounded-3xl p-8 mb-6 text-center"
+              style={{ background: 'var(--color-white)', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+              <div className="text-6xl mb-6">🎌</div>
+              <h2 className="text-xl font-extrabold mb-3" style={{ color: 'var(--color-text-1)' }}>
+                Selamat Datang di Kotoba Quiz
+              </h2>
+              <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+                Simpan progress latihan kosakata dan kana lo di cloud. Masuk biar bisa lanjut di mana aja!
+              </p>
               <button onClick={() => signIn('google')}
-                className="flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold active:scale-95 transition-transform"
-                style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', color: 'var(--color-text-1)', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-                <GoogleIcon /> Masuk
+                className="w-full flex items-center justify-center gap-3 rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform"
+                style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 8px 20px rgba(91,94,244,0.28)' }}>
+                <GoogleIcon size={20} color="white" /> Masuk dengan Google
               </button>
-            )}
+            </div>
+            <p className="text-center text-xs font-bold" style={{ color: 'var(--color-text-3)' }}>
+              Aplikasi pendamping belajar Bahasa Jepang 🎌
+            </p>
           </div>
-        </div>
-
-        {/* ── Cloud sync banner ── */}
-        {session ? (
-          <div className="rounded-2xl px-4 py-3 mb-4 flex items-center justify-between anim-up"
-            style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <div>
-              <p className="text-xs font-bold" style={{ color: 'var(--color-text-1)' }}>☁ Cloud Sync Aktif</p>
-              <p className="text-xs" style={{ color: 'var(--color-text-2)' }}>Progress lo tersinkron lintas device</p>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => doSync('pull')} disabled={syncStatus === 'syncing'}
-                className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all"
-                style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', opacity: syncStatus === 'syncing' ? 0.6 : 1 }}>
-                ↓ Pull
-              </button>
-              <button onClick={() => doSync('push')} disabled={syncStatus === 'syncing'}
-                className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all"
-                style={{ background: syncStatus !== 'idle' ? (syncStatus === 'ok' ? 'var(--color-green-light)' : syncStatus === 'error' ? 'var(--color-red-light)' : 'var(--color-accent-light)') : 'var(--color-accent-light)', color: syncColor, opacity: syncStatus === 'syncing' ? 0.6 : 1 }}>
-                {syncLabel}
-              </button>
-            </div>
-          </div>
-        ) : status !== 'loading' && (
-          <button onClick={() => signIn('google')}
-            className="w-full rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 anim-up active:scale-[0.98] transition-transform"
-            style={{ background: 'var(--color-white)', border: '1.5px dashed var(--color-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-            <GoogleIcon size={20} />
-            <div className="text-left flex-1">
-              <p className="text-sm font-bold" style={{ color: 'var(--color-text-1)' }}>Masuk dengan Google</p>
-              <p className="text-xs" style={{ color: 'var(--color-text-2)' }}>Biar progress bisa pindah device</p>
-            </div>
-            <span style={{ color: 'var(--color-text-3)' }}>›</span>
-          </button>
-        )}
-
-        {/* ── Wajib Sheets — shown if no vocab ── */}
-        {noVocab && (
-          <div className="rounded-3xl p-5 mb-5 anim-up"
-            style={{ background: 'var(--color-white)', boxShadow: '0 4px 20px rgba(91,94,244,0.1)', border: '2px solid var(--color-accent)' }}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl">📋</span>
+        ) : session && (
+          <>
+            {/* ── Cloud sync banner ── */}
+            <div className="rounded-2xl px-4 py-3 mb-4 flex items-center justify-between anim-up"
+              style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
               <div>
-                <p className="font-extrabold text-base" style={{ color: 'var(--color-text-1)' }}>
-                  Setup kamus lo dulu!
-                </p>
-                <p className="text-xs font-semibold" style={{ color: 'var(--color-text-2)' }}>
-                  App butuh Google Sheets sebagai sumber kata
-                </p>
+                <p className="text-xs font-bold" style={{ color: 'var(--color-text-1)' }}>☁ Cloud Sync Aktif</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-2)' }}>Progress lo tersinkron lintas device</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => doSync('pull')} disabled={syncStatus === 'syncing'}
+                  className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all"
+                  style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', opacity: syncStatus === 'syncing' ? 0.6 : 1 }}>
+                  ↓ Pull
+                </button>
+                <button onClick={() => doSync('push')} disabled={syncStatus === 'syncing'}
+                  className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all"
+                  style={{ background: syncStatus !== 'idle' ? (syncStatus === 'ok' ? 'var(--color-green-light)' : syncStatus === 'error' ? 'var(--color-red-light)' : 'var(--color-accent-light)') : 'var(--color-accent-light)', color: syncColor, opacity: syncStatus === 'syncing' ? 0.6 : 1 }}>
+                  {syncLabel}
+                </button>
               </div>
             </div>
-            <input
-              type="url" value={urlInput} onChange={e => { setUrlInput(e.target.value); setVocabError('') }}
-              placeholder="Paste link CSV Google Sheets lo..."
-              className="w-full rounded-2xl px-4 py-3 text-sm mb-2 outline-none"
-              style={{ background: 'var(--color-bg)', border: `1.5px solid ${vocabError ? 'var(--color-red)' : 'var(--color-border)'}`, color: 'var(--color-text-1)', fontFamily: 'inherit' }}
-              onKeyDown={e => e.key === 'Enter' && handleSaveUrl()}
-            />
-            {vocabError && (
-              <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-2"
-                style={{ background: 'var(--color-red-light)' }}>
-                <span style={{ fontSize: 14 }}>⚠️</span>
-                <p className="text-xs font-bold" style={{ color: 'var(--color-red-dark)' }}>{vocabError}</p>
-              </div>
-            )}
-            <button onClick={handleSaveUrl} disabled={saving}
-              className="w-full rounded-2xl py-3 text-sm font-extrabold active:scale-95 transition-transform"
-              style={{ background: 'var(--color-accent)', color: '#fff', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(91,94,244,0.3)' }}>
-              {saving ? '⏳ Mengambil data...' : 'Hubungkan Sheets →'}
-            </button>
-            <details className="mt-3">
-              <summary className="text-xs font-semibold cursor-pointer select-none" style={{ color: 'var(--color-text-2)' }}>
-                Cara setup Sheets ▾
-              </summary>
-              <div className="mt-2 text-xs space-y-1 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-                <p>1. Kolom: <span className="font-bold" style={{ color: 'var(--color-accent)' }}>kategori, hiragana, kanji, arti</span></p>
-                <p>2. File → Share → Publish to web → CSV</p>
-                <p>3. Copy link → paste di atas</p>
-              </div>
-            </details>
-          </div>
-        )}
 
-        {/* ── CTA card (disabled jika belum ada vocab) ── */}
-        <div className="anim-up d1 mb-4">
-          {!noVocab ? (
-            <Link href="/quiz" className="block no-underline">
-              <div className="rounded-3xl p-6 relative overflow-hidden"
-                style={{ background: 'linear-gradient(135deg, #5b5ef4 0%, #7c7ff7 100%)', boxShadow: '0 8px 24px rgba(91,94,244,0.32)' }}>
-                <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.16) 0%, transparent 55%)' }} />
-                {srs && srs.dueCount > 0 && (
-                  <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-3 relative" style={{ background: 'rgba(255,255,255,0.18)' }}>
-                    <span style={{ fontSize: 11 }}>🔥</span>
-                    <span className="text-xs font-bold text-white">{srs.dueCount} kata siap direview</span>
+            {/* ── Wajib Sheets — shown if no vocab ── */}
+            {noVocab && (
+              <div className="rounded-3xl p-5 mb-5 anim-up"
+                style={{ background: 'var(--color-white)', boxShadow: '0 4px 20px rgba(91,94,244,0.1)', border: '2px solid var(--color-accent)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl">📋</span>
+                  <div>
+                    <p className="font-extrabold text-base" style={{ color: 'var(--color-text-1)' }}>
+                      Setup kamus lo dulu!
+                    </p>
+                    <p className="text-xs font-semibold" style={{ color: 'var(--color-text-2)' }}>
+                      App butuh Google Sheets sebagai sumber kata
+                    </p>
                   </div>
-                )}
-                <p className="jp-serif text-white relative mb-1" style={{ fontSize: '1.9rem', fontWeight: 700 }}>練習する</p>
-                <p className="text-sm font-semibold relative" style={{ color: 'rgba(255,255,255,0.72)' }}>
-                  {vocab.length} kata · Mulai latihan →
-                </p>
-              </div>
-            </Link>
-          ) : (
-            <div className="rounded-3xl p-6 relative overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%)', opacity: 0.6 }}>
-              <p className="jp-serif text-white mb-1" style={{ fontSize: '1.9rem', fontWeight: 700 }}>練習する</p>
-              <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.72)' }}>Setup Sheets dulu di atas ↑</p>
-            </div>
-          )}
-        </div>
-
-        {/* ── Kana card ── */}
-        <div className="anim-up d1 mb-4">
-          <Link href="/kana" className="block no-underline">
-            <div className="rounded-3xl p-5 flex items-center gap-4"
-              style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1.5px solid var(--color-border)' }}>
-              <div className="jp-serif text-4xl leading-none">あア</div>
-              <div className="flex-1">
-                <p className="font-extrabold text-base" style={{ color: 'var(--color-text-1)' }}>Hiragana & Katakana</p>
-                <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>
-                  {KANA.length} karakter · Latihan baca tulis kana
-                </p>
-              </div>
-              <span style={{ color: 'var(--color-text-3)', fontSize: 20, fontWeight: 700 }}>›</span>
-            </div>
-          </Link>
-        </div>
-
-        {/* ── Stats row ── */}
-        {stats && (
-          <div className="grid grid-cols-3 gap-2.5 mb-4 anim-up d2">
-            {[
-              { icon: '⚡', label: 'Total XP', value: String(stats.totalXP), color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-              { icon: '🔥', label: 'Streak',   value: `${stats.currentStreak}h`, color: 'var(--color-red)',   bg: 'var(--color-red-light)' },
-              { icon: '🎯', label: 'Akurasi',  value: `${accuracy}%`,  color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-            ].map(s => (
-              <div key={s.label} className="rounded-2xl py-4 text-center" style={{ background: s.bg }}>
-                <p className="text-xl mb-1">{s.icon}</p>
-                <p className="text-base font-extrabold" style={{ color: s.color }}>{s.value}</p>
-                <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── Vocab status ── */}
-        {srs && !noVocab && (
-          <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-            <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-              <p className="font-bold" style={{ color: 'var(--color-text-1)' }}>Status Vocab</p>
-              <Link href="/progress" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>
-                Lihat semua →
-              </Link>
-            </div>
-            <div className="grid grid-cols-4 gap-2 px-3 pb-4">
-              {[
-                { label: 'Review', val: srs.dueCount,     color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
-                { label: 'Baru',   val: srs.newCount,     color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-                { label: 'Proses', val: srs.learningCount,color: '#a855f7',             bg: '#faf0ff' },
-                { label: 'Hafal',  val: srs.masteredCount,color: 'var(--color-green)',  bg: 'var(--color-green-light)' },
-              ].map(s => (
-                <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}>
-                  <p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p>
-                  <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Kana status ── */}
-        <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-          <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-            <p className="font-bold" style={{ color: 'var(--color-text-1)' }}>Status Kana</p>
-            <Link href="/kana" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>
-              Lanjut belajar →
-            </Link>
-          </div>
-          <div className="grid grid-cols-4 gap-2 px-3 pb-4">
-            {[
-              { label: 'Review', val: kanaSrs.dueCount,     color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
-              { label: 'Baru',   val: kanaSrs.newCount,     color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-              { label: 'Proses', val: kanaSrs.learningCount,color: '#a855f7',             bg: '#faf0ff' },
-              { label: 'Hafal',  val: kanaSrs.masteredCount,color: 'var(--color-green)',  bg: 'var(--color-green-light)' },
-            ].map(s => (
-              <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}>
-                <p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p>
-                <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Settings ── */}
-        {!noVocab && (
-          <div className="anim-up d3">
-            <button onClick={() => setShowSettings(s => !s)}
-              className="w-full flex items-center justify-between rounded-2xl px-4 py-4 active:scale-[0.98] transition-transform"
-              style={{ background: 'var(--color-white)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-accent-light)' }}>
-                  <span style={{ fontSize: 15 }}>⚙️</span>
-                </div>
-                <span className="font-bold" style={{ color: 'var(--color-text-1)' }}>Pengaturan</span>
-              </div>
-              <span style={{ color: 'var(--color-text-3)', fontSize: 18, fontWeight: 700, transform: showSettings ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>›</span>
-            </button>
-
-            {showSettings && (
-              <div className="mt-2 rounded-3xl p-5 anim-down" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Google Sheets</p>
-                {savedUrl && <p className="text-xs font-semibold mb-2" style={{ color: 'var(--color-green)' }}>✓ {vocab.length} kata aktif dari Sheets</p>}
-                <input type="url" value={urlInput} onChange={e => { setUrlInput(e.target.value); setVocabError('') }}
-                  placeholder="Paste link CSV Sheets lo..."
+                <input
+                  type="url" value={urlInput} onChange={e => { setUrlInput(e.target.value); setVocabError('') }}
+                  placeholder="Paste link CSV Google Sheets lo..."
                   className="w-full rounded-2xl px-4 py-3 text-sm mb-2 outline-none"
-                  style={{ background: 'var(--color-bg)', border: `1.5px solid ${vocabError ? 'var(--color-red)' : 'var(--color-border)'}`, color: 'var(--color-text-1)', fontFamily: 'inherit' }} />
+                  style={{ background: 'var(--color-bg)', border: `1.5px solid ${vocabError ? 'var(--color-red)' : 'var(--color-border)'}`, color: 'var(--color-text-1)', fontFamily: 'inherit' }}
+                  onKeyDown={e => e.key === 'Enter' && handleSaveUrl()}
+                />
                 {vocabError && (
                   <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-2"
                     style={{ background: 'var(--color-red-light)' }}>
-                    <span style={{ fontSize: 13 }}>⚠️</span>
+                    <span style={{ fontSize: 14 }}>⚠️</span>
                     <p className="text-xs font-bold" style={{ color: 'var(--color-red-dark)' }}>{vocabError}</p>
                   </div>
                 )}
                 <button onClick={handleSaveUrl} disabled={saving}
-                  className="w-full rounded-2xl py-3 text-sm font-bold active:scale-95 transition-transform mb-3"
+                  className="w-full rounded-2xl py-3 text-sm font-extrabold active:scale-95 transition-transform"
                   style={{ background: 'var(--color-accent)', color: '#fff', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(91,94,244,0.3)' }}>
-                  {saving ? 'Mengambil data...' : 'Update URL'}
+                  {saving ? '⏳ Mengambil data...' : 'Hubungkan Sheets →'}
                 </button>
+                <details className="mt-3">
+                  <summary className="text-xs font-semibold cursor-pointer select-none" style={{ color: 'var(--color-text-2)' }}>
+                    Cara setup Sheets ▾
+                  </summary>
+                  <div className="mt-2 text-xs space-y-1 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+                    <p>1. Kolom: <span className="font-bold" style={{ color: 'var(--color-accent)' }}>kategori, hiragana, kanji, arti</span></p>
+                    <p>2. File → Share → Publish to web → CSV</p>
+                    <p>3. Copy link → paste di atas</p>
+                  </div>
+                </details>
+              </div>
+            )}
 
-                <div className="my-3" style={{ height: 1, background: 'var(--color-border)' }} />
-                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Pengingat Harian</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ background: notifStatus === 'granted' ? 'var(--color-green-light)' : 'var(--color-amber-light)' }}>
-                    <span style={{ fontSize: 14 }}>🔔</span>
+            {/* ── CTA card (disabled jika belum ada vocab) ── */}
+            <div className="anim-up d1 mb-4">
+              {!noVocab ? (
+                <Link href="/quiz" className="block no-underline">
+                  <div className="rounded-3xl p-6 relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg, #5b5ef4 0%, #7c7ff7 100%)', boxShadow: '0 8px 24px rgba(91,94,244,0.32)' }}>
+                    <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.16) 0%, transparent 55%)' }} />
+                    {srs && srs.dueCount > 0 && (
+                      <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-3 relative" style={{ background: 'rgba(255,255,255,0.18)' }}>
+                        <span style={{ fontSize: 11 }}>🔥</span>
+                        <span className="text-xs font-bold text-white">{srs.dueCount} kata siap direview</span>
+                      </div>
+                    )}
+                    <p className="jp-serif text-white relative mb-1" style={{ fontSize: '1.9rem', fontWeight: 700 }}>練習する</p>
+                    <p className="text-sm font-semibold relative" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                      {vocab.length} kata · Mulai latihan →
+                    </p>
                   </div>
+                </Link>
+              ) : (
+                <div className="rounded-3xl p-6 relative overflow-hidden"
+                  style={{ background: 'linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%)', opacity: 0.6 }}>
+                  <p className="jp-serif text-white mb-1" style={{ fontSize: '1.9rem', fontWeight: 700 }}>練習する</p>
+                  <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.72)' }}>Setup Sheets dulu di atas ↑</p>
+                </div>
+              )}
+            </div>
+
+            {/* ── Kana card ── */}
+            <div className="anim-up d1 mb-4">
+              <Link href="/kana" className="block no-underline">
+                <div className="rounded-3xl p-5 flex items-center gap-4"
+                  style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1.5px solid var(--color-border)' }}>
+                  <div className="jp-serif text-4xl leading-none">あア</div>
                   <div className="flex-1">
-                    {notifStatus === 'granted' ? <p className="text-sm font-bold" style={{ color: 'var(--color-green)' }}>Pengingat aktif!</p>
-                      : notifStatus === 'denied' ? <p className="text-sm font-bold" style={{ color: 'var(--color-red)' }}>Ditolak — aktifkan di browser</p>
-                      : <p className="text-sm font-semibold" style={{ color: 'var(--color-text-1)' }}>Belum diaktifkan</p>}
+                    <p className="font-extrabold text-base" style={{ color: 'var(--color-text-1)' }}>Hiragana & Katakana</p>
+                    <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>
+                      {KANA.length} karakter · Latihan baca tulis kana
+                    </p>
                   </div>
-                  {notifStatus === 'idle' && (
-                    <button onClick={enableNotif} className="rounded-xl px-4 py-2 text-sm font-bold active:scale-95"
-                      style={{ background: 'var(--color-amber-light)', color: 'var(--color-amber)' }}>
-                      Aktifkan
-                    </button>
-                  )}
+                  <span style={{ color: 'var(--color-text-3)', fontSize: 20, fontWeight: 700 }}>›</span>
+                </div>
+              </Link>
+            </div>
+
+            {/* ── Stats row ── */}
+            {stats && (
+              <div className="grid grid-cols-3 gap-2.5 mb-4 anim-up d2">
+                {[
+                  { icon: '⚡', label: 'Total XP', value: String(stats.totalXP), color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
+                  { icon: '🔥', label: 'Streak',   value: `${stats.currentStreak}h`, color: 'var(--color-red)',   bg: 'var(--color-red-light)' },
+                  { icon: '🎯', label: 'Akurasi',  value: `${accuracy}%`,  color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+                ].map(s => (
+                  <div key={s.label} className="rounded-2xl py-4 text-center" style={{ background: s.bg }}>
+                    <p className="text-xl mb-1">{s.icon}</p>
+                    <p className="text-base font-extrabold" style={{ color: s.color }}>{s.value}</p>
+                    <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ── Vocab status ── */}
+            {srs && !noVocab && (
+              <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+                  <p className="font-bold" style={{ color: 'var(--color-text-1)' }}>Status Vocab</p>
+                  <Link href="/progress" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>
+                    Lihat semua →
+                  </Link>
+                </div>
+                <div className="grid grid-cols-4 gap-2 px-3 pb-4">
+                  {[
+                    { label: 'Review', val: srs.dueCount,     color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
+                    { label: 'Baru',   val: srs.newCount,     color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+                    { label: 'Proses', val: srs.learningCount,color: '#a855f7',             bg: '#faf0ff' },
+                    { label: 'Hafal',  val: srs.masteredCount,color: 'var(--color-green)',  bg: 'var(--color-green-light)' },
+                  ].map(s => (
+                    <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}>
+                      <p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p>
+                      <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
-          </div>
+
+            {/* ── Kana status ── */}
+            <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+              <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+                <p className="font-bold" style={{ color: 'var(--color-text-1)' }}>Status Kana</p>
+                <Link href="/kana" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>
+                  Lanjut belajar →
+                </Link>
+              </div>
+              <div className="grid grid-cols-4 gap-2 px-3 pb-4">
+                {[
+                  { label: 'Review', val: kanaSrs.dueCount,     color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
+                  { label: 'Baru',   val: kanaSrs.newCount,     color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+                  { label: 'Proses', val: kanaSrs.learningCount,color: '#a855f7',             bg: '#faf0ff' },
+                  { label: 'Hafal',  val: kanaSrs.masteredCount,color: 'var(--color-green)',  bg: 'var(--color-green-light)' },
+                ].map(s => (
+                  <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}>
+                    <p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p>
+                    <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Settings ── */}
+            {!noVocab && (
+              <div className="anim-up d3">
+                <button onClick={() => setShowSettings(s => !s)}
+                  className="w-full flex items-center justify-between rounded-2xl px-4 py-4 active:scale-[0.98] transition-transform"
+                  style={{ background: 'var(--color-white)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-accent-light)' }}>
+                      <span style={{ fontSize: 15 }}>⚙️</span>
+                    </div>
+                    <span className="font-bold" style={{ color: 'var(--color-text-1)' }}>Pengaturan</span>
+                  </div>
+                  <span style={{ color: 'var(--color-text-3)', fontSize: 18, fontWeight: 700, transform: showSettings ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>›</span>
+                </button>
+
+                {showSettings && (
+                  <div className="mt-2 rounded-3xl p-5 anim-down" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Google Sheets</p>
+                    {savedUrl && <p className="text-xs font-semibold mb-2" style={{ color: 'var(--color-green)' }}>✓ {vocab.length} kata aktif dari Sheets</p>}
+                    <input type="url" value={urlInput} onChange={e => { setUrlInput(e.target.value); setVocabError('') }}
+                      placeholder="Paste link CSV Sheets lo..."
+                      className="w-full rounded-2xl px-4 py-3 text-sm mb-2 outline-none"
+                      style={{ background: 'var(--color-bg)', border: `1.5px solid ${vocabError ? 'var(--color-red)' : 'var(--color-border)'}`, color: 'var(--color-text-1)', fontFamily: 'inherit' }} />
+                    {vocabError && (
+                      <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-2"
+                        style={{ background: 'var(--color-red-light)' }}>
+                        <span style={{ fontSize: 13 }}>⚠️</span>
+                        <p className="text-xs font-bold" style={{ color: 'var(--color-red-dark)' }}>{vocabError}</p>
+                      </div>
+                    )}
+                    <button onClick={handleSaveUrl} disabled={saving}
+                      className="w-full rounded-2xl py-3 text-sm font-bold active:scale-95 transition-transform mb-3"
+                      style={{ background: 'var(--color-accent)', color: '#fff', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(91,94,244,0.3)' }}>
+                      {saving ? 'Mengambil data...' : 'Update URL'}
+                    </button>
+
+                    <div className="my-3" style={{ height: 1, background: 'var(--color-border)' }} />
+                    <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Pengingat Harian</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ background: notifStatus === 'granted' ? 'var(--color-green-light)' : 'var(--color-amber-light)' }}>
+                        <span style={{ fontSize: 14 }}>🔔</span>
+                      </div>
+                      <div className="flex-1">
+                        {notifStatus === 'granted' ? <p className="text-sm font-bold" style={{ color: 'var(--color-green)' }}>Pengingat aktif!</p>
+                          : notifStatus === 'denied' ? <p className="text-sm font-bold" style={{ color: 'var(--color-red)' }}>Ditolak — aktifkan di browser</p>
+                          : <p className="text-sm font-semibold" style={{ color: 'var(--color-text-1)' }}>Belum diaktifkan</p>}
+                      </div>
+                      {notifStatus === 'idle' && (
+                        <button onClick={enableNotif} className="rounded-xl px-4 py-2 text-sm font-bold active:scale-95"
+                          style={{ background: 'var(--color-amber-light)', color: 'var(--color-amber)' }}>
+                          Aktifkan
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
 
         {/* Pull hint */}
-        <p className="text-center text-xs mt-6" style={{ color: 'var(--color-text-3)' }}>
-          ↓ Tarik ke bawah untuk refresh
-        </p>
+        {session && (
+          <p className="text-center text-xs mt-6" style={{ color: 'var(--color-text-3)' }}>
+            ↓ Tarik ke bawah untuk refresh
+          </p>
+        )}
       </div>
 
       {/* Spin animation */}
@@ -483,13 +492,13 @@ export default function Home() {
   )
 }
 
-function GoogleIcon({ size = 16 }: { size?: number }) {
+function GoogleIcon({ size = 16, color }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill={color || "#4285F4"}/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill={color || "#34A853"}/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill={color || "#FBBC05"}/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill={color || "#EA4335"}/>
     </svg>
   )
 }
