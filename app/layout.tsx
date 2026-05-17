@@ -20,7 +20,22 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              try {
+                var theme = localStorage.getItem('kotoba_theme');
+                var supportDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (theme === 'dark' || (!theme && supportDark)) {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (e) {}
+            })();
+          `
+        }} />
+      </head>
       <body>
         <SessionProvider>
           {children}

@@ -17,12 +17,21 @@ export default function SettingsPage() {
   const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/')
   }, [status, router])
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem('kotoba_theme') as 'light' | 'dark' | null
+    if (savedTheme) {
+      setTheme(savedTheme)
+    } else {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      setTheme(isDark ? 'dark' : 'light')
+    }
+
     const url = localStorage.getItem('kotoba_sheets_url') || ''
     setUrlInput(url)
     if (typeof Notification !== 'undefined') {
@@ -30,6 +39,16 @@ export default function SettingsPage() {
       else if (Notification.permission === 'denied') setNotifStatus('denied')
     }
   }, [])
+
+  function toggleTheme(newTheme: 'light' | 'dark') {
+    setTheme(newTheme)
+    localStorage.setItem('kotoba_theme', newTheme)
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
 
   async function handleSaveUrl() {
     if (!urlInput.trim()) {
@@ -98,6 +117,27 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-6">
+          {/* Theme Section */}
+          <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Tampilan</p>
+            <div className="flex gap-2">
+              {[
+                { key: 'light', label: 'Terang', icon: '☀️' },
+                { key: 'dark',  label: 'Gelap',  icon: '🌙' },
+              ].map(t => (
+                <button key={t.key} onClick={() => toggleTheme(t.key as any)}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold transition-all active:scale-95"
+                  style={{
+                    background: theme === t.key ? 'var(--color-accent)' : 'var(--color-bg)',
+                    color: theme === t.key ? '#fff' : 'var(--color-text-2)',
+                    boxShadow: theme === t.key ? '0 4px 12px rgba(91,94,244,0.25)' : 'none',
+                  }}>
+                  <span>{t.icon}</span> {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Google Sheets Section */}
           <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Sumber Kamus</p>

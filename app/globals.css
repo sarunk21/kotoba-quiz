@@ -36,6 +36,28 @@
   --color-cat-adj-bg: #fdf0f8;
 }
 
+@variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --color-bg: #0f1115;
+  --color-white: #1a1d24;
+  --color-subtle: #262a33;
+  --color-border: #2d333d;
+
+  --color-text-1: #f9fafb;
+  --color-text-2: #9ca3af;
+  --color-text-3: #6b7280;
+
+  --color-accent-light: rgba(91,94,244,0.15);
+  --color-green-light: rgba(34,197,94,0.15);
+  --color-red-light: rgba(239,68,68,0.15);
+  --color-amber-light: rgba(245,158,11,0.15);
+
+  --color-cat-noun-bg: rgba(91,94,244,0.15);
+  --color-cat-verb-bg: rgba(16,185,129,0.15);
+  --color-cat-adj-bg: rgba(236,72,153,0.15);
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;

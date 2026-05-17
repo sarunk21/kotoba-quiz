@@ -46,7 +46,7 @@ function QuizContent() {
   const [choices, setChoices] = useState<string[]>([])
   const [selected, setSelected] = useState<string | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
-  const [showRomaji, setShowRomaji] = useState(true)
+  const [showRomaji, setShowRomaji] = useState(false)
   const [quizMode, setQuizMode] = useState<QuizMode>('kana→romaji')
   const [cardKey, setCardKey] = useState(0)
   const [xpKey, setXpKey] = useState(0)
