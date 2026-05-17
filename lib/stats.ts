@@ -4,10 +4,11 @@ export interface GameStats {
   totalXP: number
   currentStreak: number
   longestStreak: number
-  lastPlayedDate: string
+  lastPlayedDate: string // YYYY-MM-DD
   totalSessions: number
   totalCorrect: number
   totalAnswered: number
+  updatedAt: string      // ISO string for sync
 }
 
 const DEFAULT_STATS: GameStats = {
@@ -18,6 +19,7 @@ const DEFAULT_STATS: GameStats = {
   totalSessions: 0,
   totalCorrect: 0,
   totalAnswered: 0,
+  updatedAt: '',
 }
 
 export function loadStats(): GameStats {
@@ -38,13 +40,15 @@ export function saveStats(stats: GameStats) {
 
 export function updateAfterSession(correct: number, total: number, xpGained: number): GameStats {
   const stats = loadStats()
-  const today = new Date().toDateString()
+  const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
   
   let newDayStreak = stats.currentStreak
   if (stats.lastPlayedDate !== today) {
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
-    if (stats.lastPlayedDate === yesterday.toDateString()) {
+    const yesterdayStr = yesterday.toISOString().split('T')[0]
+    
+    if (stats.lastPlayedDate === yesterdayStr) {
       newDayStreak = stats.currentStreak + 1
     } else {
       newDayStreak = 1
@@ -59,6 +63,7 @@ export function updateAfterSession(correct: number, total: number, xpGained: num
     totalSessions: stats.totalSessions + 1,
     totalCorrect: stats.totalCorrect + correct,
     totalAnswered: stats.totalAnswered + total,
+    updatedAt: new Date().toISOString(),
   }
   saveStats(updated)
   return updated

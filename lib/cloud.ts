@@ -22,6 +22,8 @@ function collectLocalData(): CloudData {
 
 /** Apply cloud data ke lokal — merge SRS (ambil level tertinggi), stats (ambil yang terbaru) */
 function applyCloudData(cloud: CloudData) {
+  console.log('[Sync] Applying cloud data...', { cloudUpdate: cloud.stats.updatedAt })
+
   // Merge SRS — item by item, level tertinggi menang
   const localSRS = loadSRS()
   const merged: SRSStore = { ...localSRS }
@@ -33,12 +35,17 @@ function applyCloudData(cloud: CloudData) {
   }
   saveSRS(merged)
 
-  // Merge stats — ambil satu set utuh yang XP-nya lebih gede (asumsi lebih maju)
+  // Merge stats — ambil satu set utuh yang updatedAt-nya lebih baru (Last Write Wins)
   const localStats = loadStats()
-  const useCloud = cloud.stats.totalXP > localStats.totalXP
+  
+  // Jika cloud lebih baru ATAU lokal masih kosong (updatedAt '')
+  const useCloud = cloud.stats.updatedAt > (localStats.updatedAt || '')
   
   if (useCloud) {
+    console.log('[Sync] Cloud stats are newer, overwriting local.')
     saveStats(cloud.stats)
+  } else {
+    console.log('[Sync] Local stats are newer or same, keeping local.')
   }
 
   // Sheets URL — selalu prioritaskan cloud kalau ada (source of truth per akun)
