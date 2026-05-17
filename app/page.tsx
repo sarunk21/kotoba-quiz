@@ -155,8 +155,8 @@ export default function Home() {
                 </button>
                 {showProfileMenu && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl z-50 border border-[var(--color-border)] overflow-hidden anim-pop">
+                    <div className="fixed inset-0 z-[60]" onClick={() => setShowProfileMenu(false)} />
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl z-[70] border border-[var(--color-border)] overflow-hidden anim-pop">
                       <div className="px-4 py-3 border-b border-[var(--color-border)]">
                         <p className="text-xs font-bold truncate" style={{ color: 'var(--color-text-1)' }}>{session.user?.name}</p>
                         <p className="text-[10px] font-semibold truncate" style={{ color: 'var(--color-text-3)' }}>{session.user?.email}</p>
@@ -188,16 +188,18 @@ export default function Home() {
           </div>
         ) : session && (
           <>
-            {/* Sync Status */}
-            <div className="rounded-2xl px-4 py-3 mb-4 flex items-center justify-between anim-up" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)' }}>
-              <div>
-                <p className="text-xs font-bold" style={{ color: 'var(--color-text-1)' }}>☁ Status Cloud</p>
-                <p className="text-[10px] font-semibold" style={{ color: syncStatus === 'error' ? 'var(--color-red)' : 'var(--color-text-2)' }}>
-                  {syncStatus === 'syncing' ? 'Sedang mensinkronisasi...' : syncStatus === 'ok' ? 'Data terbaru sudah aman ✓' : syncStatus === 'error' ? 'Gagal sinkron. Cek koneksi le.' : 'Tarik ke bawah untuk sinkron'}
-                </p>
+            {/* Sync Status - Only show when syncing, ok (briefly), or error */}
+            {syncStatus !== 'idle' && (
+              <div className="rounded-2xl px-4 py-3 mb-4 flex items-center justify-between anim-up" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)' }}>
+                <div>
+                  <p className="text-xs font-bold" style={{ color: 'var(--color-text-1)' }}>☁ Status Cloud</p>
+                  <p className="text-[10px] font-semibold" style={{ color: syncStatus === 'error' ? 'var(--color-red)' : 'var(--color-text-2)' }}>
+                    {syncStatus === 'syncing' ? 'Sedang mensinkronisasi...' : syncStatus === 'ok' ? 'Data terbaru sudah aman ✓' : 'Gagal sinkron. Cek koneksi le.'}
+                  </p>
+                </div>
+                {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />}
               </div>
-              {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />}
-            </div>
+            )}
 
             {noVocab && (
               <div className="rounded-3xl p-6 mb-5 anim-up text-center" style={{ background: 'var(--color-white)', border: '2px solid var(--color-accent)' }}>
@@ -242,7 +244,7 @@ export default function Home() {
               <div className="grid grid-cols-3 gap-2.5 mb-4 anim-up d2">
                 {[
                   { icon: '⚡', label: 'Total XP', value: String(stats.totalXP), color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-                  { icon: '🔥', label: 'Streak', value: `${stats.currentStreak}h`, color: 'var(--color-red)', bg: 'var(--color-red-light)' },
+                  { icon: '🔥', label: 'Streak', value: String(stats.currentStreak), color: 'var(--color-red)', bg: 'var(--color-red-light)' },
                   { icon: '🎯', label: 'Akurasi', value: `${accuracy}%`, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
                 ].map(s => (
                   <div key={s.label} className="rounded-2xl py-4 text-center" style={{ background: s.bg }}>
@@ -290,16 +292,6 @@ export default function Home() {
                   <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}><p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p><p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p></div>
                 ))}
               </div>
-            </div>
-
-            {/* Settings Link */}
-            <div className="anim-up d3 mt-4">
-              <Link href="/settings" className="block no-underline">
-                <div className="rounded-2xl p-4 flex items-center justify-between active:scale-[0.98] transition-transform" style={{ background: 'var(--color-white)', border: '1px solid var(--color-border)' }}>
-                  <div className="flex items-center gap-3"><span className="text-sm">⚙️</span><span className="text-sm font-bold" style={{ color: 'var(--color-text-1)' }}>Buka Pengaturan</span></div>
-                  <span style={{ color: 'var(--color-text-3)', fontSize: 16 }}>›</span>
-                </div>
-              </Link>
             </div>
           </>
         )}
