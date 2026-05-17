@@ -7,9 +7,13 @@ const DRIVE_API = 'https://www.googleapis.com/drive/v3'
 const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3'
 
 async function findFile(token: string): Promise<string | null> {
+  const t = Date.now()
   const res = await fetch(
-    `${DRIVE_API}/files?spaces=appDataFolder&q=name='${FILENAME}'&fields=files(id,modifiedTime)`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    `${DRIVE_API}/files?spaces=appDataFolder&q=name='${FILENAME}'&fields=files(id,modifiedTime)&t=${t}`,
+    { 
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store'
+    }
   )
   const data = await res.json()
   return data.files?.[0]?.id ?? null
@@ -22,6 +26,7 @@ async function upsertFile(token: string, fileId: string | null, content: string)
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: content,
+      cache: 'no-store'
     })
   } else {
     const meta = JSON.stringify({ name: FILENAME, parents: ['appDataFolder'] })
@@ -44,6 +49,7 @@ async function upsertFile(token: string, fileId: string | null, content: string)
         'Content-Type': `multipart/related; boundary=${boundary}`,
       },
       body: multipart,
+      cache: 'no-store'
     })
   }
   return res.ok
@@ -58,7 +64,8 @@ export async function GET() {
     const fileId = await findFile(session.accessToken)
     if (!fileId) return NextResponse.json({ data: null })
 
-    const res = await fetch(`${DRIVE_API}/files/${fileId}?alt=media`, {
+    const t = Date.now()
+    const res = await fetch(`${DRIVE_API}/files/${fileId}?alt=media&t=${t}`, {
       headers: { Authorization: `Bearer ${session.accessToken}` },
       cache: 'no-store',
     })

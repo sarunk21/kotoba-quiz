@@ -59,8 +59,9 @@ function applyCloudData(cloud: CloudData) {
 /** Sync data: pull, merge with local, then push back */
 export async function syncToCloud(): Promise<boolean> {
   try {
-    // 1. Pull latest from cloud
-    const res = await fetch('/api/sync', { cache: 'no-store' })
+    // 1. Pull latest from cloud (pake cache buster)
+    const t = Date.now()
+    const res = await fetch(`/api/sync?t=${t}`, { cache: 'no-store' })
     if (res.ok) {
       const { data } = await res.json()
       if (data) {
@@ -75,9 +76,11 @@ export async function syncToCloud(): Promise<boolean> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dataToPush),
+      cache: 'no-store',
     })
     return pushRes.ok
-  } catch {
+  } catch (e) {
+    console.error('[Sync] Error:', e)
     return false
   }
 }

@@ -94,7 +94,7 @@ function QuizContent() {
     }
   }, [state, phase, quizMode, kanaType])
 
-  function nextQuestion() {
+  async function nextQuestion() {
     if (!state) return
     if (state.lives <= 0 || state.current + 1 >= state.queue.length) {
       saveSRS(srsRef.current)
@@ -102,7 +102,7 @@ function QuizContent() {
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, xp: state.sessionXP }
       setFinalStats(fs)
       updateAfterSession(fs.correct, fs.total, fs.xp)
-      pushToCloud() // sync to drive (after stats updated)
+      await pushToCloud() // sync to drive (Wajib await biar ga ilang)
       setPhase('result')
       return
     }
