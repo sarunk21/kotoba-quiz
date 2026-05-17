@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { loadStats } from '@/lib/stats'
+import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
 import { parseCSVToVocab } from '@/lib/vocab'
 import { fetchVocabCSV, pushToCloud, resetCloudData } from '@/lib/cloud'
@@ -48,6 +48,7 @@ export default function SettingsPage() {
     } else {
       document.documentElement.classList.remove('dark')
     }
+    touchStats() // Update timestamp for sync
   }
 
   async function handleSaveUrl() {

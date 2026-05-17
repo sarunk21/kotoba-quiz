@@ -68,3 +68,14 @@ export function updateAfterSession(correct: number, total: number, xpGained: num
   saveStats(updated)
   return updated
 }
+
+/** Update updatedAt timestamp only (for settings changes) */
+export function touchStats(): GameStats {
+  const stats = loadStats()
+  const updated: GameStats = {
+    ...stats,
+    updatedAt: new Date().toISOString(),
+  }
+  saveStats(updated)
+  return updated
+}

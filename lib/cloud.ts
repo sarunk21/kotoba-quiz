@@ -20,64 +20,82 @@ function collectLocalData(): CloudData {
   }
 }
 
-/** Apply cloud data ke lokal — merge SRS (ambil level tertinggi), stats (ambil yang terbaru) */
-function applyCloudData(cloud: CloudData) {
-  console.log('[Sync] Applying cloud data...', { cloudUpdate: cloud.stats.updatedAt })
+/** Merge cloud data dengan local data (Pure function, no side effects) */
+function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
+  console.log('[Sync] Merging data...', { localUpdate: local.stats.updatedAt, cloudUpdate: cloud.stats.updatedAt })
 
-  // Merge SRS — item by item, level tertinggi menang
-  const localSRS = loadSRS()
-  const merged: SRSStore = { ...localSRS }
+  // 1. Merge SRS — item by item, level tertinggi menang
+  const mergedSRS: SRSStore = { ...local.srs }
   for (const [id, wp] of Object.entries(cloud.srs)) {
-    const local = localSRS[id]
-    if (!local || wp.level > local.level || (wp.level === local.level && wp.lastSeen > local.lastSeen)) {
-      merged[id] = wp
+    const localWp = local.srs[id]
+    if (!localWp || wp.level > localWp.level || (wp.level === localWp.level && wp.lastSeen > localWp.lastSeen)) {
+      mergedSRS[id] = wp
     }
   }
-  saveSRS(merged)
 
-  // Merge stats — ambil satu set utuh yang updatedAt-nya lebih baru (Last Write Wins)
-  const localStats = loadStats()
+  // 2. Merge Stats
+  // Gunakan 'updatedAt' sebagai penentu utama
+  const cloudIsNewer = cloud.stats.updatedAt > (local.stats.updatedAt || '')
   
-  // Jika cloud lebih baru ATAU lokal masih kosong (updatedAt '')
-  const useCloud = cloud.stats.updatedAt > (localStats.updatedAt || '')
-  
-  if (useCloud) {
-    console.log('[Sync] Cloud stats are newer, overwriting local.')
-    saveStats(cloud.stats)
-  } else {
-    console.log('[Sync] Local stats are newer or same, keeping local.')
+  const mergedStats: GameStats = {
+    // XP, Sessions, Correct, Answered: Ambil yang TERBESAR (biar ga ilang progress dari device manapun)
+    totalXP: Math.max(local.stats.totalXP, cloud.stats.totalXP),
+    totalSessions: Math.max(local.stats.totalSessions, cloud.stats.totalSessions),
+    totalCorrect: Math.max(local.stats.totalCorrect, cloud.stats.totalCorrect),
+    totalAnswered: Math.max(local.stats.totalAnswered, cloud.stats.totalAnswered),
+    // Streak & LastPlayed: Ikut yang paling baru updatenya
+    currentStreak: cloudIsNewer ? cloud.stats.currentStreak : local.stats.currentStreak,
+    longestStreak: Math.max(local.stats.longestStreak, cloud.stats.longestStreak),
+    lastPlayedDate: cloudIsNewer ? cloud.stats.lastPlayedDate : local.stats.lastPlayedDate,
+    updatedAt: cloudIsNewer ? cloud.stats.updatedAt : local.stats.updatedAt,
   }
 
-  // Sheets URL — selalu prioritaskan cloud kalau ada (source of truth per akun)
-  if (cloud.sheetsUrl) {
-    localStorage.setItem('kotoba_sheets_url', cloud.sheetsUrl)
-  }
+  // 3. Sheets URL
+  // Jika lokal kosong, ambil cloud. Jika ada, lokal menang (user baru aja ganti di settings)
+  const mergedUrl = local.sheetsUrl || cloud.sheetsUrl
 
-  return { srs: merged, stats: useCloud ? cloud.stats : localStats, sheetsUrl: cloud.sheetsUrl }
+  return {
+    srs: mergedSRS,
+    stats: mergedStats,
+    sheetsUrl: mergedUrl,
+    updatedAt: cloudIsNewer ? cloud.updatedAt : local.updatedAt,
+  }
 }
 
 /** Sync data: pull, merge with local, then push back */
 export async function syncToCloud(): Promise<boolean> {
   try {
-    // 1. Pull latest from cloud (pake cache buster)
+    const localData = collectLocalData()
+    
+    // 1. Pull latest from cloud
     const t = Date.now()
     const res = await fetch(`/api/sync?t=${t}`, { cache: 'no-store' })
+    
+    let finalData = localData
     if (res.ok) {
-      const { data } = await res.json()
-      if (data) {
-        // 2. Merge cloud into local
-        applyCloudData(data as CloudData)
+      const { data: cloudData } = await res.json()
+      if (cloudData) {
+        // 2. Merge in-memory
+        finalData = mergeCloudData(localData, cloudData as CloudData)
       }
     }
     
-    // 3. Push merged result back to cloud
-    const dataToPush = collectLocalData()
+    // 3. Save merged result to local storage
+    saveSRS(finalData.srs)
+    saveStats(finalData.stats)
+    if (finalData.sheetsUrl) {
+      localStorage.setItem('kotoba_sheets_url', finalData.sheetsUrl)
+    }
+    
+    // 4. Push merged result back to cloud
     const pushRes = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dataToPush),
+      body: JSON.stringify(finalData),
       cache: 'no-store',
     })
+    
+    console.log('[Sync] Success', { ok: pushRes.ok })
     return pushRes.ok
   } catch (e) {
     console.error('[Sync] Error:', e)
@@ -91,12 +109,23 @@ export const pushToCloud = syncToCloud
 /** Pull dari cloud + merge ke lokal */
 export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats; sheetsUrl: string } | null> {
   try {
-    const res = await fetch('/api/sync', { cache: 'no-store' })
+    const localData = collectLocalData()
+    const t = Date.now()
+    const res = await fetch(`/api/sync?t=${t}`, { cache: 'no-store' })
     if (!res.ok) return null
-    const { data } = await res.json()
-    if (!data) return null
-    return applyCloudData(data as CloudData)
-  } catch {
+    const { data: cloudData } = await res.json()
+    if (!cloudData) return null
+    
+    const finalData = mergeCloudData(localData, cloudData as CloudData)
+    // Simpan hasil merge ke lokal
+    saveSRS(finalData.srs)
+    saveStats(finalData.stats)
+    if (finalData.sheetsUrl) {
+      localStorage.setItem('kotoba_sheets_url', finalData.sheetsUrl)
+    }
+    return finalData
+  } catch (e) {
+    console.error('[Pull] Error:', e)
     return null
   }
 }
