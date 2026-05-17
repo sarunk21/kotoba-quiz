@@ -142,7 +142,7 @@ export default function Home() {
         onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         
         {/* Header */}
-        <div className="anim-up mb-5">
+        <div className="anim-up mb-5 relative z-[100]">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>{session ? `おかえり、${session.user?.name?.split(' ')[0]} 👋` : 'おはようございます 👋'}</p>
@@ -205,8 +205,7 @@ export default function Home() {
               <div className="rounded-3xl p-6 mb-5 anim-up text-center" style={{ background: 'var(--color-white)', border: '2px solid var(--color-accent)' }}>
                 <div className="text-4xl mb-3">📋</div>
                 <h3 className="font-extrabold text-base mb-2">Kamus lo belum diset!</h3>
-                <p className="text-xs font-semibold mb-6">Buka Pengaturan untuk menghubungkan Google Sheets lo.</p>
-                <Link href="/settings" className="block w-full rounded-2xl py-3.5 text-sm font-extrabold no-underline text-center active:scale-95 transition-transform" style={{ background: 'var(--color-accent)', color: '#fff' }}>Pergi ke Pengaturan →</Link>
+                <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>Buka Menu Profil (klik foto lo) &gt; Pengaturan untuk menghubungkan Google Sheets lo le.</p>
               </div>
             )}
 
