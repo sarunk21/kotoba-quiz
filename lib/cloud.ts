@@ -22,44 +22,58 @@ function collectLocalData(): CloudData {
 
 /** Merge cloud data dengan local data (Pure function, no side effects) */
 function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
-  console.log('[Sync] Merging data...', { localUpdate: local.stats.updatedAt, cloudUpdate: cloud.stats.updatedAt })
+  // Safety check: Pastiin object exist
+  const cloudSRS = cloud.srs || {}
+  const cloudStats = cloud.stats || { totalXP: 0, updatedAt: '' }
+  
+  console.log('[Sync] Merging data...', { 
+    localXP: local.stats.totalXP, 
+    cloudXP: cloudStats.totalXP,
+    localUpdate: local.stats.updatedAt,
+    cloudUpdate: cloudStats.updatedAt 
+  })
 
   // 1. Merge SRS — item by item, level tertinggi menang
   const mergedSRS: SRSStore = { ...local.srs }
-  for (const [id, wp] of Object.entries(cloud.srs)) {
+  for (const [id, wp] of Object.entries(cloudSRS)) {
     const localWp = local.srs[id]
-    if (!localWp || wp.level > localWp.level || (wp.level === localWp.level && wp.lastSeen > localWp.lastSeen)) {
+    if (!localWp || wp.level > localWp.level || (wp.level === localWp.level && wp.lastSeen > (localWp.lastSeen || ''))) {
       mergedSRS[id] = wp
     }
   }
 
   // 2. Merge Stats
-  // Gunakan 'updatedAt' sebagai penentu utama
-  const cloudIsNewer = cloud.stats.updatedAt > (local.stats.updatedAt || '')
+  // Ambil yang paling baru updatenya (Last Write Wins)
+  const cloudIsNewer = (cloudStats.updatedAt || '') > (local.stats.updatedAt || '')
   
+  // XP, Sessions, Correct, Answered: Ambil yang TERBESAR (biar ga ilang progress dari device manapun)
   const mergedStats: GameStats = {
-    // XP, Sessions, Correct, Answered: Ambil yang TERBESAR (biar ga ilang progress dari device manapun)
-    totalXP: Math.max(local.stats.totalXP, cloud.stats.totalXP),
-    totalSessions: Math.max(local.stats.totalSessions, cloud.stats.totalSessions),
-    totalCorrect: Math.max(local.stats.totalCorrect, cloud.stats.totalCorrect),
-    totalAnswered: Math.max(local.stats.totalAnswered, cloud.stats.totalAnswered),
-    // Streak & LastPlayed: Ikut yang paling baru updatenya
-    currentStreak: cloudIsNewer ? cloud.stats.currentStreak : local.stats.currentStreak,
-    longestStreak: Math.max(local.stats.longestStreak, cloud.stats.longestStreak),
-    lastPlayedDate: cloudIsNewer ? cloud.stats.lastPlayedDate : local.stats.lastPlayedDate,
-    updatedAt: cloudIsNewer ? cloud.stats.updatedAt : local.stats.updatedAt,
+    totalXP: Math.max(local.stats.totalXP || 0, cloudStats.totalXP || 0),
+    totalSessions: Math.max(local.stats.totalSessions || 0, cloudStats.totalSessions || 0),
+    totalCorrect: Math.max(local.stats.totalCorrect || 0, cloudStats.totalCorrect || 0),
+    totalAnswered: Math.max(local.stats.totalAnswered || 0, cloudStats.totalAnswered || 0),
+    // Streak & LastPlayed & Theme: Ikut yang paling baru updatenya
+    currentStreak: cloudIsNewer ? (cloudStats.currentStreak || 0) : (local.stats.currentStreak || 0),
+    longestStreak: Math.max(local.stats.longestStreak || 0, cloudStats.longestStreak || 0),
+    lastPlayedDate: cloudIsNewer ? (cloudStats.lastPlayedDate || '') : (local.stats.lastPlayedDate || ''),
+    updatedAt: cloudIsNewer ? (cloudStats.updatedAt || '') : (local.stats.updatedAt || ''),
   }
 
   // 3. Sheets URL
-  // Jika cloud lebih baru, ambil URL cloud (user mungkin ganti URL di device lain)
-  // Jika lokal lebih baru, ambil URL lokal (user baru ganti di device ini)
-  const mergedUrl = cloudIsNewer ? (cloud.sheetsUrl || local.sheetsUrl) : (local.sheetsUrl || cloud.sheetsUrl)
+  // Jika lokal kosong, ambil cloud. Jika cloud kosong, ambil lokal.
+  // Jika dua-duanya ada, ambil yang paling baru.
+  let mergedUrl = local.sheetsUrl
+  if (!local.sheetsUrl) {
+    mergedUrl = cloud.sheetsUrl || ''
+  } else if (cloud.sheetsUrl && cloudIsNewer) {
+    mergedUrl = cloud.sheetsUrl
+  }
 
   return {
     srs: mergedSRS,
     stats: mergedStats,
     sheetsUrl: mergedUrl,
-    updatedAt: cloudIsNewer ? cloud.updatedAt : local.updatedAt,
+    updatedAt: cloudIsNewer ? (cloud.updatedAt || '') : (local.updatedAt || ''),
   }
 }
 
@@ -74,19 +88,18 @@ export async function syncToCloud(): Promise<boolean> {
     
     let finalData = localData
     if (res.ok) {
-      const { data: cloudData } = await res.json()
-      if (cloudData) {
+      const body = await res.json()
+      if (body && body.data) {
         // 2. Merge in-memory
-        finalData = mergeCloudData(localData, cloudData as CloudData)
+        finalData = mergeCloudData(localData, body.data as CloudData)
       }
     }
     
     // 3. Save merged result to local storage
     saveSRS(finalData.srs)
     saveStats(finalData.stats)
-    if (finalData.sheetsUrl) {
-      localStorage.setItem('kotoba_sheets_url', finalData.sheetsUrl)
-    }
+    // Always set, even if empty (to allow clearing)
+    localStorage.setItem('kotoba_sheets_url', finalData.sheetsUrl || '')
     
     // 4. Push merged result back to cloud
     const pushRes = await fetch('/api/sync', {
@@ -96,7 +109,7 @@ export async function syncToCloud(): Promise<boolean> {
       cache: 'no-store',
     })
     
-    console.log('[Sync] Success', { ok: pushRes.ok })
+    console.log('[Sync] Success', { ok: pushRes.ok, finalXP: finalData.stats.totalXP })
     return pushRes.ok
   } catch (e) {
     console.error('[Sync] Error:', e)
