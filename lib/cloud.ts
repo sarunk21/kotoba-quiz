@@ -51,8 +51,9 @@ function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
   }
 
   // 3. Sheets URL
-  // Jika lokal kosong, ambil cloud. Jika ada, lokal menang (user baru aja ganti di settings)
-  const mergedUrl = local.sheetsUrl || cloud.sheetsUrl
+  // Jika cloud lebih baru, ambil URL cloud (user mungkin ganti URL di device lain)
+  // Jika lokal lebih baru, ambil URL lokal (user baru ganti di device ini)
+  const mergedUrl = cloudIsNewer ? (cloud.sheetsUrl || local.sheetsUrl) : (local.sheetsUrl || cloud.sheetsUrl)
 
   return {
     srs: mergedSRS,
