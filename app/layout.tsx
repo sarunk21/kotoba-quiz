@@ -5,7 +5,12 @@ import { SessionProvider } from 'next-auth/react'
 export const metadata: Metadata = {
   title: '言葉カード — Kotoba Quiz',
   description: 'Latihan kosakata Jepang harian dengan flashcard',
-  appleWebApp: { capable: true, statusBarStyle: 'default', title: '言葉カード' },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: '言葉カード',
+  },
 }
 
 export const viewport: Viewport = {

@@ -1,0 +1,21 @@
+{
+  "name": "Kotoba Quiz",
+  "short_name": "Kotoba",
+  "description": "Latihan kosakata Jepang harian dengan flashcard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f4f7",
+  "theme_color": "#5b5ef4",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/globe.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ]
+}
