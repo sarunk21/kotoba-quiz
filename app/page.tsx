@@ -1,12 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { useSession, signIn, signOut } from 'next-auth/react'
-import { loadStats, type GameStats } from '@/lib/stats'
-import { loadSRS, saveSRS, getSRSSummary, type SRSStore } from '@/lib/srs'
-import { DEFAULT_VOCAB, parseCSVToVocab, type VocabItem } from '@/lib/vocab'
-import { fetchVocabCSV, pullFromCloud, pushToCloud } from '@/lib/cloud'
+import { loadStats, saveStats, type GameStats } from '@/lib/stats'
+import { loadSRS, type SRSStore } from '@/lib/srs'
+import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
+import { getSRSSummary } from '@/lib/srs'
+import { fetchVocabCSV, pushToCloud, pullFromCloud } from '@/lib/cloud'
+import { KANA } from '@/lib/kana'
+
+type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
+
+const PULL_THRESHOLD = 80 // px tarik ke bawah sebelum trigger
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -16,67 +22,120 @@ export default function Home() {
   const [sheetsUrl, setSheetsUrl] = useState('')
   const [savedUrl, setSavedUrl] = useState('')
   const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
-  const [saving, setSaving] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'ok' | 'error'>('idle')
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
+  const [vocabError, setVocabError] = useState('')
+  const [urlInput, setUrlInput] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  // Pull-to-refresh
+  const [pullY, setPullY] = useState(0)
+  const [isPulling, setIsPulling] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const touchStartY = useRef(0)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setStats(loadStats())
-    const store = loadSRS()
-    setSrsStore(store)
+    const s = loadStats(); setStats(s)
+    const store = loadSRS(); setSrsStore(store)
     const url = localStorage.getItem('kotoba_sheets_url') || ''
-    setSavedUrl(url); setSheetsUrl(url)
+    setSavedUrl(url); setUrlInput(url)
     if (typeof Notification !== 'undefined') {
       if (Notification.permission === 'granted') setNotifStatus('granted')
       else if (Notification.permission === 'denied') setNotifStatus('denied')
     }
-    loadVocabData(url)
+    if (url) loadVocabData(url)
   }, [])
 
-  // Auto-pull dari cloud saat login
+  // Auto-pull saat login
   useEffect(() => {
-    if (session?.accessToken) {
-      handleCloudPull()
-    }
+    if (session?.accessToken) doSync('pull')
   }, [session?.accessToken])
 
-  async function loadVocabData(url: string) {
-    if (url) {
-      // Pakai server-side proxy biar bypass CORS
-      const csv = await fetchVocabCSV(url)
-      if (csv) {
-        const parsed = parseCSVToVocab(csv)
-        if (parsed.length >= 4) { setVocab(parsed); return }
+  async function loadVocabData(url: string): Promise<VocabItem[]> {
+    setVocabError('')
+    const csv = await fetchVocabCSV(url)
+    if (!csv) {
+      setVocabError('Gagal fetch dari Sheets. Cek URL atau koneksi lo.')
+      setVocab([]); return []
+    }
+    const parsed = parseCSVToVocab(csv)
+    if (parsed.length < 4) {
+      setVocabError('Format Sheets salah atau isinya kosong.')
+      setVocab([]); return []
+    }
+    setVocab(parsed)
+    return parsed
+  }
+
+  async function doSync(direction: 'push' | 'pull' = 'push') {
+    if (!session?.accessToken) return
+    setSyncStatus('syncing')
+    if (direction === 'pull') {
+      const result = await pullFromCloud()
+      if (result) {
+        setSrsStore(result.srs)
+        setStats(loadStats())
+        // Sync sheetsUrl dari cloud kalau lokal kosong
+        const cloudUrl = result.sheetsUrl
+        if (cloudUrl && !localStorage.getItem('kotoba_sheets_url')) {
+          localStorage.setItem('kotoba_sheets_url', cloudUrl)
+          setSavedUrl(cloudUrl); setUrlInput(cloudUrl)
+          await loadVocabData(cloudUrl)
+        }
+        setSyncStatus('ok')
+      } else {
+        setSyncStatus('error')
       }
-    }
-    setVocab(DEFAULT_VOCAB)
-  }
-
-  async function handleCloudPull() {
-    setSyncStatus('syncing')
-    const merged = await pullFromCloud()
-    if (merged) {
-      setSrsStore(merged)
-      setSyncStatus('ok')
     } else {
-      setSyncStatus('error')
+      const ok = await pushToCloud()
+      setSyncStatus(ok ? 'ok' : 'error')
     }
     setTimeout(() => setSyncStatus('idle'), 2500)
   }
 
-  async function handleCloudPush() {
-    setSyncStatus('syncing')
-    const store = loadSRS()
-    const ok = await pushToCloud(store)
-    setSyncStatus(ok ? 'ok' : 'error')
-    setTimeout(() => setSyncStatus('idle'), 2500)
+  // Pull-to-refresh handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    const el = scrollRef.current
+    if (el && el.scrollTop === 0) {
+      touchStartY.current = e.touches[0].clientY
+      setIsPulling(true)
+    }
+  }
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!isPulling) return
+    const dy = e.touches[0].clientY - touchStartY.current
+    if (dy > 0) setPullY(Math.min(dy * 0.5, PULL_THRESHOLD + 20))
+  }
+  const onTouchEnd = async () => {
+    setIsPulling(false)
+    if (pullY >= PULL_THRESHOLD) {
+      setPullY(40)
+      setIsRefreshing(true)
+      // Refresh: pull cloud + reload vocab
+      if (session?.accessToken) await doSync('pull')
+      if (savedUrl) await loadVocabData(savedUrl)
+      setIsRefreshing(false)
+    }
+    setPullY(0)
   }
 
-  async function saveUrl() {
+  async function handleSaveUrl() {
+    if (!urlInput.trim()) {
+      setVocabError('URL tidak boleh kosong!')
+      return
+    }
+    if (!urlInput.includes('docs.google.com')) {
+      setVocabError('Harus URL Google Sheets yang valid.')
+      return
+    }
     setSaving(true)
-    localStorage.setItem('kotoba_sheets_url', sheetsUrl)
-    setSavedUrl(sheetsUrl)
-    await loadVocabData(sheetsUrl)
+    localStorage.setItem('kotoba_sheets_url', urlInput)
+    setSavedUrl(urlInput)
+    const v = await loadVocabData(urlInput)
+    if (v.length > 0 && session?.accessToken) {
+      await pushToCloud() // push sheetsUrl ke cloud juga
+    }
     setSaving(false)
   }
 
@@ -91,20 +150,39 @@ export default function Home() {
   const srs = vocab.length > 0 ? getSRSSummary(vocab.map(v => v.id), srsStore) : null
 
   const syncLabel = syncStatus === 'syncing' ? '⏳ Syncing...'
-    : syncStatus === 'ok' ? '✓ Tersinkron'
-    : syncStatus === 'error' ? '✗ Gagal sync'
-    : '☁ Sync sekarang'
+    : syncStatus === 'ok' ? '✓ Tersinkron!' : syncStatus === 'error' ? '✗ Gagal' : '☁ Sync'
   const syncColor = syncStatus === 'ok' ? 'var(--color-green)'
-    : syncStatus === 'error' ? 'var(--color-red)'
-    : 'var(--color-accent)'
+    : syncStatus === 'error' ? 'var(--color-red)' : 'var(--color-accent)'
+
+  const noVocab = vocab.length === 0
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto px-4 pt-12 pb-10">
 
+      {/* Pull indicator */}
+      {(pullY > 0 || isRefreshing) && (
+        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 transition-all"
+          style={{ transform: `translateY(${Math.min(pullY, 44)}px)`, opacity: Math.min(pullY / PULL_THRESHOLD, 1) }}>
+          <div className="rounded-full px-4 py-1.5 flex items-center gap-2 text-xs font-bold"
+            style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.1)', color: 'var(--color-accent)' }}>
+            <span style={{ display: 'inline-block', animation: isRefreshing ? 'spin 1s linear infinite' : 'none' }}>
+              {isRefreshing ? '⏳' : pullY >= PULL_THRESHOLD ? '↑ Lepas untuk refresh' : '↓ Tarik untuk refresh'}
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div
+        ref={scrollRef}
+        className="max-w-sm mx-auto px-4 pt-12 pb-10 overflow-y-auto"
+        style={{ minHeight: '100dvh', transform: pullY > 0 ? `translateY(${pullY}px)` : 'none', transition: isPulling ? 'none' : 'transform 0.3s ease' }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         {/* ── Header ── */}
-        <div className="anim-up mb-6">
-          <div className="flex items-center justify-between mb-1">
+        <div className="anim-up mb-5">
+          <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>
                 {session ? `おかえり、${session.user?.name?.split(' ')[0]} 👋` : 'おはようございます 👋'}
@@ -113,50 +191,49 @@ export default function Home() {
                 Siap latihan hari ini?
               </h1>
             </div>
-            {/* Avatar / Login button */}
             {status === 'loading' ? (
               <div className="w-10 h-10 rounded-full" style={{ background: 'var(--color-subtle)' }} />
             ) : session ? (
               <button onClick={() => signOut()} title="Logout"
-                className="relative w-10 h-10 rounded-full overflow-hidden border-2 active:scale-95 transition-transform"
+                className="w-10 h-10 rounded-full overflow-hidden border-2 active:scale-95 transition-transform"
                 style={{ borderColor: 'var(--color-accent)' }}>
                 {session.user?.image
                   ? <img src={session.user.image} alt="avatar" className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center font-bold text-white"
-                      style={{ background: 'var(--color-accent)' }}>
-                      {session.user?.name?.[0]}
-                    </div>
-                }
+                      style={{ background: 'var(--color-accent)' }}>{session.user?.name?.[0]}</div>}
               </button>
             ) : (
               <button onClick={() => signIn('google')}
                 className="flex items-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold active:scale-95 transition-transform"
                 style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', color: 'var(--color-text-1)', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-                <GoogleIcon />
-                Masuk
+                <GoogleIcon /> Masuk
               </button>
             )}
           </div>
         </div>
 
-        {/* ── Cloud sync banner (kalau login) ── */}
-        {session && (
+        {/* ── Cloud sync banner ── */}
+        {session ? (
           <div className="rounded-2xl px-4 py-3 mb-4 flex items-center justify-between anim-up"
             style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
             <div>
               <p className="text-xs font-bold" style={{ color: 'var(--color-text-1)' }}>☁ Cloud Sync Aktif</p>
-              <p className="text-xs" style={{ color: 'var(--color-text-2)' }}>Progress tersimpan di akun Google lo</p>
+              <p className="text-xs" style={{ color: 'var(--color-text-2)' }}>Progress lo tersinkron lintas device</p>
             </div>
-            <button onClick={handleCloudPush} disabled={syncStatus === 'syncing'}
-              className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all"
-              style={{ background: 'var(--color-accent-light)', color: syncColor, opacity: syncStatus === 'syncing' ? 0.7 : 1 }}>
-              {syncLabel}
-            </button>
+            <div className="flex gap-2">
+              <button onClick={() => doSync('pull')} disabled={syncStatus === 'syncing'}
+                className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all"
+                style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', opacity: syncStatus === 'syncing' ? 0.6 : 1 }}>
+                ↓ Pull
+              </button>
+              <button onClick={() => doSync('push')} disabled={syncStatus === 'syncing'}
+                className="text-xs font-bold px-3 py-1.5 rounded-xl active:scale-95 transition-all"
+                style={{ background: syncStatus !== 'idle' ? (syncStatus === 'ok' ? 'var(--color-green-light)' : syncStatus === 'error' ? 'var(--color-red-light)' : 'var(--color-accent-light)') : 'var(--color-accent-light)', color: syncColor, opacity: syncStatus === 'syncing' ? 0.6 : 1 }}>
+                {syncLabel}
+              </button>
+            </div>
           </div>
-        )}
-
-        {/* ── Login prompt (kalau belum login) ── */}
-        {!session && status !== 'loading' && (
+        ) : status !== 'loading' && (
           <button onClick={() => signIn('google')}
             className="w-full rounded-2xl px-4 py-3 mb-4 flex items-center gap-3 anim-up active:scale-[0.98] transition-transform"
             style={{ background: 'var(--color-white)', border: '1.5px dashed var(--color-border)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
@@ -169,20 +246,94 @@ export default function Home() {
           </button>
         )}
 
-        {/* ── CTA card ── */}
+        {/* ── Wajib Sheets — shown if no vocab ── */}
+        {noVocab && (
+          <div className="rounded-3xl p-5 mb-5 anim-up"
+            style={{ background: 'var(--color-white)', boxShadow: '0 4px 20px rgba(91,94,244,0.1)', border: '2px solid var(--color-accent)' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl">📋</span>
+              <div>
+                <p className="font-extrabold text-base" style={{ color: 'var(--color-text-1)' }}>
+                  Setup kamus lo dulu!
+                </p>
+                <p className="text-xs font-semibold" style={{ color: 'var(--color-text-2)' }}>
+                  App butuh Google Sheets sebagai sumber kata
+                </p>
+              </div>
+            </div>
+            <input
+              type="url" value={urlInput} onChange={e => { setUrlInput(e.target.value); setVocabError('') }}
+              placeholder="Paste link CSV Google Sheets lo..."
+              className="w-full rounded-2xl px-4 py-3 text-sm mb-2 outline-none"
+              style={{ background: 'var(--color-bg)', border: `1.5px solid ${vocabError ? 'var(--color-red)' : 'var(--color-border)'}`, color: 'var(--color-text-1)', fontFamily: 'inherit' }}
+              onKeyDown={e => e.key === 'Enter' && handleSaveUrl()}
+            />
+            {vocabError && (
+              <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-2"
+                style={{ background: 'var(--color-red-light)' }}>
+                <span style={{ fontSize: 14 }}>⚠️</span>
+                <p className="text-xs font-bold" style={{ color: 'var(--color-red-dark)' }}>{vocabError}</p>
+              </div>
+            )}
+            <button onClick={handleSaveUrl} disabled={saving}
+              className="w-full rounded-2xl py-3 text-sm font-extrabold active:scale-95 transition-transform"
+              style={{ background: 'var(--color-accent)', color: '#fff', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(91,94,244,0.3)' }}>
+              {saving ? '⏳ Mengambil data...' : 'Hubungkan Sheets →'}
+            </button>
+            <details className="mt-3">
+              <summary className="text-xs font-semibold cursor-pointer select-none" style={{ color: 'var(--color-text-2)' }}>
+                Cara setup Sheets ▾
+              </summary>
+              <div className="mt-2 text-xs space-y-1 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+                <p>1. Kolom: <span className="font-bold" style={{ color: 'var(--color-accent)' }}>kategori, hiragana, kanji, arti</span></p>
+                <p>2. File → Share → Publish to web → CSV</p>
+                <p>3. Copy link → paste di atas</p>
+              </div>
+            </details>
+          </div>
+        )}
+
+        {/* ── CTA card (disabled jika belum ada vocab) ── */}
         <div className="anim-up d1 mb-4">
-          <Link href="/quiz" className="block no-underline">
+          {!noVocab ? (
+            <Link href="/quiz" className="block no-underline">
+              <div className="rounded-3xl p-6 relative overflow-hidden"
+                style={{ background: 'linear-gradient(135deg, #5b5ef4 0%, #7c7ff7 100%)', boxShadow: '0 8px 24px rgba(91,94,244,0.32)' }}>
+                <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.16) 0%, transparent 55%)' }} />
+                {srs && srs.dueCount > 0 && (
+                  <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-3 relative" style={{ background: 'rgba(255,255,255,0.18)' }}>
+                    <span style={{ fontSize: 11 }}>🔥</span>
+                    <span className="text-xs font-bold text-white">{srs.dueCount} kata siap direview</span>
+                  </div>
+                )}
+                <p className="jp-serif text-white relative mb-1" style={{ fontSize: '1.9rem', fontWeight: 700 }}>練習する</p>
+                <p className="text-sm font-semibold relative" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                  {vocab.length} kata · Mulai latihan →
+                </p>
+              </div>
+            </Link>
+          ) : (
             <div className="rounded-3xl p-6 relative overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #5b5ef4 0%, #7c7ff7 100%)', boxShadow: '0 8px 24px rgba(91,94,244,0.32)' }}>
-              <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.16) 0%, transparent 55%)' }} />
-              {srs && srs.dueCount > 0 && (
-                <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-3 relative" style={{ background: 'rgba(255,255,255,0.18)' }}>
-                  <span style={{ fontSize: 11 }}>🔥</span>
-                  <span className="text-xs font-bold text-white">{srs.dueCount} kata siap direview</span>
-                </div>
-              )}
-              <p className="jp-serif text-white relative mb-1" style={{ fontSize: '1.9rem', fontWeight: 700 }}>練習する</p>
-              <p className="text-sm font-semibold relative" style={{ color: 'rgba(255,255,255,0.72)' }}>Mulai latihan sekarang →</p>
+              style={{ background: 'linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%)', opacity: 0.6 }}>
+              <p className="jp-serif text-white mb-1" style={{ fontSize: '1.9rem', fontWeight: 700 }}>練習する</p>
+              <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.72)' }}>Setup Sheets dulu di atas ↑</p>
+            </div>
+          )}
+        </div>
+
+        {/* ── Kana card ── */}
+        <div className="anim-up d1 mb-4">
+          <Link href="/kana" className="block no-underline">
+            <div className="rounded-3xl p-5 flex items-center gap-4"
+              style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1.5px solid var(--color-border)' }}>
+              <div className="jp-serif text-4xl leading-none">あア</div>
+              <div className="flex-1">
+                <p className="font-extrabold text-base" style={{ color: 'var(--color-text-1)' }}>Hiragana & Katakana</p>
+                <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>
+                  {KANA.length} karakter · Latihan baca tulis kana
+                </p>
+              </div>
+              <span style={{ color: 'var(--color-text-3)', fontSize: 20, fontWeight: 700 }}>›</span>
             </div>
           </Link>
         </div>
@@ -192,8 +343,8 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2.5 mb-4 anim-up d2">
             {[
               { icon: '⚡', label: 'Total XP', value: String(stats.totalXP), color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-              { icon: '🔥', label: 'Streak', value: `${stats.currentStreak}h`, color: 'var(--color-red)', bg: 'var(--color-red-light)' },
-              { icon: '🎯', label: 'Akurasi', value: `${accuracy}%`, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+              { icon: '🔥', label: 'Streak',   value: `${stats.currentStreak}h`, color: 'var(--color-red)',   bg: 'var(--color-red-light)' },
+              { icon: '🎯', label: 'Akurasi',  value: `${accuracy}%`,  color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
             ].map(s => (
               <div key={s.label} className="rounded-2xl py-4 text-center" style={{ background: s.bg }}>
                 <p className="text-xl mb-1">{s.icon}</p>
@@ -205,7 +356,7 @@ export default function Home() {
         )}
 
         {/* ── Vocab status ── */}
-        {srs && (
+        {srs && !noVocab && (
           <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
             <div className="px-5 pt-5 pb-3 flex items-center justify-between">
               <p className="font-bold" style={{ color: 'var(--color-text-1)' }}>Status Vocab</p>
@@ -215,10 +366,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-4 gap-2 px-3 pb-4">
               {[
-                { label: 'Review', val: srs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-                { label: 'Baru', val: srs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-                { label: 'Proses', val: srs.learningCount, color: '#a855f7', bg: '#faf0ff' },
-                { label: 'Hafal', val: srs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
+                { label: 'Review', val: srs.dueCount,     color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
+                { label: 'Baru',   val: srs.newCount,     color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+                { label: 'Proses', val: srs.learningCount,color: '#a855f7',             bg: '#faf0ff' },
+                { label: 'Hafal',  val: srs.masteredCount,color: 'var(--color-green)',  bg: 'var(--color-green-light)' },
               ].map(s => (
                 <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}>
                   <p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p>
@@ -230,75 +381,73 @@ export default function Home() {
         )}
 
         {/* ── Settings ── */}
-        <div className="anim-up d3">
-          <button onClick={() => setShowSettings(s => !s)}
-            className="w-full flex items-center justify-between rounded-2xl px-4 py-4 active:scale-[0.98] transition-transform"
-            style={{ background: 'var(--color-white)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-accent-light)' }}>
-                <span style={{ fontSize: 15 }}>⚙️</span>
-              </div>
-              <span className="font-bold" style={{ color: 'var(--color-text-1)' }}>Pengaturan</span>
-            </div>
-            <span style={{ color: 'var(--color-text-3)', fontSize: 18, fontWeight: 700, transform: showSettings ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>›</span>
-          </button>
-
-          {showSettings && (
-            <div className="mt-2 rounded-3xl p-5 anim-down" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Google Sheets</p>
-              <input type="url" value={sheetsUrl} onChange={e => setSheetsUrl(e.target.value)}
-                placeholder="Paste link CSV Sheets lo..."
-                className="w-full rounded-2xl px-4 py-3 text-sm mb-3 outline-none"
-                style={{ background: 'var(--color-bg)', border: '1.5px solid var(--color-border)', color: 'var(--color-text-1)', fontFamily: 'inherit' }} />
-              <div className="flex gap-2 mb-2">
-                <button onClick={saveUrl} disabled={saving}
-                  className="flex-1 rounded-2xl py-3 text-sm font-bold active:scale-95 transition-transform"
-                  style={{ background: 'var(--color-accent)', color: '#fff', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(91,94,244,0.3)' }}>
-                  {saving ? 'Nyimpen...' : 'Simpan URL'}
-                </button>
-                {savedUrl && (
-                  <button onClick={() => { setSheetsUrl(''); setSavedUrl(''); localStorage.removeItem('kotoba_sheets_url'); setVocab(DEFAULT_VOCAB) }}
-                    className="rounded-2xl px-4 py-3 text-sm font-bold active:scale-95 transition-transform"
-                    style={{ background: 'var(--color-red-light)', color: 'var(--color-red)' }}>
-                    Hapus
-                  </button>
-                )}
-              </div>
-              <p className="text-xs font-semibold mb-4" style={{ color: savedUrl ? 'var(--color-green)' : 'var(--color-text-3)' }}>
-                {savedUrl ? '✓ Tersambung ke Google Sheets' : 'Belum tersambung — pakai data bawaan'}
-              </p>
-              <details>
-                <summary className="text-xs font-semibold cursor-pointer select-none" style={{ color: 'var(--color-text-2)' }}>Cara setup Sheets ▾</summary>
-                <div className="mt-2 text-xs space-y-1 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-                  <p>1. Kolom: <span className="font-bold" style={{ color: 'var(--color-accent)' }}>kategori, hiragana, kanji, arti</span></p>
-                  <p>2. File → Share → Publish to web → CSV</p>
-                  <p>3. Copy link → paste di atas</p>
-                </div>
-              </details>
-              <div className="my-4" style={{ height: 1, background: 'var(--color-border)' }} />
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Pengingat Harian</p>
+        {!noVocab && (
+          <div className="anim-up d3">
+            <button onClick={() => setShowSettings(s => !s)}
+              className="w-full flex items-center justify-between rounded-2xl px-4 py-4 active:scale-[0.98] transition-transform"
+              style={{ background: 'var(--color-white)', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: notifStatus === 'granted' ? 'var(--color-green-light)' : 'var(--color-amber-light)' }}>
-                  <span style={{ fontSize: 14 }}>🔔</span>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-accent-light)' }}>
+                  <span style={{ fontSize: 15 }}>⚙️</span>
                 </div>
-                <div className="flex-1">
-                  {notifStatus === 'granted' ? <p className="text-sm font-bold" style={{ color: 'var(--color-green)' }}>Pengingat aktif!</p>
-                    : notifStatus === 'denied' ? <p className="text-sm font-bold" style={{ color: 'var(--color-red)' }}>Ditolak — aktifkan di browser</p>
-                    : <p className="text-sm font-semibold" style={{ color: 'var(--color-text-1)' }}>Belum diaktifkan</p>}
-                </div>
-                {notifStatus === 'idle' && (
-                  <button onClick={enableNotif} className="rounded-xl px-4 py-2 text-sm font-bold active:scale-95 transition-transform"
-                    style={{ background: 'var(--color-amber-light)', color: 'var(--color-amber)' }}>
-                    Aktifkan
-                  </button>
-                )}
+                <span className="font-bold" style={{ color: 'var(--color-text-1)' }}>Pengaturan</span>
               </div>
-            </div>
-          )}
-        </div>
+              <span style={{ color: 'var(--color-text-3)', fontSize: 18, fontWeight: 700, transform: showSettings ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>›</span>
+            </button>
 
+            {showSettings && (
+              <div className="mt-2 rounded-3xl p-5 anim-down" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Google Sheets</p>
+                {savedUrl && <p className="text-xs font-semibold mb-2" style={{ color: 'var(--color-green)' }}>✓ {vocab.length} kata aktif dari Sheets</p>}
+                <input type="url" value={urlInput} onChange={e => { setUrlInput(e.target.value); setVocabError('') }}
+                  placeholder="Paste link CSV Sheets lo..."
+                  className="w-full rounded-2xl px-4 py-3 text-sm mb-2 outline-none"
+                  style={{ background: 'var(--color-bg)', border: `1.5px solid ${vocabError ? 'var(--color-red)' : 'var(--color-border)'}`, color: 'var(--color-text-1)', fontFamily: 'inherit' }} />
+                {vocabError && (
+                  <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-2"
+                    style={{ background: 'var(--color-red-light)' }}>
+                    <span style={{ fontSize: 13 }}>⚠️</span>
+                    <p className="text-xs font-bold" style={{ color: 'var(--color-red-dark)' }}>{vocabError}</p>
+                  </div>
+                )}
+                <button onClick={handleSaveUrl} disabled={saving}
+                  className="w-full rounded-2xl py-3 text-sm font-bold active:scale-95 transition-transform mb-3"
+                  style={{ background: 'var(--color-accent)', color: '#fff', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(91,94,244,0.3)' }}>
+                  {saving ? 'Mengambil data...' : 'Update URL'}
+                </button>
+
+                <div className="my-3" style={{ height: 1, background: 'var(--color-border)' }} />
+                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>Pengingat Harian</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: notifStatus === 'granted' ? 'var(--color-green-light)' : 'var(--color-amber-light)' }}>
+                    <span style={{ fontSize: 14 }}>🔔</span>
+                  </div>
+                  <div className="flex-1">
+                    {notifStatus === 'granted' ? <p className="text-sm font-bold" style={{ color: 'var(--color-green)' }}>Pengingat aktif!</p>
+                      : notifStatus === 'denied' ? <p className="text-sm font-bold" style={{ color: 'var(--color-red)' }}>Ditolak — aktifkan di browser</p>
+                      : <p className="text-sm font-semibold" style={{ color: 'var(--color-text-1)' }}>Belum diaktifkan</p>}
+                  </div>
+                  {notifStatus === 'idle' && (
+                    <button onClick={enableNotif} className="rounded-xl px-4 py-2 text-sm font-bold active:scale-95"
+                      style={{ background: 'var(--color-amber-light)', color: 'var(--color-amber)' }}>
+                      Aktifkan
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Pull hint */}
+        <p className="text-center text-xs mt-6" style={{ color: 'var(--color-text-3)' }}>
+          ↓ Tarik ke bawah untuk refresh
+        </p>
       </div>
+
+      {/* Spin animation */}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

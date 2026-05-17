@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { loadSRS, getWordProgress, SRS_INTERVALS, MASTERED_LEVEL, type SRSStore } from '@/lib/srs'
-import { DEFAULT_VOCAB, parseCSVToVocab, type VocabItem } from '@/lib/vocab'
+import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
 
 const CAT: Record<string, { color: string; bg: string }> = {
   'Kata Benda': { color: 'var(--color-cat-noun)', bg: 'var(--color-cat-noun-bg)' },
@@ -21,7 +21,7 @@ export default function ProgressPage() {
     setSrsStore(loadSRS())
     const url = localStorage.getItem('kotoba_sheets_url')
     async function load() {
-      let v = DEFAULT_VOCAB
+      let v: VocabItem[] = []
       if (url) {
         try {
           const res = await fetch(`/api/sheets?url=${encodeURIComponent(url)}`)

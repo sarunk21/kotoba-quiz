@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { DEFAULT_VOCAB, parseCSVToVocab, getDisplayText, type VocabItem } from '@/lib/vocab'
+import { parseCSVToVocab, getDisplayText, type VocabItem } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 import {
   loadSRS, saveSRS, onCorrect, onWrong,
@@ -56,14 +56,14 @@ export default function QuizPage() {
     async function init() {
       const store = loadSRS(); srsRef.current = store
       const url = localStorage.getItem('kotoba_sheets_url')
-      let v = DEFAULT_VOCAB
+      let v: VocabItem[] = []
       if (url) {
         try {
           const parsed = parseCSVToVocab(await (await fetch(url)).text())
           if (parsed.length >= 4) v = parsed
         } catch { }
       }
-      setVocab(v)
+      if (v.length > 0) setVocab(v)
     }
     init()
   }, [])
@@ -109,7 +109,7 @@ export default function QuizPage() {
     if (!state) return
     if (state.lives <= 0 || state.current + 1 >= state.queue.length) {
       saveSRS(srsRef.current)
-      pushToCloud(srsRef.current) // fire-and-forget
+      pushToCloud() // fire-and-forget
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, xp: state.sessionXP, srsStore: srsRef.current }
       setFinalStats(fs); updateAfterSession(fs.correct, fs.total, fs.xp)
       playFinish(); setPhase('result'); return
