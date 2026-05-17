@@ -25,6 +25,7 @@ export default function Home() {
   const [vocabError, setVocabError] = useState('')
   const [urlInput, setUrlInput] = useState('')
   const [saving, setSaving] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0)
@@ -32,27 +33,6 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const touchStartY = useRef(0)
   const scrollRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const s = loadStats(); setStats(s)
-    const store = loadSRS(); setSrsStore(store)
-    const url = localStorage.getItem('kotoba_sheets_url') || ''
-    setSavedUrl(url); setUrlInput(url)
-    if (typeof Notification !== 'undefined') {
-      if (Notification.permission === 'granted') setNotifStatus('granted')
-      else if (Notification.permission === 'denied') setNotifStatus('denied')
-    }
-    if (url) loadVocabData(url)
-  }, [])
-
-  async function handleSignOut() {
-    if (confirm('Yakin mau logout? Data lokal di browser ini bakal diapus (tapi yang di cloud tetep aman).')) {
-      localStorage.removeItem('kotoba_srs')
-      localStorage.removeItem('kotoba_stats')
-      localStorage.removeItem('kotoba_sheets_url')
-      await signOut()
-    }
-  }
 
   const loadVocabData = useCallback(async (url: string): Promise<VocabItem[]> => {
     setVocabError('')
@@ -69,6 +49,43 @@ export default function Home() {
     setVocab(parsed)
     return parsed
   }, [])
+
+  useEffect(() => {
+    const s = loadStats(); setStats(s)
+    const store = loadSRS(); setSrsStore(store)
+    const url = localStorage.getItem('kotoba_sheets_url') || ''
+    setSavedUrl(url); setUrlInput(url)
+    if (typeof Notification !== 'undefined') {
+      if (Notification.permission === 'granted') setNotifStatus('granted')
+      else if (Notification.permission === 'denied') setNotifStatus('denied')
+    }
+    if (url) loadVocabData(url)
+  }, [loadVocabData])
+
+  // Account Isolation: Clear data if user changed
+  useEffect(() => {
+    if (session?.user?.email) {
+      const lastUser = localStorage.getItem('kotoba_last_user')
+      if (lastUser && lastUser !== session.user.email) {
+        // Different account! Clear everything to prevent leakage
+        localStorage.removeItem('kotoba_srs')
+        localStorage.removeItem('kotoba_stats')
+        localStorage.removeItem('kotoba_sheets_url')
+        localStorage.setItem('kotoba_last_user', session.user.email)
+        window.location.reload() // Hard refresh to reset state
+      } else if (!lastUser) {
+        localStorage.setItem('kotoba_last_user', session.user.email)
+      }
+    }
+  }, [session])
+
+  async function handleSignOut() {
+    localStorage.removeItem('kotoba_srs')
+    localStorage.removeItem('kotoba_stats')
+    localStorage.removeItem('kotoba_sheets_url')
+    localStorage.removeItem('kotoba_last_user')
+    await signOut()
+  }
 
   const doSync = useCallback(async (direction: 'push' | 'pull' = 'push') => {
     if (!session?.accessToken) return
@@ -203,7 +220,7 @@ export default function Home() {
             {status === 'loading' ? (
               <div className="w-10 h-10 rounded-full" style={{ background: 'var(--color-subtle)' }} />
             ) : session ? (
-              <button onClick={handleSignOut} title="Logout"
+              <button onClick={() => setShowLogoutConfirm(true)} title="Logout"
                 className="w-10 h-10 rounded-full overflow-hidden border-2 active:scale-95 transition-transform"
                 style={{ borderColor: 'var(--color-accent)' }}>
                 {session.user?.image
@@ -485,6 +502,32 @@ export default function Home() {
           </p>
         )}
       </div>
+
+      {/* ── Logout Modal ── */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowLogoutConfirm(false)} />
+          <div className="bg-white rounded-[32px] p-8 w-full max-w-xs relative anim-pop shadow-2xl text-center">
+            <div className="text-5xl mb-4">🚪</div>
+            <h3 className="text-xl font-extrabold mb-2" style={{ color: 'var(--color-text-1)' }}>Mau Logout?</h3>
+            <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+              Data lokal di browser ini bakal diapus, tapi tenang aja progress lo aman di cloud.
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <button onClick={handleSignOut}
+                className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform"
+                style={{ background: 'var(--color-red)', color: '#fff', boxShadow: '0 8px 20px rgba(239,68,68,0.25)' }}>
+                Ya, Logout 👋
+              </button>
+              <button onClick={() => setShowLogoutConfirm(false)}
+                className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform"
+                style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)' }}>
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Spin animation */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>

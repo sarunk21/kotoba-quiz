@@ -20,40 +20,33 @@ function collectLocalData(): CloudData {
   }
 }
 
-/** Apply cloud data ke lokal — merge SRS (ambil level tertinggi), stats (ambil terbesar) */
+/** Apply cloud data ke lokal — merge SRS (ambil level tertinggi), stats (ambil yang terbaru) */
 function applyCloudData(cloud: CloudData) {
-  // Merge SRS
+  // Merge SRS — item by item, level tertinggi menang
   const localSRS = loadSRS()
   const merged: SRSStore = { ...localSRS }
   for (const [id, wp] of Object.entries(cloud.srs)) {
     const local = localSRS[id]
-    // Ambil yang levelnya lebih tinggi, atau yang lebih baru kalau sama
     if (!local || wp.level > local.level || (wp.level === local.level && wp.lastSeen > local.lastSeen)) {
       merged[id] = wp
     }
   }
   saveSRS(merged)
 
-  // Merge stats — ambil yang lebih besar
+  // Merge stats — ambil satu set utuh yang XP-nya lebih gede (asumsi lebih maju)
   const localStats = loadStats()
-  const mergedStats: GameStats = {
-    totalXP: Math.max(localStats.totalXP, cloud.stats.totalXP),
-    currentStreak: Math.max(localStats.currentStreak, cloud.stats.currentStreak),
-    longestStreak: Math.max(localStats.longestStreak, cloud.stats.longestStreak),
-    lastPlayedDate: localStats.lastPlayedDate > cloud.stats.lastPlayedDate
-      ? localStats.lastPlayedDate : cloud.stats.lastPlayedDate,
-    totalSessions: Math.max(localStats.totalSessions, cloud.stats.totalSessions),
-    totalCorrect: Math.max(localStats.totalCorrect, cloud.stats.totalCorrect),
-    totalAnswered: Math.max(localStats.totalAnswered, cloud.stats.totalAnswered),
+  const useCloud = cloud.stats.totalXP > localStats.totalXP
+  
+  if (useCloud) {
+    saveStats(cloud.stats)
   }
-  saveStats(mergedStats)
 
-  // Sheets URL — pakai cloud kalau lokal kosong
-  if (cloud.sheetsUrl && !localStorage.getItem('kotoba_sheets_url')) {
+  // Sheets URL — selalu prioritaskan cloud kalau ada (source of truth per akun)
+  if (cloud.sheetsUrl) {
     localStorage.setItem('kotoba_sheets_url', cloud.sheetsUrl)
   }
 
-  return { srs: merged, stats: mergedStats, sheetsUrl: cloud.sheetsUrl }
+  return { srs: merged, stats: useCloud ? cloud.stats : localStats, sheetsUrl: cloud.sheetsUrl }
 }
 
 /** Push semua data ke cloud */
