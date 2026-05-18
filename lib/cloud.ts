@@ -12,11 +12,12 @@ export interface CloudData {
 
 /** Kumpulin semua data lokal */
 function collectLocalData(): CloudData {
+  const stats = loadStats()
   return {
     srs: loadSRS(),
-    stats: loadStats(),
+    stats: stats,
     sheetsUrl: localStorage.getItem('kotoba_sheets_url') || '',
-    updatedAt: new Date().toISOString(),
+    updatedAt: stats.updatedAt || '',
   }
 }
 
