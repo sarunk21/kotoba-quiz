@@ -146,7 +146,7 @@ function QuizContent() {
               style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 8px 20px rgba(91,94,244,0.28)' }}>
               Latihan lagi 🔄
             </button>
-            <button onClick={() => router.push('/kana')}
+            <button onClick={() => router.replace('/kana')}
               className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform"
               style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', color: 'var(--color-text-2)' }}>
               Kembali ke menu
@@ -172,7 +172,7 @@ function QuizContent() {
       {/* Header */}
       <div className="px-4 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => { saveSRS(srsRef.current); pushToCloud(); router.push('/kana') }}
+          <button onClick={() => { saveSRS(srsRef.current); pushToCloud(); router.replace('/kana') }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 active:scale-95 transition-transform"
             style={{ background: 'var(--color-white)', color: 'var(--color-text-2)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             ✕

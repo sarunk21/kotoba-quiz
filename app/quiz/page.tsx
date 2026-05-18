@@ -139,7 +139,7 @@ export default function QuizPage() {
   /* Result */
   if (phase === 'result' && finalStats) {
     return <ResultScreen stats={finalStats} vocab={vocab} srsStore={finalStats.srsStore}
-      onRetry={() => startQuiz(vocab, srsRef.current)} onHome={() => router.push('/')} />
+      onRetry={() => startQuiz(vocab, srsRef.current)} onHome={() => router.replace('/')} />
   }
 
   const q = state.queue[state.current]
@@ -156,7 +156,7 @@ export default function QuizPage() {
       <div className="px-4 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-5">
           {/* Close */}
-          <button onClick={() => { saveSRS(srsRef.current); pushToCloud(); router.push('/') }}
+          <button onClick={() => { saveSRS(srsRef.current); pushToCloud(); router.replace('/') }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 active:scale-95 transition-transform"
             style={{ background: 'var(--color-white)', color: 'var(--color-text-2)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             ✕
