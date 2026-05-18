@@ -102,7 +102,13 @@ export async function syncToCloud(): Promise<boolean> {
     // Always set, even if empty (to allow clearing)
     localStorage.setItem('kotoba_sheets_url', finalData.sheetsUrl || '')
     
-    // 4. Push merged result back to cloud
+    // 4. Update timestamp before push to ensure it's marked as the latest
+    const now = new Date().toISOString()
+    finalData.updatedAt = now
+    finalData.stats.updatedAt = now
+    saveStats(finalData.stats) // Save again with new timestamp
+
+    // 5. Push merged result back to cloud
     const pushRes = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -122,6 +128,13 @@ export async function syncToCloud(): Promise<boolean> {
 export async function forcePushToCloud(): Promise<boolean> {
   try {
     const data = collectLocalData()
+    
+    // Update timestamp before push
+    const now = new Date().toISOString()
+    data.updatedAt = now
+    data.stats.updatedAt = now
+    saveStats(data.stats)
+
     const res = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
