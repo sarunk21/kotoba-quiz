@@ -25,11 +25,9 @@ function collectLocalData(): CloudData {
 function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
   // Safety check: Pastiin object exist
   const cloudSRS = cloud.srs || {}
-  const cloudStats = cloud.stats || { totalXP: 0, updatedAt: '' }
+  const cloudStats = cloud.stats || { updatedAt: '' }
   
   console.log('[Sync] Merging data...', { 
-    localXP: local.stats.totalXP, 
-    cloudXP: cloudStats.totalXP,
     localUpdate: local.stats.updatedAt,
     cloudUpdate: cloudStats.updatedAt 
   })
