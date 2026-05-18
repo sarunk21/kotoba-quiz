@@ -99,7 +99,7 @@ function QuizContent() {
       updateAfterSession(fs.correct, fs.total)
       
       const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
-      if (isAuto) await pushToCloud() // sync ke drive (Wajib await biar ga ilang)
+      if (isAuto) pushToCloud() // sync ke drive (Background sync biar ga stuck)
       
       setPhase('result')
       return
