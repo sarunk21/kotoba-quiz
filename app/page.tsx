@@ -243,7 +243,7 @@ export default function Home() {
             {stats && (
               <div className="grid grid-cols-3 gap-2.5 mb-4 anim-up d2">
                 {[
-                  { icon: '⚡', label: 'Total XP', value: String(stats.totalXP), color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
+                  { icon: '📅', label: 'Sessions', value: String(stats.totalSessions), color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
                   { icon: '🔥', label: 'Streak', value: String(stats.currentStreak), color: 'var(--color-red)', bg: 'var(--color-red-light)' },
                   { icon: '🎯', label: 'Akurasi', value: `${accuracy}%`, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
                 ].map(s => (

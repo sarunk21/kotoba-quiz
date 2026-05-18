@@ -18,7 +18,6 @@ interface SessionState {
   queue: VocabItem[]
   current: number
   lives: number
-  sessionXP: number
   sessionCorrect: number
   sessionAnswered: number
   roundStreak: number
@@ -46,10 +45,8 @@ export default function QuizPage() {
   const [choices, setChoices] = useState<string[]>([])
   const [selected, setSelected] = useState<string | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
-  const [xpKey, setXpKey] = useState(0)
-  const [xpGained, setXpGained] = useState(0)
   const [cardKey, setCardKey] = useState(0)
-  const [finalStats, setFinalStats] = useState<{ correct: number; total: number; xp: number; srsStore: SRSStore } | null>(null)
+  const [finalStats, setFinalStats] = useState<{ correct: number; total: number; srsStore: SRSStore } | null>(null)
   const srsRef = useRef<SRSStore>({})
 
   useEffect(() => {
@@ -78,8 +75,8 @@ export default function QuizPage() {
     const allIds = [...dueIds, ...newIds, ...refreshIds].slice(0, TOTAL_QUESTIONS)
     const map = Object.fromEntries(v.map(i => [i.id, i]))
     const queue = allIds.map(id => map[id]).filter(Boolean)
-    if (!queue.length) { setFinalStats({ correct: 0, total: 0, xp: 0, srsStore: store }); setPhase('result'); return }
-    setState({ queue, current: 0, lives: 3, sessionXP: 0, sessionCorrect: 0, sessionAnswered: 0, roundStreak: 0 })
+    if (!queue.length) { setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result'); return }
+    setState({ queue, current: 0, lives: 3, sessionCorrect: 0, sessionAnswered: 0, roundStreak: 0 })
     setChoices(getChoices(queue[0], v))
     setSelected(null); setIsCorrect(null); setCardKey(k => k + 1); setPhase('question')
   }
@@ -94,13 +91,11 @@ export default function QuizPage() {
     const newLevel = getWordProgress(srsRef.current, q.id).level
     if (correct) {
       const ns = state.roundStreak + 1
-      const gained = ns >= 3 ? 20 : 10
-      setXpGained(gained); setXpKey(k => k + 1)
       // Sound: streak > level up > correct
       if (ns >= 3) playStreak()
       else if (newLevel > prevLevel && newLevel >= MASTERED_LEVEL) playLevelUp()
       else playCorrect()
-      setState(p => p ? { ...p, roundStreak: ns, sessionXP: p.sessionXP + gained, sessionCorrect: p.sessionCorrect + 1, sessionAnswered: p.sessionAnswered + 1 } : p)
+      setState(p => p ? { ...p, roundStreak: ns, sessionCorrect: p.sessionCorrect + 1, sessionAnswered: p.sessionAnswered + 1 } : p)
     } else {
       playWrong()
       if (state.lives - 1 <= 0) playLoseHeart()
@@ -112,8 +107,8 @@ export default function QuizPage() {
     if (!state) return
     if (state.lives <= 0 || state.current + 1 >= state.queue.length) {
       saveSRS(srsRef.current)
-      const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, xp: state.sessionXP, srsStore: srsRef.current }
-      updateAfterSession(fs.correct, fs.total, fs.xp)
+      const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, srsStore: srsRef.current }
+      updateAfterSession(fs.correct, fs.total)
       
       const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
       if (isAuto) await pushToCloud() // sync ke drive (Wajib await biar ga ilang)
@@ -171,18 +166,6 @@ export default function QuizPage() {
           <div className="flex-1 rounded-full overflow-hidden" style={{ height: 10, background: 'var(--color-subtle)' }}>
             <div className="h-full rounded-full transition-all duration-500"
               style={{ width: progress + '%', background: 'var(--color-accent)', boxShadow: '0 0 8px rgba(91,94,244,0.35)' }} />
-          </div>
-
-          {/* XP chip */}
-          <div className="relative shrink-0">
-            <div className="flex items-center gap-1.5 rounded-2xl px-3 py-1.5" style={{ background: 'var(--color-amber-light)' }}>
-              <span style={{ fontSize: 12 }}>⚡</span>
-              <span className="text-sm font-extrabold" style={{ color: 'var(--color-amber)' }}>{state.sessionXP}</span>
-            </div>
-            {xpGained > 0 && (
-              <span key={xpKey} className="anim-xp absolute -top-1 right-0 text-sm font-extrabold pointer-events-none"
-                style={{ color: 'var(--color-green)' }}>+{xpGained}</span>
-            )}
           </div>
         </div>
 
@@ -326,7 +309,7 @@ export default function QuizPage() {
 
 /* ── Result Screen ── */
 function ResultScreen({ stats, vocab, srsStore, onRetry, onHome }: {
-  stats: { correct: number; total: number; xp: number }
+  stats: { correct: number; total: number }
   vocab: VocabItem[]; srsStore: SRSStore
   onRetry: () => void; onHome: () => void
 }) {
@@ -349,7 +332,7 @@ function ResultScreen({ stats, vocab, srsStore, onRetry, onHome }: {
         <div className="grid grid-cols-3 gap-2.5 mb-5">
           {[
             { icon: '🎯', val: `${stats.correct}/${stats.total}`, label: 'Benar',   color: 'var(--color-green)',  bg: 'var(--color-green-light)' },
-            { icon: '⚡', val: `+${stats.xp}`,                   label: 'XP',      color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
+            { icon: '📅', val: `+1`,                             label: 'Session', color: 'var(--color-amber)',  bg: 'var(--color-amber-light)' },
             { icon: '📊', val: `${pct}%`,                        label: 'Akurasi', color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
           ].map(s => (
             <div key={s.label} className="rounded-3xl py-4 text-center" style={{ background: s.bg }}>

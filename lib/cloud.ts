@@ -49,7 +49,6 @@ function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
   
   // XP, Sessions, Correct, Answered: Ambil yang TERBESAR (biar ga ilang progress dari device manapun)
   const mergedStats: GameStats = {
-    totalXP: Math.max(local.stats.totalXP || 0, cloudStats.totalXP || 0),
     totalSessions: Math.max(local.stats.totalSessions || 0, cloudStats.totalSessions || 0),
     totalCorrect: Math.max(local.stats.totalCorrect || 0, cloudStats.totalCorrect || 0),
     totalAnswered: Math.max(local.stats.totalAnswered || 0, cloudStats.totalAnswered || 0),
@@ -116,7 +115,7 @@ export async function syncToCloud(): Promise<boolean> {
       cache: 'no-store',
     })
     
-    console.log('[Sync] Success', { ok: pushRes.ok, finalXP: finalData.stats.totalXP })
+    console.log('[Sync] Success', { ok: pushRes.ok })
     return pushRes.ok
   } catch (e) {
     console.error('[Sync] Error:', e)

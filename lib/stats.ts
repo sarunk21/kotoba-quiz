@@ -1,7 +1,6 @@
 'use client'
 
 export interface GameStats {
-  totalXP: number
   currentStreak: number
   longestStreak: number
   lastPlayedDate: string // YYYY-MM-DD
@@ -12,7 +11,6 @@ export interface GameStats {
 }
 
 const DEFAULT_STATS: GameStats = {
-  totalXP: 0,
   currentStreak: 0,
   longestStreak: 0,
   lastPlayedDate: '',
@@ -22,12 +20,38 @@ const DEFAULT_STATS: GameStats = {
   updatedAt: '',
 }
 
+/** Check if streak should be reset (if more than 1 day has passed since last played) */
+export function checkAndResetStreak(stats: GameStats): GameStats {
+  if (!stats.lastPlayedDate) return stats
+  
+  const today = new Date().toISOString().split('T')[0]
+  if (stats.lastPlayedDate === today) return stats
+
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+  // Jika hari terakhir main bukan hari ini DAN bukan kemarin, berarti streak putus
+  if (stats.lastPlayedDate !== yesterdayStr) {
+    const updated = {
+      ...stats,
+      currentStreak: 0,
+      updatedAt: new Date().toISOString()
+    }
+    saveStats(updated)
+    return updated
+  }
+
+  return stats
+}
+
 export function loadStats(): GameStats {
   if (typeof window === 'undefined') return DEFAULT_STATS
   try {
     const raw = localStorage.getItem('kotoba_stats')
     if (!raw) return DEFAULT_STATS
-    return { ...DEFAULT_STATS, ...JSON.parse(raw) }
+    const parsed = { ...DEFAULT_STATS, ...JSON.parse(raw) }
+    return checkAndResetStreak(parsed)
   } catch {
     return DEFAULT_STATS
   }
@@ -38,25 +62,18 @@ export function saveStats(stats: GameStats) {
   localStorage.setItem('kotoba_stats', JSON.stringify(stats))
 }
 
-export function updateAfterSession(correct: number, total: number, xpGained: number): GameStats {
+export function updateAfterSession(correct: number, total: number): GameStats {
   const stats = loadStats()
   const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
   
   let newDayStreak = stats.currentStreak
   if (stats.lastPlayedDate !== today) {
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-    const yesterdayStr = yesterday.toISOString().split('T')[0]
-    
-    if (stats.lastPlayedDate === yesterdayStr) {
-      newDayStreak = stats.currentStreak + 1
-    } else {
-      newDayStreak = 1
-    }
+    // Kita udah tau dari loadStats() kalau masuk sini berarti lastPlayedDate adalah yesterdayStr
+    // atau emang baru main pertama kali
+    newDayStreak = stats.currentStreak + 1
   }
 
   const updated: GameStats = {
-    totalXP: stats.totalXP + xpGained,
     currentStreak: newDayStreak,
     longestStreak: Math.max(stats.longestStreak, newDayStreak),
     lastPlayedDate: today,

@@ -10,7 +10,7 @@ Flashcard kosakata Jepang bergaya Duolingo, dibangun dengan Next.js. Connect ke 
 
 ## Fitur
 - Multiple choice quiz (4 pilihan) bergaya Duolingo
-- Streak & XP system
+- Streak system
 - Lives (3 nyawa)
 - Data dari Google Sheets (auto-update)
 - Stats persistent (localStorage)
