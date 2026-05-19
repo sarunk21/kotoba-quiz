@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { parseCSVToVocab, getDisplayText, type VocabItem } from '@/lib/vocab'
+import { parseCSVToVocab, getDisplayText, type VocabItem, getGlobalVocab, setGlobalVocab } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 import {
   loadSRS, saveSRS, onCorrect, onWrong,
