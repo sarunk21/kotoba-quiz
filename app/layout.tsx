@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: '言葉カード — Kotoba Quiz',
   description: 'Latihan kosakata Jepang harian dengan flashcard',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/kotoba-quiz-icon.png',
+    apple: '/kotoba-quiz-icon.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
