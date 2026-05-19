@@ -8,6 +8,7 @@ import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs
 import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
 import { fetchVocabCSV, pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
+import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
 
@@ -23,6 +24,7 @@ export default function Home() {
   const [vocabError, setVocabError] = useState('')
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [notificationNeed, setNotificationNeed] = useState<{ type: string; message: string } | null>(null)
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0)
@@ -53,6 +55,13 @@ export default function Home() {
     const url = localStorage.getItem('kotoba_sheets_url') || ''
     setSavedUrl(url)
     if (url) loadVocabData(url)
+
+    // Check notifications
+    const need = checkNotificationNeeds()
+    if (need) {
+      setNotificationNeed(need)
+      showLocalNotification('言葉カード', need.message)
+    }
   }, [loadVocabData])
 
   // Account Isolation
@@ -208,6 +217,27 @@ export default function Home() {
             ) : null}
           </div>
         </div>
+
+        {/* Notification Banner (Passive Aggressive Duolingo style) */}
+        {session && notificationNeed && (
+          <div className="anim-up mb-6">
+            <div className="rounded-3xl p-4 flex items-center gap-4 border-2" 
+              style={{ 
+                background: notificationNeed.type === 'streak_at_risk' ? 'var(--color-amber-light)' : 'var(--color-red-light)',
+                borderColor: notificationNeed.type === 'streak_at_risk' ? 'var(--color-amber)' : 'var(--color-red)'
+              }}>
+              <div className="text-3xl shrink-0">
+                {notificationNeed.type === 'streak_at_risk' ? '🔥' : notificationNeed.type === 'streak_lost' ? '🕯️' : '👋'}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold leading-tight" style={{ color: 'var(--color-text-1)' }}>
+                  {notificationNeed.message}
+                </p>
+              </div>
+              <button onClick={() => setNotificationNeed(null)} className="p-1 text-xs opacity-50 font-black">✕</button>
+            </div>
+          </div>
+        )}
 
         {!session && status !== 'loading' ? (
           <div className="anim-up d1">

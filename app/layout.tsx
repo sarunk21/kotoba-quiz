@@ -40,6 +40,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider>
           {children}
         </SessionProvider>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                  console.log('SW registered');
+                }).catch(function(err) {
+                  console.log('SW fail', err);
+                });
+              });
+            }
+          `
+        }} />
       </body>
     </html>
   )
