@@ -7,8 +7,12 @@ export const metadata: Metadata = {
   description: 'Latihan kosakata Jepang harian dengan flashcard',
   manifest: '/manifest.json',
   icons: {
-    icon: '/kotoba-quiz-icon.png',
-    apple: '/kotoba-quiz-icon.png',
+    icon: [
+      { url: '/icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    shortcut: '/icons/favicon.ico',
+    apple: '/icons/apple-touch-icon.png',
   },
   appleWebApp: {
     capable: true,
