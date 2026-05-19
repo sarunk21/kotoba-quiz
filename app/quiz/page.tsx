@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { parseCSVToVocab, getDisplayText, type VocabItem } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 import {
@@ -38,7 +38,28 @@ const CAT: Record<string, { color: string; bg: string }> = {
 }
 
 export default function QuizPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-dvh" style={{ background: 'var(--color-bg)' }}>
+        <div className="text-center">
+          <p className="jp-serif text-3xl mb-3" style={{ color: 'var(--color-text-2)' }}>読み込み中</p>
+          <div className="flex justify-center gap-1.5">
+            {[0, 1, 2].map(i => <div key={i} className="w-2 h-2 rounded-full" style={{ background: 'var(--color-accent)', opacity: 0.3 + i * 0.35 }} />)}
+          </div>
+        </div>
+      </div>
+    }>
+      <QuizContent />
+    </Suspense>
+  )
+}
+
+function QuizContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const mode = searchParams.get('mode')
+  const isKanjiMode = mode === 'kanji'
+
   const [vocab, setVocab] = useState<VocabItem[]>([])
   const [phase, setPhase] = useState<Phase>('loading')
   const [state, setState] = useState<SessionState | null>(null)
@@ -47,6 +68,7 @@ export default function QuizPage() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [cardKey, setCardKey] = useState(0)
   const [finalStats, setFinalStats] = useState<{ correct: number; total: number; srsStore: SRSStore } | null>(null)
+  const [showHint, setShowHint] = useState(false)
   const srsRef = useRef<SRSStore>({})
 
   useEffect(() => {
@@ -59,14 +81,24 @@ export default function QuizPage() {
           const csv = await fetchVocabCSV(url)
           if (csv) {
             const parsed = parseCSVToVocab(csv)
-            if (parsed.length >= 4) v = parsed
+            if (parsed.length >= 4) {
+              if (isKanjiMode) {
+                v = parsed.filter(item => item.kanji && item.kanji !== item.hiragana)
+              } else {
+                v = parsed
+              }
+            }
           }
         } catch { }
       }
       if (v.length > 0) setVocab(v)
+      else if (phase === 'loading') {
+        // Handle empty case (e.g. no kanji words)
+        setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
+      }
     }
     init()
-  }, [])
+  }, [isKanjiMode])
 
   useEffect(() => { if (vocab.length > 0) startQuiz(vocab, srsRef.current) }, [vocab])
 
@@ -78,7 +110,7 @@ export default function QuizPage() {
     if (!queue.length) { setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result'); return }
     setState({ queue, current: 0, lives: 3, sessionCorrect: 0, sessionAnswered: 0, roundStreak: 0 })
     setChoices(getChoices(queue[0], v))
-    setSelected(null); setIsCorrect(null); setCardKey(k => k + 1); setPhase('question')
+    setSelected(null); setIsCorrect(null); setCardKey(k => k + 1); setPhase('question'); setShowHint(false)
   }
 
   const handleAnswer = useCallback((choice: string) => {
@@ -119,7 +151,7 @@ export default function QuizPage() {
     const next = state.current + 1
     setState(p => p ? { ...p, current: next } : p)
     setChoices(getChoices(state.queue[next], vocab))
-    setSelected(null); setIsCorrect(null); setCardKey(k => k + 1); setPhase('question')
+    setSelected(null); setIsCorrect(null); setCardKey(k => k + 1); setPhase('question'); setShowHint(false)
   }
 
   /* Loading */
@@ -139,7 +171,7 @@ export default function QuizPage() {
   /* Result */
   if (phase === 'result' && finalStats) {
     return <ResultScreen stats={finalStats} vocab={vocab} srsStore={finalStats.srsStore}
-      onRetry={() => startQuiz(vocab, srsRef.current)} onHome={() => router.replace('/')} />
+      onRetry={() => startQuiz(vocab, srsRef.current)} onHome={() => router.replace('/')} isKanji={isKanjiMode} />
   }
 
   const q = state.queue[state.current]
@@ -176,7 +208,11 @@ export default function QuizPage() {
               <span key={i} style={{ fontSize: 18, opacity: i <= state.lives ? 1 : 0.15, transition: 'opacity 0.3s' }}>❤️</span>
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            {isKanjiMode && (
+              <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg uppercase tracking-wider"
+                style={{ background: 'var(--color-accent)', color: '#fff' }}>Kanji Mode</span>
+            )}
             {isRefresh && (
               <span className="text-xs font-bold px-2.5 py-1 rounded-full"
                 style={{ background: 'var(--color-green-light)', color: 'var(--color-green)' }}>🔄 refresh</span>
@@ -208,9 +244,22 @@ export default function QuizPage() {
           <div className="absolute inset-0" style={{
             background: `radial-gradient(ellipse at 50% 0%, ${cat.bg} 0%, transparent 60%)`,
           }} />
-          {sub && (
-            <p className="relative jp text-xs mb-2" style={{ color: 'var(--color-text-3)', letterSpacing: '0.1em' }}>{sub}</p>
-          )}
+          
+          <div className="min-h-[20px] mb-2 flex justify-center">
+            {sub && (isKanjiMode ? (
+              showHint ? (
+                <p className="relative jp text-xs anim-pop" style={{ color: 'var(--color-text-3)', letterSpacing: '0.1em' }}>{sub}</p>
+              ) : (
+                <button onClick={() => { setShowHint(true); playTap() }} 
+                  className="relative text-[10px] font-bold px-3 py-1 rounded-full border border-dashed border-[var(--color-border)] text-[var(--color-text-3)] active:scale-95 transition-all">
+                  💡 Hint?
+                </button>
+              )
+            ) : (
+              <p className="relative jp text-xs" style={{ color: 'var(--color-text-3)', letterSpacing: '0.1em' }}>{sub}</p>
+            ))}
+          </div>
+
           <p className="relative jp-serif" style={{
             fontSize: main.length > 6 ? '2.2rem' : main.length > 3 ? '2.8rem' : '3.5rem',
             fontWeight: 700, color: 'var(--color-text-1)', lineHeight: 1.2,
@@ -308,10 +357,10 @@ export default function QuizPage() {
 }
 
 /* ── Result Screen ── */
-function ResultScreen({ stats, vocab, srsStore, onRetry, onHome }: {
+function ResultScreen({ stats, vocab, srsStore, onRetry, onHome, isKanji }: {
   stats: { correct: number; total: number }
   vocab: VocabItem[]; srsStore: SRSStore
-  onRetry: () => void; onHome: () => void
+  onRetry: () => void; onHome: () => void; isKanji?: boolean
 }) {
   const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
   const great = pct >= 80; const ok = pct >= 50

@@ -124,6 +124,8 @@ export default function Home() {
   const srs = vocab.length > 0 ? getSRSSummary(vocab.map(v => v.id), srsStore) : null
   const kanaSrs = getKanaSummary(KANA, srsStore)
   const noVocab = vocab.length === 0
+  const kanjiVocab = vocab.filter(v => v.kanji && v.kanji !== v.hiragana)
+  const kanjiSrs = kanjiVocab.length > 0 ? getSRSSummary(kanjiVocab.map(v => v.id), srsStore) : null
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
@@ -141,7 +143,7 @@ export default function Home() {
       <div ref={scrollRef} className="max-w-sm mx-auto px-4 pt-12 pb-10 overflow-y-auto"
         style={{ minHeight: '100dvh', transform: pullY > 0 ? `translateY(${pullY}px)` : 'none', transition: isPulling ? 'none' : 'transform 0.3s ease' }}
         onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-        
+
         {/* Header */}
         <div className="anim-up mb-5 relative z-[100]">
           <div className="flex items-center justify-between">
@@ -228,6 +230,22 @@ export default function Home() {
               )}
             </div>
 
+            {/* Kanji card */}
+            {!noVocab && kanjiVocab.length > 0 && (
+              <div className="anim-up d1 mb-4">
+                <Link href="/quiz?mode=kanji" className="block no-underline">
+                  <div className="rounded-3xl p-5 flex items-center gap-4" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1.5px solid var(--color-border)' }}>
+                    <div className="jp-serif text-4xl leading-none text-[var(--color-accent)]">漢</div>
+                    <div className="flex-1">
+                      <p className="font-extrabold text-base">Latihan Kanji</p>
+                      <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{kanjiVocab.length} kata pakai kanji · Fokus baca kanji</p>
+                    </div>
+                    <span style={{ color: 'var(--color-text-3)', fontSize: 20 }}>›</span>
+                  </div>
+                </Link>
+              </div>
+            )}
+
             {/* Kana card */}
             <div className="anim-up d1 mb-4">
               <Link href="/kana" className="block no-underline">
@@ -266,7 +284,7 @@ export default function Home() {
                 <div className="grid grid-cols-4 gap-2 px-3 pb-4">
                   {[
                     { label: 'Review', val: srs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-                    { label: 'Baru', val: srs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+                    { label: 'Baru',   val: srs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
                     { label: 'Proses', val: srs.learningCount, color: '#a855f7', bg: '#faf0ff' },
                     { label: 'Hafal', val: srs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
                   ].map(s => (
@@ -275,6 +293,27 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+            {/* Kanji status */}
+            {kanjiSrs && (
+              <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+                  <p className="font-bold">Status Kanji</p>
+                  <Link href="/quiz?mode=kanji" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>Latih kanji →</Link>
+                </div>
+                <div className="grid grid-cols-4 gap-2 px-3 pb-4">
+                  {[
+                    { label: 'Review', val: kanjiSrs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
+                    { label: 'Baru',   val: kanjiSrs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+                    { label: 'Proses', val: kanjiSrs.learningCount, color: '#a855f7', bg: '#faf0ff' },
+                    { label: 'Hafal', val: kanjiSrs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
+                  ].map(s => (
+                    <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}><p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p><p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p></div>
+                  ))}
+                </div>
+              </div>
+            )}
+
 
             {/* Kana status */}
             <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
