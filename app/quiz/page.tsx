@@ -58,10 +58,11 @@ function QuizContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode')
+  const chapter = searchParams.get('chapter')
   const isKanjiMode = mode === 'kanji'
 
   const [vocab, setVocab] = useState<VocabItem[]>([])
-  const [phase, setPhase] = useState<Phase>('loading')
+  const [phase, setPhase] = useState<'loading' | 'question' | 'feedback' | 'result'>('loading')
   const [state, setState] = useState<SessionState | null>(null)
   const [choices, setChoices] = useState<string[]>([])
   const [selected, setSelected] = useState<string | null>(null)
@@ -82,23 +83,26 @@ function QuizContent() {
           if (csv) {
             const parsed = parseCSVToVocab(csv)
             if (parsed.length >= 4) {
+              let filtered = parsed
               if (isKanjiMode) {
-                v = parsed.filter(item => item.kanji && item.kanji !== item.hiragana)
-              } else {
-                v = parsed
+                filtered = filtered.filter(item => item.kanji && item.kanji !== item.hiragana)
               }
+              if (chapter) {
+                filtered = filtered.filter(item => item.chapter === chapter)
+              }
+              v = filtered
             }
           }
         } catch { }
       }
       if (v.length > 0) setVocab(v)
       else if (phase === 'loading') {
-        // Handle empty case (e.g. no kanji words)
+        // Handle empty case
         setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
       }
     }
     init()
-  }, [isKanjiMode])
+  }, [isKanjiMode, chapter])
 
   useEffect(() => { if (vocab.length > 0) startQuiz(vocab, srsRef.current) }, [vocab])
 

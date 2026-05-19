@@ -3,7 +3,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
   --color-bg: #f2f4f7;
   --color-white: #ffffff;
   --color-subtle: #e8eaed;
@@ -72,7 +72,7 @@ html, body {
   min-height: 100dvh;
 }
 
-.jp      { font-family: 'Noto Sans JP', sans-serif; }
+.jp      { font-family: 'Plus Jakarta Sans', -apple-system, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif; }
 .jp-serif { font-family: 'Noto Serif JP', serif; }
 
 /* ── Shadows ── */

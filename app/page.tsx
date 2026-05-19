@@ -127,6 +127,12 @@ export default function Home() {
   const kanjiVocab = vocab.filter(v => v.kanji && v.kanji !== v.hiragana)
   const kanjiSrs = kanjiVocab.length > 0 ? getSRSSummary(kanjiVocab.map(v => v.id), srsStore) : null
 
+  const chapters = useMemo(() => {
+    const set = new Set<string>()
+    vocab.forEach(v => { if (v.chapter) set.add(v.chapter) })
+    return Array.from(set).sort()
+  }, [vocab])
+
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
       {/* Pull indicator */}
@@ -213,7 +219,7 @@ export default function Home() {
             )}
 
             {/* CTA card */}
-            <div className="anim-up d1 mb-4">
+            <div className="anim-up d1 mb-6">
               {!noVocab ? (
                 <Link href="/quiz" className="block no-underline">
                   <div className="rounded-3xl p-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #5b5ef4 0%, #7c7ff7 100%)', boxShadow: '0 8px 24px rgba(91,94,244,0.32)' }}>
@@ -229,6 +235,31 @@ export default function Home() {
                 </div>
               )}
             </div>
+
+            {/* Chapters section */}
+            {!noVocab && chapters.length > 0 && (
+              <div className="mb-6 anim-up d1">
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <p className="font-bold text-sm" style={{ color: 'var(--color-text-1)' }}>Latihan Per Bab</p>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--color-subtle)', color: 'var(--color-text-3)' }}>{chapters.length} Bab</span>
+                </div>
+                <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                  {chapters.map(ch => (
+                    <Link key={ch} href={`/quiz?chapter=${encodeURIComponent(ch)}`} className="block no-underline shrink-0">
+                      <div className="rounded-2xl p-4 w-32 flex flex-col items-center justify-center text-center transition-all active:scale-95" 
+                        style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                        <div className="text-2xl mb-2">📖</div>
+                        <p className="text-[10px] font-black uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-3)' }}>BAB</p>
+                        <p className="text-xs font-bold truncate w-full" style={{ color: 'var(--color-text-1)' }}>{ch}</p>
+                        <div className="mt-3 w-full py-1.5 rounded-xl text-[10px] font-bold" style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)' }}>
+                          Mulai
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Kanji card */}
             {!noVocab && kanjiVocab.length > 0 && (
