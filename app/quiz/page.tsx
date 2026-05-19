@@ -264,7 +264,7 @@ function QuizContent() {
             ))}
           </div>
 
-          <p className="relative jp-serif" style={{
+          <p className="relative jp" style={{
             fontSize: main.length > 6 ? '2.2rem' : main.length > 3 ? '2.8rem' : '3.5rem',
             fontWeight: 700, color: 'var(--color-text-1)', lineHeight: 1.2,
           }}>
@@ -339,7 +339,7 @@ function QuizContent() {
                   ? wp.level >= MASTERED_LEVEL
                     ? 'Masih hafal! Muncul lagi 90 hari lagi'
                     : `Naik level → review ${SRS_INTERVALS[Math.min(wp.level + 1, 6)]} hari lagi`
-                  : <span>Jawaban: <span className="font-bold" style={{ color: 'var(--color-green-dark)' }}>{q.arti}</span></span>
+                  : <span>Jawaban: <span className="jp font-bold" style={{ color: 'var(--color-green-dark)' }}>{q.arti}</span></span>
                 }
               </p>
             </div>

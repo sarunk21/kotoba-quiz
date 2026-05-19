@@ -314,8 +314,8 @@ function QuizContent() {
             return (
               <button key={i} onClick={() => { playTap(); handleAnswer(c) }} disabled={!!selected}
                 className={`rounded-2xl px-3 py-4 text-center active:scale-95 transition-transform ${cls}`}
-                style={{ background: bg, border, color, boxShadow: shadow, fontFamily: isKanaChoice ? "'Noto Serif JP', serif" : 'inherit' }}>
-                <span style={{ fontSize: isKanaChoice ? '1.8rem' : '1rem', fontWeight: isKanaChoice ? 700 : 600 }}>
+                style={{ background: bg, border, color, boxShadow: shadow }}>
+                <span className={isKanaChoice ? "jp" : ""} style={{ fontSize: isKanaChoice ? '1.8rem' : '1rem', fontWeight: isKanaChoice ? 700 : 600 }}>
                   {c}
                 </span>
               </button>
@@ -343,7 +343,7 @@ function QuizContent() {
                     ? 'Masih hafal! Muncul lagi 90 hari'
                     : `Naik level → review ${SRS_INTERVALS[Math.min(wp.level + 1, 6)]} hari lagi`
                   : <span>
-                      <span className="jp-serif font-bold" style={{ color: 'var(--color-text-1)' }}>{displayKana}</span>
+                      <span className="jp font-bold" style={{ color: 'var(--color-text-1)' }}>{displayKana}</span>
                       {' = '}
                       <span style={{ color: 'var(--color-green-dark)', fontWeight: 700 }}>{q.romaji}</span>
                     </span>

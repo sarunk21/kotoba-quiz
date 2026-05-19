@@ -72,8 +72,8 @@ html, body {
   min-height: 100dvh;
 }
 
-.jp      { font-family: 'Noto Sans JP', 'Plus Jakarta Sans', -apple-system, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif; }
-.jp-serif { font-family: 'Noto Serif JP', serif; }
+.jp      { font-family: 'Noto Sans JP', sans-serif; }
+.jp-serif { font-family: 'Noto Sans JP', sans-serif; }
 
 /* ── Shadows ── */
 .shadow-card { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
