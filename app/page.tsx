@@ -135,10 +135,24 @@ export default function Home() {
         map.get(v.chapter)!.push(v.id)
       }
     })
-    return Array.from(map.entries()).map(([name, ids]) => ({
-      name,
-      summary: getSRSSummary(ids, srsStore)
-    })).sort((a, b) => a.name.localeCompare(b.name))
+    
+    // Calculate progress based on actual SRS levels (0-6) instead of just Mastered count
+    const MAX_LEVEL = 6 // Matches lib/srs
+    return Array.from(map.entries()).map(([name, ids]) => {
+      const summary = getSRSSummary(ids, srsStore)
+      
+      // Calculate total potential levels vs achieved levels
+      let totalLevelsAchieved = 0
+      ids.forEach(id => {
+        const level = srsStore[id]?.level || 0
+        totalLevelsAchieved += Math.min(level, MAX_LEVEL)
+      })
+      
+      const maxPossibleLevels = ids.length * MAX_LEVEL
+      const pct = maxPossibleLevels > 0 ? Math.round((totalLevelsAchieved / maxPossibleLevels) * 100) : 0
+
+      return { name, summary, pct }
+    }).sort((a, b) => a.name.localeCompare(b.name))
   }, [vocab, srsStore])
 
   return (
