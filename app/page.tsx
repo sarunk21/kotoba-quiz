@@ -392,7 +392,15 @@ export default function Home() {
             {srs && !noVocab && (
               <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-                  <p className="font-bold">Status Vocab</p>
+                  <div>
+                    <p className="font-bold">Status Vocab</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
+                        <div className="h-full transition-all duration-700" style={{ width: `${srs.pct}%`, background: srs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }} />
+                      </div>
+                      <span className="text-[10px] font-black" style={{ color: srs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{srs.pct}%</span>
+                    </div>
+                  </div>
                   <Link href="/progress" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>Lihat semua →</Link>
                 </div>
                 <div className="grid grid-cols-4 gap-2 px-3 pb-4">
@@ -412,7 +420,15 @@ export default function Home() {
             {kanjiSrs && (
               <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-                  <p className="font-bold">Status Kanji</p>
+                  <div>
+                    <p className="font-bold">Status Kanji</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
+                        <div className="h-full transition-all duration-700" style={{ width: `${kanjiSrs.pct}%`, background: kanjiSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }} />
+                      </div>
+                      <span className="text-[10px] font-black" style={{ color: kanjiSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{kanjiSrs.pct}%</span>
+                    </div>
+                  </div>
                   <Link href="/quiz?mode=kanji" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>Latih kanji →</Link>
                 </div>
                 <div className="grid grid-cols-4 gap-2 px-3 pb-4">
@@ -432,7 +448,15 @@ export default function Home() {
             {/* Kana status */}
             <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-                <p className="font-bold">Status Kana</p>
+                <div>
+                  <p className="font-bold">Status Kana</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
+                      <div className="h-full transition-all duration-700" style={{ width: `${kanaSrs.pct}%`, background: kanaSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }} />
+                    </div>
+                    <span className="text-[10px] font-black" style={{ color: kanaSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{kanaSrs.pct}%</span>
+                  </div>
+                </div>
                 <Link href="/kana" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>Lanjut belajar →</Link>
               </div>
               <div className="grid grid-cols-4 gap-2 px-3 pb-4">

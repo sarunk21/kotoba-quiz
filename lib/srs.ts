@@ -145,21 +145,28 @@ export function getSRSSummary(vocabIds: string[], store: SRSStore) {
   let newCount = 0
   let masteredCount = 0
   let learningCount = 0
+  let totalLevelsAchieved = 0
 
   for (const id of vocabIds) {
     const wp = store[id]
     if (!wp || wp.level === 0) {
       newCount++
-    } else if (wp.level >= MASTERED_LEVEL) {
-      masteredCount++
-      if (wp.nextReview <= today) dueCount++ // mastered but due for refresh
     } else {
-      learningCount++
-      if (wp.nextReview <= today) dueCount++
+      totalLevelsAchieved += Math.min(wp.level, MAX_LEVEL)
+      if (wp.level >= MASTERED_LEVEL) {
+        masteredCount++
+        if (wp.nextReview <= today) dueCount++ // mastered but due for refresh
+      } else {
+        learningCount++
+        if (wp.nextReview <= today) dueCount++
+      }
     }
   }
 
-  return { dueCount, newCount, masteredCount, learningCount, total: vocabIds.length }
+  const maxPossibleLevels = vocabIds.length * MAX_LEVEL
+  const pct = maxPossibleLevels > 0 ? Math.round((totalLevelsAchieved / maxPossibleLevels) * 100) : 0
+
+  return { dueCount, newCount, masteredCount, learningCount, total: vocabIds.length, pct }
 }
 
 /** Stats summary for all kana */
