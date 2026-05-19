@@ -54,11 +54,11 @@ export async function showLocalNotification(title: string, body: string) {
     if (registration) {
       registration.showNotification(title, {
         body,
-        icon: '/favicon.ico', // Update with your actual icon path
+        icon: '/favicon.ico',
         badge: '/favicon.ico',
         vibrate: [200, 100, 200],
         tag: 'kotoba-reminder'
-      })
+      } as any)
     } else {
       new Notification(title, { body })
     }
