@@ -128,10 +128,18 @@ export default function Home() {
   const kanjiSrs = kanjiVocab.length > 0 ? getSRSSummary(kanjiVocab.map(v => v.id), srsStore) : null
 
   const chapters = useMemo(() => {
-    const set = new Set<string>()
-    vocab.forEach(v => { if (v.chapter) set.add(v.chapter) })
-    return Array.from(set).sort()
-  }, [vocab])
+    const map = new Map<string, string[]>()
+    vocab.forEach(v => {
+      if (v.chapter) {
+        if (!map.has(v.chapter)) map.set(v.chapter, [])
+        map.get(v.chapter)!.push(v.id)
+      }
+    })
+    return Array.from(map.entries()).map(([name, ids]) => ({
+      name,
+      summary: getSRSSummary(ids, srsStore)
+    })).sort((a, b) => a.name.localeCompare(b.name))
+  }, [vocab, srsStore])
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
@@ -244,19 +252,39 @@ export default function Home() {
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--color-subtle)', color: 'var(--color-text-3)' }}>{chapters.length} Bab</span>
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                  {chapters.map(ch => (
-                    <Link key={ch} href={`/quiz?chapter=${encodeURIComponent(ch)}`} className="block no-underline shrink-0">
-                      <div className="rounded-2xl p-4 w-32 flex flex-col items-center justify-center text-center transition-all active:scale-95" 
-                        style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                        <div className="text-2xl mb-2">📖</div>
-                        <p className="text-[10px] font-black uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-3)' }}>BAB</p>
-                        <p className="text-xs font-bold truncate w-full" style={{ color: 'var(--color-text-1)' }}>{ch}</p>
-                        <div className="mt-3 w-full py-1.5 rounded-xl text-[10px] font-bold" style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)' }}>
-                          Mulai
+                  {chapters.map(ch => {
+                    const pct = Math.round((ch.summary.masteredCount / ch.summary.total) * 100)
+                    return (
+                      <Link key={ch.name} href={`/quiz?chapter=${encodeURIComponent(ch.name)}`} className="block no-underline shrink-0">
+                        <div className="rounded-2xl p-4 w-32 flex flex-col items-center justify-center text-center transition-all active:scale-95" 
+                          style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                          <div className="text-2xl mb-2">📖</div>
+                          <p className="text-[10px] font-black uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-3)' }}>BAB</p>
+                          <p className="text-xs font-bold truncate w-full mb-2" style={{ color: 'var(--color-text-1)' }}>{ch.name}</p>
+                          
+                          {/* Progress indicator */}
+                          <div className="w-full mb-3">
+                            <div className="flex justify-between items-center mb-1 px-0.5">
+                              <span className="text-[8px] font-bold" style={{ color: 'var(--color-text-3)' }}>Progress</span>
+                              <span className="text-[8px] font-bold" style={{ color: pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{pct}%</span>
+                            </div>
+                            <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
+                              <div className="h-full rounded-full transition-all duration-500" 
+                                style={{ 
+                                  width: `${pct}%`, 
+                                  background: pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' 
+                                }} 
+                              />
+                            </div>
+                          </div>
+
+                          <div className="w-full py-1.5 rounded-xl text-[10px] font-bold" style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)' }}>
+                            Mulai
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    )
+                  })}
                 </div>
               </div>
             )}
