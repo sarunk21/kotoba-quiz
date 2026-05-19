@@ -42,7 +42,7 @@ export default function QuizPage() {
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-dvh" style={{ background: 'var(--color-bg)' }}>
         <div className="text-center">
-          <p className="jp-serif text-3xl mb-3" style={{ color: 'var(--color-text-2)' }}>読み込み中</p>
+          <p className="jp text-3xl mb-3" style={{ color: 'var(--color-text-2)' }}>読み込み中</p>
           <div className="flex justify-center gap-1.5">
             {[0, 1, 2].map(i => <div key={i} className="w-2 h-2 rounded-full" style={{ background: 'var(--color-accent)', opacity: 0.3 + i * 0.35 }} />)}
           </div>
@@ -71,42 +71,9 @@ function QuizContent() {
   const [finalStats, setFinalStats] = useState<{ correct: number; total: number; srsStore: SRSStore } | null>(null)
   const [showHint, setShowHint] = useState(false)
   const srsRef = useRef<SRSStore>({})
+  const initialized = useRef(false)
 
-  useEffect(() => {
-    async function init() {
-      const store = loadSRS(); srsRef.current = store
-      const url = localStorage.getItem('kotoba_sheets_url')
-      let v: VocabItem[] = []
-      if (url) {
-        try {
-          const csv = await fetchVocabCSV(url)
-          if (csv) {
-            const parsed = parseCSVToVocab(csv)
-            if (parsed.length >= 4) {
-              let filtered = parsed
-              if (isKanjiMode) {
-                filtered = filtered.filter(item => item.kanji && item.kanji !== item.hiragana)
-              }
-              if (chapter) {
-                filtered = filtered.filter(item => item.chapter === chapter)
-              }
-              v = filtered
-            }
-          }
-        } catch { }
-      }
-      if (v.length > 0) setVocab(v)
-      else if (phase === 'loading') {
-        // Handle empty case
-        setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
-      }
-    }
-    init()
-  }, [isKanjiMode, chapter])
-
-  useEffect(() => { if (vocab.length > 0) startQuiz(vocab, srsRef.current) }, [vocab])
-
-  function startQuiz(v: VocabItem[], store: SRSStore) {
+  const startQuiz = useCallback((v: VocabItem[], store: SRSStore) => {
     const { dueIds, newIds, refreshIds } = buildQueue(v.map(i => i.id), store, TOTAL_QUESTIONS)
     const allIds = [...dueIds, ...newIds, ...refreshIds].slice(0, TOTAL_QUESTIONS)
     const map = Object.fromEntries(v.map(i => [i.id, i]))
@@ -115,7 +82,48 @@ function QuizContent() {
     setState({ queue, current: 0, lives: 3, sessionCorrect: 0, sessionAnswered: 0, roundStreak: 0 })
     setChoices(getChoices(queue[0], v))
     setSelected(null); setIsCorrect(null); setCardKey(k => k + 1); setPhase('question'); setShowHint(false)
-  }
+  }, [])
+
+  useEffect(() => {
+    async function init() {
+      if (initialized.current) return
+      const store = loadSRS(); srsRef.current = store
+      const url = localStorage.getItem('kotoba_sheets_url')
+      
+      let v: VocabItem[] | null = getGlobalVocab()
+      
+      if (!v && url) {
+        try {
+          const csv = await fetchVocabCSV(url)
+          if (csv) {
+            v = parseCSVToVocab(csv)
+            setGlobalVocab(v)
+          }
+        } catch { }
+      }
+
+      if (v && v.length > 0) {
+        let filtered = v
+        if (isKanjiMode) {
+          filtered = filtered.filter(item => item.kanji && item.kanji !== item.hiragana)
+        }
+        if (chapter) {
+          filtered = filtered.filter(item => item.chapter === chapter)
+        }
+
+        if (filtered.length > 0) {
+          setVocab(filtered)
+          startQuiz(filtered, store)
+          initialized.current = true
+        } else {
+          setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
+        }
+      } else if (phase === 'loading') {
+        setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
+      }
+    }
+    init()
+  }, [isKanjiMode, chapter, startQuiz])
 
   const handleAnswer = useCallback((choice: string) => {
     if (!state || phase !== 'question') return
@@ -163,7 +171,7 @@ function QuizContent() {
     return (
       <div className="flex items-center justify-center min-h-dvh" style={{ background: 'var(--color-bg)' }}>
         <div className="text-center">
-          <p className="jp-serif text-3xl mb-3" style={{ color: 'var(--color-text-2)' }}>読み込み中</p>
+          <p className="jp text-3xl mb-3" style={{ color: 'var(--color-text-2)' }}>読み込み中</p>
           <div className="flex justify-center gap-1.5">
             {[0,1,2].map(i => <div key={i} className="w-2 h-2 rounded-full" style={{ background: 'var(--color-accent)', opacity: 0.3 + i * 0.35 }} />)}
           </div>

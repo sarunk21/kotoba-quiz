@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, type GameStats } from '@/lib/stats'
 import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
-import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
+import { parseCSVToVocab, type VocabItem, setGlobalVocab } from '@/lib/vocab'
 import { fetchVocabCSV, pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
@@ -46,6 +46,7 @@ export default function Home() {
     }
     const parsed = parseCSVToVocab(csv)
     setVocab(parsed)
+    setGlobalVocab(parsed)
     return parsed
   }, [])
 

@@ -371,7 +371,7 @@ export default function KanaQuizPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-dvh" style={{ background: 'var(--color-bg)' }}>
-        <p className="jp-serif text-2xl" style={{ color: 'var(--color-text-2)' }}>読み込み中...</p>
+        <p className="jp text-2xl" style={{ color: 'var(--color-text-2)' }}>読み込み中...</p>
       </div>
     }>
       <QuizContent />

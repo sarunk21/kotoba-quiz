@@ -91,6 +91,17 @@ export function parseCSVToVocab(csvText: string): VocabItem[] {
   return items
 }
 
+// ── Global Cache ──
+let cachedVocab: VocabItem[] | null = null
+
+export function getGlobalVocab(): VocabItem[] | null {
+  return cachedVocab
+}
+
+export function setGlobalVocab(items: VocabItem[]) {
+  cachedVocab = items
+}
+
 export function getDisplayText(item: VocabItem): { main: string; sub: string } {
   const hasKanji = item.kanji !== item.hiragana && item.kanji !== ''
   return {
