@@ -267,6 +267,40 @@ export default function ProgressPage() {
             )}
           </div>
 
+          {/* Grouping Dropdown */}
+          <div className="relative">
+            <button onClick={() => setOpenDropdown(openDropdown === 'group' ? null : 'group')}
+              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
+              style={{
+                background: 'var(--color-white)',
+                color: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                borderColor: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-border)',
+                boxShadow: groupBy !== 'none' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
+              }}>
+              <span className="truncate">{groupBy === 'none' ? '❌ Grup' : groupBy === 'category' ? '📂 Tipe' : '📖 Bab'}</span>
+              <span className="text-[8px] opacity-60 shrink-0">▼</span>
+            </button>
+            {openDropdown === 'group' && (
+              <div className={`absolute top-full mt-2 ${groupBy === 'none' ? 'right-0' : 'left-1/2 -translate-x-1/2'} w-[150px] rounded-2xl p-1.5 z-50 border anim-pop`}
+                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                {[
+                  { key: 'none', label: '❌ Tanpa Grup' },
+                  { key: 'category', label: '📂 Grup Tipe Kata' },
+                  { key: 'chapter', label: '📖 Grup Bab' },
+                ].map(opt => (
+                  <button key={opt.key} onClick={() => { setGroupBy(opt.key as any); setOpenDropdown(null) }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                    style={{
+                      background: groupBy === opt.key ? 'var(--color-accent-light)' : 'transparent',
+                      color: groupBy === opt.key ? 'var(--color-accent)' : 'var(--color-text-2)',
+                    }}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Tipe Dropdown */}
           {(groupBy === 'none' || groupBy === 'category') && (
             <div className="relative">
@@ -282,7 +316,7 @@ export default function ProgressPage() {
                 <span className="text-[8px] opacity-60 shrink-0">▼</span>
               </button>
               {openDropdown === 'category' && (
-                <div className={`absolute top-full mt-2 ${groupBy === 'none' ? 'right-0' : 'left-1/2 -translate-x-1/2'} w-[160px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop`}
+                <div className={`absolute top-full mt-2 ${groupBy === 'none' ? 'left-0' : 'right-0'} w-[160px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop`}
                   style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
                   <button onClick={() => { setSelectedCategory('all'); setOpenDropdown(null) }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
@@ -322,7 +356,7 @@ export default function ProgressPage() {
                 <span className="text-[8px] opacity-60 shrink-0">▼</span>
               </button>
               {openDropdown === 'chapter' && (
-                <div className={`absolute top-full mt-2 ${groupBy === 'none' ? 'left-0' : 'left-1/2 -translate-x-1/2'} w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop`}
+                <div className="absolute top-full mt-2 right-0 w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
                   style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
                   <button onClick={() => { setSelectedChapter('all'); setOpenDropdown(null) }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
@@ -354,40 +388,6 @@ export default function ProgressPage() {
               )}
             </div>
           )}
-
-          {/* Grouping Dropdown */}
-          <div className="relative">
-            <button onClick={() => setOpenDropdown(openDropdown === 'group' ? null : 'group')}
-              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
-              style={{
-                background: 'var(--color-white)',
-                color: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-text-2)',
-                borderColor: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-border)',
-                boxShadow: groupBy !== 'none' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
-              }}>
-              <span className="truncate">{groupBy === 'none' ? '❌ Grup' : groupBy === 'category' ? '📂 Tipe' : '📖 Bab'}</span>
-              <span className="text-[8px] opacity-60 shrink-0">▼</span>
-            </button>
-            {openDropdown === 'group' && (
-              <div className="absolute top-full mt-2 right-0 w-[150px] rounded-2xl p-1.5 z-50 border anim-pop"
-                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
-                {[
-                  { key: 'none', label: '❌ Tanpa Grup' },
-                  { key: 'category', label: '📂 Grup Tipe Kata' },
-                  { key: 'chapter', label: '📖 Grup Bab' },
-                ].map(opt => (
-                  <button key={opt.key} onClick={() => { setGroupBy(opt.key as any); setOpenDropdown(null) }}
-                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
-                    style={{
-                      background: groupBy === opt.key ? 'var(--color-accent-light)' : 'transparent',
-                      color: groupBy === opt.key ? 'var(--color-accent)' : 'var(--color-text-2)',
-                    }}>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
 
 
