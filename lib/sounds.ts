@@ -136,14 +136,14 @@ export function playLoseHeart() {
 }
 
 /** Speak Japanese text using Web Speech API */
-export function speakJapanese(text: string) {
+export function speakJapanese(text: string, slow = false) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
   
   window.speechSynthesis.cancel()
 
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'ja-JP'
-  utterance.rate = 0.85 // Slightly slower for clearer pronunciation
+  utterance.rate = slow ? 0.45 : 0.85 // 0.45 for slow-mo, 0.85 for normal clear pronunciation
 
   const speak = () => {
     const voices = window.speechSynthesis.getVoices()
@@ -163,4 +163,5 @@ export function speakJapanese(text: string) {
     speak()
   }
 }
+
 

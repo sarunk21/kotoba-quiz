@@ -8,7 +8,8 @@ import {
   getWordProgress, SRS_INTERVALS, MASTERED_LEVEL,
   type SRSStore
 } from '@/lib/srs'
-import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playFinish } from '@/lib/sounds'
+import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playFinish, speakJapanese } from '@/lib/sounds'
+
 import { updateAfterSession } from '@/lib/stats'
 import { pushToCloud } from '@/lib/cloud'
 
@@ -54,6 +55,16 @@ function QuizContent() {
   const pool = KANA.filter(c => ids.includes(c.id))
 
   useEffect(() => { startQuiz() }, [])
+
+  // Auto-play pronunciation when a new question loads
+  useEffect(() => {
+    if (phase === 'question' && state?.queue && state.queue[state.current]) {
+      const q = state.queue[state.current]
+      const displayKana = kanaType === 'hiragana' ? q.hiragana : q.katakana
+      speakJapanese(displayKana)
+    }
+  }, [state?.current, phase, kanaType])
+
 
   function startQuiz() {
     const queue = shuffle(pool).slice(0, Math.min(15, pool.length))
@@ -259,6 +270,23 @@ function QuizContent() {
             background: `radial-gradient(ellipse at 50% 0%, ${kanaType === 'hiragana' ? 'var(--color-accent-light)' : '#faf0ff'} 0%, transparent 60%)`,
           }} />
 
+          {/* Pronunciation buttons */}
+          <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+            {/* Turtle (Slow-mo) */}
+            <button onClick={() => speakJapanese(displayKana, true)}
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-sm border border-[var(--color-border)]"
+              title="Pelafalan Lambat (Slow-mo)">
+              🐢
+            </button>
+            {/* Normal */}
+            <button onClick={() => speakJapanese(displayKana, false)}
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)]"
+              title="Pelafalan Normal">
+              <VolumeIcon size={16} />
+            </button>
+          </div>
+
+
           {/* Question */}
           {quizMode === 'kana→romaji' ? (
             <div className="relative">
@@ -378,3 +406,14 @@ export default function KanaQuizPage() {
     </Suspense>
   )
 }
+
+function VolumeIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    </svg>
+  )
+}
+

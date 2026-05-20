@@ -266,12 +266,22 @@ function QuizContent() {
             background: `radial-gradient(ellipse at 50% 0%, ${cat.bg} 0%, transparent 60%)`,
           }} />
           
-          {/* Pronunciation button */}
-          <button onClick={() => speakJapanese(q.hiragana || q.kanji)}
-            className="absolute top-4 right-4 w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] z-10"
-            title="Pelafalan">
-            <VolumeIcon size={16} />
-          </button>
+          {/* Pronunciation buttons */}
+          <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+            {/* Turtle (Slow-mo) */}
+            <button onClick={() => speakJapanese(q.hiragana || q.kanji, true)}
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-sm border border-[var(--color-border)]"
+              title="Pelafalan Lambat (Slow-mo)">
+              🐢
+            </button>
+            {/* Normal */}
+            <button onClick={() => speakJapanese(q.hiragana || q.kanji, false)}
+              className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)]"
+              title="Pelafalan Normal">
+              <VolumeIcon size={16} />
+            </button>
+          </div>
+
 
           
           <div className="min-h-[20px] mb-2 flex justify-center">
