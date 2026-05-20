@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
+
 import { useRouter } from 'next/navigation'
 import { loadSRS, getWordProgress, MASTERED_LEVEL, type SRSStore } from '@/lib/srs'
 import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
@@ -27,6 +28,24 @@ export default function ProgressPage() {
   const [openDropdown, setOpenDropdown] = useState<'status' | 'chapter' | 'group' | null>(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
+
+  const filterBarRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns when clicking outside the filter container
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      if (filterBarRef.current && !filterBarRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [])
+
 
   useEffect(() => {
     setSrsStore(loadSRS())
@@ -168,7 +187,7 @@ export default function ProgressPage() {
         </div>
 
         {/* Custom Filter Bar */}
-        <div className="flex gap-2 mb-6 anim-up d1 relative z-20">
+        <div ref={filterBarRef} className="flex gap-2 mb-6 anim-up d1 relative z-20">
           {/* Status Dropdown */}
           <div className="flex-1 relative">
             <button onClick={() => setOpenDropdown(openDropdown === 'status' ? null : 'status')}
@@ -285,10 +304,6 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        {/* Backdrop for click-away */}
-        {openDropdown && (
-          <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setOpenDropdown(null)} />
-        )}
 
 
 
