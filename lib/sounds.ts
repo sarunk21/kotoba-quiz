@@ -134,3 +134,33 @@ export function playLoseHeart() {
   o.connect(g)
   o.start(t); o.stop(t + 0.22)
 }
+
+/** Speak Japanese text using Web Speech API */
+export function speakJapanese(text: string) {
+  if (typeof window === 'undefined' || !window.speechSynthesis) return
+  
+  window.speechSynthesis.cancel()
+
+  const utterance = new SpeechSynthesisUtterance(text)
+  utterance.lang = 'ja-JP'
+  utterance.rate = 0.85 // Slightly slower for clearer pronunciation
+
+  const speak = () => {
+    const voices = window.speechSynthesis.getVoices()
+    const jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang.toLowerCase().includes('ja'))
+    if (jaVoice) {
+      utterance.voice = jaVoice
+    }
+    window.speechSynthesis.speak(utterance)
+  }
+
+  if (window.speechSynthesis.getVoices().length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      speak()
+      window.speechSynthesis.onvoiceschanged = null
+    }
+  } else {
+    speak()
+  }
+}
+

@@ -10,7 +10,7 @@ import {
   type SRSStore
 } from '@/lib/srs'
 import { fetchVocabCSV, pushToCloud } from '@/lib/cloud'
-import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish } from '@/lib/sounds'
+import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish, speakJapanese } from '@/lib/sounds'
 
 type Phase = 'loading' | 'question' | 'feedback' | 'result'
 
@@ -124,6 +124,15 @@ function QuizContent() {
     }
     init()
   }, [isKanjiMode, chapter, startQuiz])
+
+  // Auto-play pronunciation when a new question loads
+  useEffect(() => {
+    if (phase === 'question' && state?.queue && state.queue[state.current]) {
+      const currentVocab = state.queue[state.current]
+      speakJapanese(currentVocab.hiragana || currentVocab.kanji)
+    }
+  }, [state?.current, phase])
+
 
   const handleAnswer = useCallback((choice: string) => {
     if (!state || phase !== 'question') return
@@ -257,6 +266,14 @@ function QuizContent() {
             background: `radial-gradient(ellipse at 50% 0%, ${cat.bg} 0%, transparent 60%)`,
           }} />
           
+          {/* Pronunciation button */}
+          <button onClick={() => speakJapanese(q.hiragana || q.kanji)}
+            className="absolute top-4 right-4 w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] z-10"
+            title="Pelafalan">
+            <VolumeIcon size={16} />
+          </button>
+
+          
           <div className="min-h-[20px] mb-2 flex justify-center">
             {sub && (isKanjiMode ? (
               showHint ? (
@@ -364,7 +381,18 @@ function QuizContent() {
         </div>
       )}
       {!selected && <div style={{ height: 28 }} />}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
+  )
+}
+
+function VolumeIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    </svg>
   )
 }
 
