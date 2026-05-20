@@ -23,6 +23,8 @@ export default function ProgressPage() {
   const [filter, setFilter] = useState<'all' | 'new' | 'learning' | 'mastered'>('all')
   const [search, setSearch] = useState('')
   const [groupBy, setGroupBy] = useState<'none' | 'category' | 'chapter'>('category')
+  const [selectedChapter, setSelectedChapter] = useState<string>('all')
+  const [openDropdown, setOpenDropdown] = useState<'status' | 'chapter' | 'group' | null>(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
 
@@ -43,6 +45,15 @@ export default function ProgressPage() {
     load()
   }, [])
 
+  // Unique chapters in vocabulary
+  const chapters = useMemo(() => {
+    const set = new Set<string>()
+    vocab.forEach(v => {
+      if (v.chapter) set.add(v.chapter)
+    })
+    return Array.from(set).sort()
+  }, [vocab])
+
   const filtered = useMemo(() => {
     let result = vocab.filter(v => {
       const lv = srsStore[v.id]?.level ?? 0
@@ -51,6 +62,15 @@ export default function ProgressPage() {
       if (filter === 'mastered') return lv >= MASTERED_LEVEL
       return true
     })
+
+    // Chapter filter
+    if (selectedChapter !== 'all') {
+      if (selectedChapter === 'none') {
+        result = result.filter(v => !v.chapter)
+      } else {
+        result = result.filter(v => v.chapter === selectedChapter)
+      }
+    }
 
     if (search.trim()) {
       const q = search.toLowerCase()
@@ -62,7 +82,7 @@ export default function ProgressPage() {
     }
 
     return result
-  }, [vocab, srsStore, filter, search])
+  }, [vocab, srsStore, filter, selectedChapter, search])
 
   const groupedItems = useMemo(() => {
     if (groupBy === 'none') return { '': filtered }
@@ -76,10 +96,10 @@ export default function ProgressPage() {
     return groups
   }, [filtered, groupBy])
 
-  // Reset pagination saat filter atau search ganti
+  // Reset pagination saat filter, search, atau bab ganti
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [filter, search])
+  }, [filter, search, selectedChapter])
 
   const flattenedVisible = useMemo(() => {
     // We still want to respect visibleCount for performance
@@ -147,45 +167,129 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        {/* Filter & Grouping Controls */}
-        <div className="flex gap-2.5 mb-6 anim-up d1">
-          {/* Status Filter */}
+        {/* Custom Filter Bar */}
+        <div className="flex gap-2 mb-6 anim-up d1">
+          {/* Status Dropdown */}
           <div className="flex-1 relative">
-            <select value={filter} onChange={(e) => setFilter(e.target.value as any)}
-              className="w-full appearance-none rounded-2xl py-3.5 pl-4 pr-10 text-xs font-bold outline-none cursor-pointer border transition-all"
+            <button onClick={() => setOpenDropdown(openDropdown === 'status' ? null : 'status')}
+              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
               style={{
                 background: 'var(--color-white)',
-                color: 'var(--color-text-1)',
+                color: filter !== 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
                 borderColor: filter !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
-                boxShadow: filter !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
-                fontFamily: 'inherit',
+                boxShadow: filter !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
               }}>
-              <option value="all">🎯 Semua Status</option>
-              <option value="new">🆕 Belum Dipelajari (Baru)</option>
-              <option value="learning">⚡ Sedang Dipelajari (Proses)</option>
-              <option value="mastered">🎓 Sudah Hafal</option>
-            </select>
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[10px] text-[var(--color-text-3)]">▼</div>
+              <span className="truncate">{filter === 'all' ? '🎯 Status' : filter === 'new' ? '🆕 Baru' : filter === 'learning' ? '⚡ Proses' : '🎓 Hafal'}</span>
+              <span className="text-[8px] opacity-60 shrink-0">▼</span>
+            </button>
+            {openDropdown === 'status' && (
+              <div className="absolute top-full mt-2 left-0 w-full rounded-2xl p-1.5 z-50 border anim-pop"
+                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                {[
+                  { key: 'all', label: '🎯 Semua Status' },
+                  { key: 'new', label: '🆕 Baru' },
+                  { key: 'learning', label: '⚡ Proses' },
+                  { key: 'mastered', label: '🎓 Hafal' },
+                ].map(opt => (
+                  <button key={opt.key} onClick={() => { setFilter(opt.key as any); setOpenDropdown(null) }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                    style={{
+                      background: filter === opt.key ? 'var(--color-accent-light)' : 'transparent',
+                      color: filter === opt.key ? 'var(--color-accent)' : 'var(--color-text-2)',
+                    }}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Grouping Filter */}
+          {/* Chapter Dropdown */}
           <div className="flex-1 relative">
-            <select value={groupBy} onChange={(e) => setGroupBy(e.target.value as any)}
-              className="w-full appearance-none rounded-2xl py-3.5 pl-4 pr-10 text-xs font-bold outline-none cursor-pointer border transition-all"
+            <button onClick={() => setOpenDropdown(openDropdown === 'chapter' ? null : 'chapter')}
+              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
               style={{
                 background: 'var(--color-white)',
-                color: 'var(--color-text-1)',
-                borderColor: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-border)',
-                boxShadow: groupBy !== 'none' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
-                fontFamily: 'inherit',
+                color: selectedChapter !== 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                borderColor: selectedChapter !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
+                boxShadow: selectedChapter !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
               }}>
-              <option value="none">❌ Tanpa Grup</option>
-              <option value="category">📂 Grup: Tipe Kata</option>
-              <option value="chapter">📖 Grup: Bab</option>
-            </select>
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[10px] text-[var(--color-text-3)]">▼</div>
+              <span className="truncate">{selectedChapter === 'all' ? '📖 Semua Bab' : selectedChapter === 'none' ? '📖 Tanpa Bab' : `📖 ${selectedChapter}`}</span>
+              <span className="text-[8px] opacity-60 shrink-0">▼</span>
+            </button>
+            {openDropdown === 'chapter' && (
+              <div className="absolute top-full mt-2 left-0 w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
+                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                <button onClick={() => { setSelectedChapter('all'); setOpenDropdown(null) }}
+                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                  style={{
+                    background: selectedChapter === 'all' ? 'var(--color-accent-light)' : 'transparent',
+                    color: selectedChapter === 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                  }}>
+                  📖 Semua Bab
+                </button>
+                <button onClick={() => { setSelectedChapter('none'); setOpenDropdown(null) }}
+                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                  style={{
+                    background: selectedChapter === 'none' ? 'var(--color-accent-light)' : 'transparent',
+                    color: selectedChapter === 'none' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                  }}>
+                  📖 Tanpa Bab
+                </button>
+                {chapters.map(ch => (
+                  <button key={ch} onClick={() => { setSelectedChapter(ch); setOpenDropdown(null) }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                    style={{
+                      background: selectedChapter === ch ? 'var(--color-accent-light)' : 'transparent',
+                      color: selectedChapter === ch ? 'var(--color-accent)' : 'var(--color-text-2)',
+                    }}>
+                    📖 {ch}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Grouping Dropdown */}
+          <div className="flex-1 relative">
+            <button onClick={() => setOpenDropdown(openDropdown === 'group' ? null : 'group')}
+              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
+              style={{
+                background: 'var(--color-white)',
+                color: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                borderColor: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-border)',
+                boxShadow: groupBy !== 'none' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
+              }}>
+              <span className="truncate">{groupBy === 'none' ? '❌ Tanpa Grup' : groupBy === 'category' ? '📂 Tipe Kata' : '📖 Grup Bab'}</span>
+              <span className="text-[8px] opacity-60 shrink-0">▼</span>
+            </button>
+            {openDropdown === 'group' && (
+              <div className="absolute top-full mt-2 right-0 w-full min-w-[130px] rounded-2xl p-1.5 z-50 border anim-pop"
+                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                {[
+                  { key: 'none', label: '❌ Tanpa Grup' },
+                  { key: 'category', label: '📂 Grup Tipe Kata' },
+                  { key: 'chapter', label: '📖 Grup Bab' },
+                ].map(opt => (
+                  <button key={opt.key} onClick={() => { setGroupBy(opt.key as any); setOpenDropdown(null) }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                    style={{
+                      background: groupBy === opt.key ? 'var(--color-accent-light)' : 'transparent',
+                      color: groupBy === opt.key ? 'var(--color-accent)' : 'var(--color-text-2)',
+                    }}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Backdrop for click-away */}
+        {openDropdown && (
+          <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setOpenDropdown(null)} />
+        )}
+
 
         {/* Vocab cards */}
         <div className="flex flex-col gap-6 anim-up d2">
