@@ -21,6 +21,25 @@ export default function SettingsPage() {
   const [syncMode, setSyncMode] = useState<'auto' | 'manual'>('auto')
   const [syncActionStatus, setSyncActionStatus] = useState<string>('')
 
+  function downloadTemplateCSV() {
+    const csvContent = "kategori,hiragana,kanji,arti,bab\n" +
+      "Kata Benda,わたし,私,Saya,Bab 1\n" +
+      "Kata Kerja,ねます,寝ます,Tidur,Bab 1\n" +
+      "Kata Sifat,たのしい,楽しい,Menyenangkan,Bab 2\n" +
+      "Ungkapan,ありがとう,,Terima kasih,Bab 2\n"
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    link.setAttribute("download", "template_kamus_kotoba.csv")
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/')
   }, [status, router])
@@ -238,11 +257,32 @@ export default function SettingsPage() {
                 Cara setup Sheets ▾
               </summary>
               <div className="mt-3 text-xs space-y-2 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-                <p>1. Kolom: <span className="font-bold" style={{ color: 'var(--color-accent)' }}>kategori, hiragana, kanji, arti</span></p>
+                <p>1. Kolom: <span className="font-bold" style={{ color: 'var(--color-accent)' }}>kategori, hiragana, kanji, arti, bab</span></p>
                 <p>2. File → Share → Publish to web → Format: <span className="font-bold">CSV</span></p>
                 <p>3. Copy link yang muncul → paste di atas</p>
               </div>
             </details>
+
+            <div className="mt-5 p-4 rounded-2xl border border-[var(--color-border)]" style={{ background: 'var(--color-bg)' }}>
+              <p className="text-xs font-bold mb-1.5" style={{ color: 'var(--color-text-1)' }}>Template Kamus</p>
+              <p className="text-[11px] font-semibold leading-relaxed mb-3.5" style={{ color: 'var(--color-text-2)' }}>
+                Format wajib (5 kolom): <code className="font-mono text-[var(--color-accent)]">kategori, hiragana, kanji, arti, bab</code>.
+              </p>
+              <div className="flex gap-2">
+                <button onClick={downloadTemplateCSV}
+                  className="flex-1 rounded-xl py-2.5 text-[11px] font-extrabold active:scale-95 transition-all"
+                  style={{ background: 'var(--color-white)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                  📥 Download CSV
+                </button>
+                <a href="https://docs.google.com/spreadsheets/d/1vN0Vee6rD0-X20Hn9P9e-YkSwl6i6W4u0N7WlXyC4kM/copy" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   className="flex-1 rounded-xl py-2.5 text-[11px] font-extrabold text-white text-center no-underline active:scale-95 transition-all flex items-center justify-center"
+                   style={{ background: 'var(--color-accent)', boxShadow: '0 4px 10px rgba(91,94,244,0.2)' }}>
+                  📋 Salin Google Sheet
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Notifications Section */}
