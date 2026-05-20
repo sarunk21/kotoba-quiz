@@ -15,6 +15,22 @@ const CAT: Record<string, { color: string; bg: string }> = {
   'Kata Sifat': { color: 'var(--color-cat-adj)',  bg: 'var(--color-cat-adj-bg)' },
 }
 
+function getCategoryStyle(category: string) {
+  if (!category) return CAT['Kata Benda']
+  if (CAT[category]) return CAT[category]
+  
+  const catLower = category.toLowerCase()
+  if (catLower.includes('benda')) return CAT['Kata Benda']
+  if (catLower.includes('kerja')) return CAT['Kata Kerja']
+  if (catLower.includes('sifat')) return CAT['Kata Sifat']
+  if (catLower.includes('ungkapan')) return { color: '#d97706', bg: 'rgba(217,119,6,0.12)' }
+  if (catLower.includes('keterangan')) return { color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' }
+  if (catLower.includes('partikel')) return { color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' }
+  
+  return { color: 'var(--color-text-2)', bg: 'var(--color-subtle)' }
+}
+
+
 const PAGE_SIZE = 20
 
 export default function ProgressPage() {
@@ -25,7 +41,8 @@ export default function ProgressPage() {
   const [search, setSearch] = useState('')
   const [groupBy, setGroupBy] = useState<'none' | 'category' | 'chapter'>('category')
   const [selectedChapter, setSelectedChapter] = useState<string>('all')
-  const [openDropdown, setOpenDropdown] = useState<'status' | 'chapter' | 'group' | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [openDropdown, setOpenDropdown] = useState<'status' | 'chapter' | 'category' | 'group' | null>(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
 
@@ -45,6 +62,7 @@ export default function ProgressPage() {
       document.removeEventListener('touchstart', handleClickOutside)
     }
   }, [])
+
 
 
   useEffect(() => {
@@ -73,6 +91,16 @@ export default function ProgressPage() {
     return Array.from(set).sort()
   }, [vocab])
 
+  // Unique categories in vocabulary
+  const categories = useMemo(() => {
+    const set = new Set<string>()
+    vocab.forEach(v => {
+      if (v.category) set.add(v.category)
+    })
+    return Array.from(set).sort()
+  }, [vocab])
+
+
   const filtered = useMemo(() => {
     let result = vocab.filter(v => {
       const lv = srsStore[v.id]?.level ?? 0
@@ -91,6 +119,11 @@ export default function ProgressPage() {
       }
     }
 
+    // Category filter
+    if (selectedCategory !== 'all') {
+      result = result.filter(v => v.category === selectedCategory)
+    }
+
     if (search.trim()) {
       const q = search.toLowerCase()
       result = result.filter(v => 
@@ -101,7 +134,8 @@ export default function ProgressPage() {
     }
 
     return result
-  }, [vocab, srsStore, filter, selectedChapter, search])
+  }, [vocab, srsStore, filter, selectedChapter, selectedCategory, search])
+
 
   const groupedItems = useMemo(() => {
     if (groupBy === 'none') return { '': filtered }
@@ -115,10 +149,11 @@ export default function ProgressPage() {
     return groups
   }, [filtered, groupBy])
 
-  // Reset pagination saat filter, search, atau bab ganti
+  // Reset pagination saat filter, search, bab, atau tipe ganti
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [filter, search, selectedChapter])
+  }, [filter, search, selectedChapter, selectedCategory])
+
 
   const flattenedVisible = useMemo(() => {
     // We still want to respect visibleCount for performance
@@ -187,9 +222,9 @@ export default function ProgressPage() {
         </div>
 
         {/* Custom Filter Bar */}
-        <div ref={filterBarRef} className="flex gap-2 mb-6 anim-up d1 relative z-20">
+        <div ref={filterBarRef} className="grid grid-cols-2 gap-2 mb-6 anim-up d1 relative z-20">
           {/* Status Dropdown */}
-          <div className="flex-1 relative">
+          <div className="relative">
             <button onClick={() => setOpenDropdown(openDropdown === 'status' ? null : 'status')}
               className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
               style={{
@@ -223,8 +258,46 @@ export default function ProgressPage() {
             )}
           </div>
 
+          {/* Tipe Dropdown */}
+          <div className="relative">
+            <button onClick={() => setOpenDropdown(openDropdown === 'category' ? null : 'category')}
+              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
+              style={{
+                background: 'var(--color-white)',
+                color: selectedCategory !== 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                borderColor: selectedCategory !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
+                boxShadow: selectedCategory !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
+              }}>
+              <span className="truncate">{selectedCategory === 'all' ? '📂 Tipe' : `📂 ${selectedCategory}`}</span>
+              <span className="text-[8px] opacity-60 shrink-0">▼</span>
+            </button>
+            {openDropdown === 'category' && (
+              <div className="absolute top-full mt-2 right-0 w-[160px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
+                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                <button onClick={() => { setSelectedCategory('all'); setOpenDropdown(null) }}
+                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                  style={{
+                    background: selectedCategory === 'all' ? 'var(--color-accent-light)' : 'transparent',
+                    color: selectedCategory === 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                  }}>
+                  📂 Semua Tipe
+                </button>
+                {categories.map(catName => (
+                  <button key={catName} onClick={() => { setSelectedCategory(catName); setOpenDropdown(null) }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                    style={{
+                      background: selectedCategory === catName ? 'var(--color-accent-light)' : 'transparent',
+                      color: selectedCategory === catName ? 'var(--color-accent)' : 'var(--color-text-2)',
+                    }}>
+                    📂 {catName}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Chapter Dropdown */}
-          <div className="flex-1 relative">
+          <div className="relative">
             <button onClick={() => setOpenDropdown(openDropdown === 'chapter' ? null : 'chapter')}
               className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
               style={{
@@ -237,7 +310,7 @@ export default function ProgressPage() {
               <span className="text-[8px] opacity-60 shrink-0">▼</span>
             </button>
             {openDropdown === 'chapter' && (
-              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
+              <div className="absolute top-full mt-2 left-0 w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
                 style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
                 <button onClick={() => { setSelectedChapter('all'); setOpenDropdown(null) }}
                   className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
@@ -270,7 +343,7 @@ export default function ProgressPage() {
           </div>
 
           {/* Grouping Dropdown */}
-          <div className="flex-1 relative">
+          <div className="relative">
             <button onClick={() => setOpenDropdown(openDropdown === 'group' ? null : 'group')}
               className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
               style={{
@@ -329,7 +402,7 @@ export default function ProgressPage() {
                     const lv = wp.level
                     const pct = Math.round((lv / 6) * 100)
                     const barColor = lv >= MASTERED_LEVEL ? 'var(--color-green)' : lv >= 3 ? 'var(--color-accent)' : lv >= 1 ? 'var(--color-amber)' : 'var(--color-subtle)'
-                    const cat = CAT[v.category] ?? CAT['Kata Benda']
+                    const cat = getCategoryStyle(v.category)
                     const nextReview = wp.nextReview
                     const today = new Date().toISOString().split('T')[0]
                     const isDue = nextReview <= today && lv > 0

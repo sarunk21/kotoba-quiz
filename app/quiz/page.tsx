@@ -37,6 +37,22 @@ const CAT: Record<string, { color: string; bg: string }> = {
   'Kata Sifat': { color: 'var(--color-cat-adj)',  bg: 'var(--color-cat-adj-bg)' },
 }
 
+function getCategoryStyle(category: string) {
+  if (!category) return CAT['Kata Benda']
+  if (CAT[category]) return CAT[category]
+  
+  const catLower = category.toLowerCase()
+  if (catLower.includes('benda')) return CAT['Kata Benda']
+  if (catLower.includes('kerja')) return CAT['Kata Kerja']
+  if (catLower.includes('sifat')) return CAT['Kata Sifat']
+  if (catLower.includes('ungkapan')) return { color: '#d97706', bg: 'rgba(217,119,6,0.12)' }
+  if (catLower.includes('keterangan')) return { color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' }
+  if (catLower.includes('partikel')) return { color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' }
+  
+  return { color: 'var(--color-text-2)', bg: 'var(--color-subtle)' }
+}
+
+
 export default function QuizPage() {
   return (
     <Suspense fallback={
@@ -198,7 +214,7 @@ function QuizContent() {
   const q = state.queue[state.current]
   const { main, sub } = getDisplayText(q)
   const progress = (state.current / state.queue.length) * 100
-  const cat = CAT[q.category] ?? CAT['Kata Benda']
+  const cat = getCategoryStyle(q.category)
   const wp = getWordProgress(srsRef.current, q.id)
   const isRefresh = wp.level >= MASTERED_LEVEL
 
