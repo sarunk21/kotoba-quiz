@@ -168,7 +168,7 @@ export default function ProgressPage() {
         </div>
 
         {/* Custom Filter Bar */}
-        <div className="flex gap-2 mb-6 anim-up d1">
+        <div className="flex gap-2 mb-6 anim-up d1 relative z-20">
           {/* Status Dropdown */}
           <div className="flex-1 relative">
             <button onClick={() => setOpenDropdown(openDropdown === 'status' ? null : 'status')}
@@ -183,7 +183,7 @@ export default function ProgressPage() {
               <span className="text-[8px] opacity-60 shrink-0">▼</span>
             </button>
             {openDropdown === 'status' && (
-              <div className="absolute top-full mt-2 left-0 w-full rounded-2xl p-1.5 z-50 border anim-pop"
+              <div className="absolute top-full mt-2 left-0 w-[160px] rounded-2xl p-1.5 z-50 border anim-pop"
                 style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
                 {[
                   { key: 'all', label: '🎯 Semua Status' },
@@ -214,11 +214,11 @@ export default function ProgressPage() {
                 borderColor: selectedChapter !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
                 boxShadow: selectedChapter !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
               }}>
-              <span className="truncate">{selectedChapter === 'all' ? '📖 Semua Bab' : selectedChapter === 'none' ? '📖 Tanpa Bab' : `📖 ${selectedChapter}`}</span>
+              <span className="truncate">{selectedChapter === 'all' ? '📖 Bab' : selectedChapter === 'none' ? '📖 Tanpa Bab' : `📖 ${selectedChapter}`}</span>
               <span className="text-[8px] opacity-60 shrink-0">▼</span>
             </button>
             {openDropdown === 'chapter' && (
-              <div className="absolute top-full mt-2 left-0 w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
                 style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
                 <button onClick={() => { setSelectedChapter('all'); setOpenDropdown(null) }}
                   className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
@@ -260,11 +260,11 @@ export default function ProgressPage() {
                 borderColor: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-border)',
                 boxShadow: groupBy !== 'none' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
               }}>
-              <span className="truncate">{groupBy === 'none' ? '❌ Tanpa Grup' : groupBy === 'category' ? '📂 Tipe Kata' : '📖 Grup Bab'}</span>
+              <span className="truncate">{groupBy === 'none' ? '❌ Grup' : groupBy === 'category' ? '📂 Tipe' : '📖 Bab'}</span>
               <span className="text-[8px] opacity-60 shrink-0">▼</span>
             </button>
             {openDropdown === 'group' && (
-              <div className="absolute top-full mt-2 right-0 w-full min-w-[130px] rounded-2xl p-1.5 z-50 border anim-pop"
+              <div className="absolute top-full mt-2 right-0 w-[150px] rounded-2xl p-1.5 z-50 border anim-pop"
                 style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
                 {[
                   { key: 'none', label: '❌ Tanpa Grup' },
@@ -289,6 +289,7 @@ export default function ProgressPage() {
         {openDropdown && (
           <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setOpenDropdown(null)} />
         )}
+
 
 
         {/* Vocab cards */}
