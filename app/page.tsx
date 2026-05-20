@@ -301,7 +301,7 @@ export default function Home() {
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
                   {chapters.map(ch => {
-                    const pct = Math.round((ch.summary.masteredCount / ch.summary.total) * 100)
+                    const pct = ch.pct
                     return (
                       <Link key={ch.name} href={`/quiz?chapter=${encodeURIComponent(ch.name)}`} className="block no-underline shrink-0">
                         <div className="rounded-2xl p-4 w-32 flex flex-col items-center justify-center text-center transition-all active:scale-95" 
