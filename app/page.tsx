@@ -27,7 +27,6 @@ export default function Home() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [notificationNeed, setNotificationNeed] = useState<{ type: string; message: string } | null>(null)
   const [activeStatusTab, setActiveStatusTab] = useState<'vocab' | 'kanji' | 'kana'>('vocab')
-  const [showPracticeModal, setShowPracticeModal] = useState(false)
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0)
@@ -291,22 +290,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Centered Main Practice Button */}
-            {!noVocab && (
-              <div className="anim-up d2 mb-4 text-center">
-                <button 
-                  onClick={() => setShowPracticeModal(true)}
-                  className="w-full rounded-[24px] py-4.5 font-black text-base transition-all duration-300 active:scale-95 text-white flex items-center justify-center gap-3"
-                  style={{
-                    background: 'linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%)',
-                    boxShadow: '0 8px 24px rgba(91,94,244,0.25)',
-                  }}
-                >
-                  <span className="text-lg">🎯</span> Mulai Latihan
-                </button>
-              </div>
-            )}
-
             {/* Consolidated Study Status Tracker */}
             {srs && (
               <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
@@ -411,132 +394,7 @@ export default function Home() {
       {/* Sticky Bottom Nav */}
       <BottomNav />
 
-      {/* ── Practice Mode Selection Bottom Sheet ── */}
-      {showPracticeModal && (
-        <div className="fixed inset-0 z-[120] flex items-end justify-center px-4 pb-4 select-none">
-          <div 
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" 
-            onClick={() => setShowPracticeModal(false)} 
-          />
-          <div 
-            className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up"
-            style={{
-              maxHeight: '85dvh',
-              overflowY: 'auto'
-            }}
-          >
-            {/* Handle bar at the top */}
-            <div className="w-12 h-1.5 rounded-full bg-[var(--color-border)] mx-auto mb-5" />
-
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Pilih Latihan</h3>
-                <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Pilih jenis latihan yang ingin lo jalanin</p>
-              </div>
-              <button 
-                onClick={() => setShowPracticeModal(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-[var(--color-bg)] active:scale-95 transition-all text-xs"
-                style={{ color: 'var(--color-text-2)' }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3 mb-6">
-              {/* Option 1: SRS Vocab Quiz */}
-              <Link href="/quiz" className="block no-underline active:scale-[0.98] transition-transform">
-                <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                  <div className="text-3xl">🧠</div>
-                  <div className="flex-1">
-                    <p className="font-extrabold text-sm text-[var(--color-text-1)]">Kosakata Harian (SRS)</p>
-                    <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                      {srs && srs.dueCount > 0 ? `${srs.dueCount} kata siap direview le` : 'Latih kosakata baru/due hari ini'}
-                    </p>
-                  </div>
-                  <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-                </div>
-              </Link>
-
-              {/* Option 2: Kanji Quiz */}
-              {kanjiVocab.length > 0 && (
-                <Link href="/quiz?mode=kanji" className="block no-underline active:scale-[0.98] transition-transform">
-                  <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                    <div className="jp-serif text-3xl font-extrabold text-[var(--color-accent)] leading-none flex items-center justify-center w-8">漢</div>
-                    <div className="flex-1">
-                      <p className="font-extrabold text-sm text-[var(--color-text-1)]">Fokus Membaca Kanji</p>
-                      <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                        Latih {kanjiVocab.length} kata yang menggunakan Kanji
-                      </p>
-                    </div>
-                    <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-                  </div>
-                </Link>
-              )}
-
-              {/* Option 3: Kana Quiz */}
-              <Link href="/kana" className="block no-underline active:scale-[0.98] transition-transform">
-                <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                  <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8">あ</div>
-                  <div className="flex-1">
-                    <p className="font-extrabold text-sm text-[var(--color-text-1)]">Hiragana & Katakana</p>
-                    <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                      Latih {KANA.length} karakter dasar Jepang
-                    </p>
-                  </div>
-                  <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-                </div>
-              </Link>
-            </div>
-
-            {/* Chapters sub-section inside the Modal */}
-            {chapters.length > 0 && (
-              <div className="border-t border-[var(--color-border)] pt-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="font-extrabold text-xs uppercase tracking-wider text-[var(--color-text-3)]">Latihan Per Bab</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)]">
-                    {chapters.length} Bab
-                  </span>
-                </div>
-                <div className="flex gap-2.5 overflow-x-auto pb-2 no-scrollbar">
-                  {chapters.map(ch => {
-                    const pct = ch.pct
-                    return (
-                      <Link key={ch.name} href={`/quiz?chapter=${encodeURIComponent(ch.name)}`} className="block no-underline shrink-0 active:scale-95 transition-transform">
-                        <div className="rounded-2xl p-3.5 w-28 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)]">
-                          <div className="text-xl mb-1.5">📖</div>
-                          <p className="text-xs font-extrabold truncate w-full text-[var(--color-text-1)]" title={ch.name}>{ch.name}</p>
-                          <div className="w-full mt-2">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-[8px] font-bold text-[var(--color-text-3)]">Progress</span>
-                              <span className="text-[8px] font-bold" style={{ color: pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{pct}%</span>
-                            </div>
-                            <div className="w-full h-1 rounded-full overflow-hidden bg-[var(--color-bg)]">
-                              <div className="h-full rounded-full transition-all duration-500" 
-                                style={{ 
-                                  width: `${pct}%`, 
-                                  background: pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' 
-                                }} 
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
-      `}</style>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }
