@@ -101,12 +101,6 @@ export default function ProgressPage() {
 
   const hasMore = visibleCount < filtered.length
 
-  const tabs = [
-    { key: 'all',      label: 'Semua' },
-    { key: 'new',      label: 'Baru' },
-    { key: 'learning', label: 'Proses' },
-    { key: 'mastered', label: 'Hafal' },
-  ] as const
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
@@ -153,41 +147,43 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        {/* Filter tabs & Grouping */}
-        <div className="flex flex-col gap-4 mb-6 anim-up d1">
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {tabs.map(t => (
-              <button key={t.key} onClick={() => setFilter(t.key)}
-                className="rounded-2xl px-3.5 py-2 text-xs font-bold transition-all active:scale-95 whitespace-nowrap"
-                style={{
-                  background: filter === t.key ? 'var(--color-accent)' : 'var(--color-white)',
-                  color: filter === t.key ? '#fff' : 'var(--color-text-2)',
-                  boxShadow: filter === t.key ? '0 4px 10px rgba(91,94,244,0.25)' : '0 1px 3px rgba(0,0,0,0.06)',
-                }}>
-                {t.label}
-              </button>
-            ))}
+        {/* Filter & Grouping Controls */}
+        <div className="flex gap-2.5 mb-6 anim-up d1">
+          {/* Status Filter */}
+          <div className="flex-1 relative">
+            <select value={filter} onChange={(e) => setFilter(e.target.value as any)}
+              className="w-full appearance-none rounded-2xl py-3.5 pl-4 pr-10 text-xs font-bold outline-none cursor-pointer border transition-all"
+              style={{
+                background: 'var(--color-white)',
+                color: 'var(--color-text-1)',
+                borderColor: filter !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
+                boxShadow: filter !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
+                fontFamily: 'inherit',
+              }}>
+              <option value="all">🎯 Semua Status</option>
+              <option value="new">🆕 Belum Dipelajari (Baru)</option>
+              <option value="learning">⚡ Sedang Dipelajari (Proses)</option>
+              <option value="mastered">🎓 Sudah Hafal</option>
+            </select>
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[10px] text-[var(--color-text-3)]">▼</div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider shrink-0" style={{ color: 'var(--color-text-3)' }}>Grup Berdasarkan:</p>
-            <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
-              {[
-                { key: 'none', label: '❌ Gak ada' },
-                { key: 'category', label: '📂 Tipe' },
-                { key: 'chapter', label: '📖 Bab' },
-              ].map(g => (
-                <button key={g.key} onClick={() => setGroupBy(g.key as any)}
-                  className="rounded-xl px-2.5 py-1.5 text-[10px] font-extrabold transition-all active:scale-95 whitespace-nowrap"
-                  style={{
-                    background: groupBy === g.key ? 'var(--color-white)' : 'transparent',
-                    color: groupBy === g.key ? 'var(--color-accent)' : 'var(--color-text-3)',
-                    border: groupBy === g.key ? '1.5px solid var(--color-accent)' : '1.5px solid transparent',
-                  }}>
-                  {g.label}
-                </button>
-              ))}
-            </div>
+          {/* Grouping Filter */}
+          <div className="flex-1 relative">
+            <select value={groupBy} onChange={(e) => setGroupBy(e.target.value as any)}
+              className="w-full appearance-none rounded-2xl py-3.5 pl-4 pr-10 text-xs font-bold outline-none cursor-pointer border transition-all"
+              style={{
+                background: 'var(--color-white)',
+                color: 'var(--color-text-1)',
+                borderColor: groupBy !== 'none' ? 'var(--color-accent)' : 'var(--color-border)',
+                boxShadow: groupBy !== 'none' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
+                fontFamily: 'inherit',
+              }}>
+              <option value="none">❌ Tanpa Grup</option>
+              <option value="category">📂 Grup: Tipe Kata</option>
+              <option value="chapter">📖 Grup: Bab</option>
+            </select>
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[10px] text-[var(--color-text-3)]">▼</div>
           </div>
         </div>
 
