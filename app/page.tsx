@@ -337,6 +337,22 @@ export default function Home() {
               </div>
             )}
 
+            {/* Sentence Scramble Card */}
+            {!noVocab && (
+              <div className="anim-up d1 mb-4">
+                <Link href="/sentence" className="block no-underline">
+                  <div className="rounded-3xl p-5 flex items-center gap-4" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1.5px solid var(--color-border)' }}>
+                    <div className="text-4xl leading-none">💬</div>
+                    <div className="flex-1">
+                      <p className="font-extrabold text-base">Rangkai Kalimat</p>
+                      <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>Susun kalimat dari kata yang sudah dipelajari</p>
+                    </div>
+                    <span style={{ color: 'var(--color-text-3)', fontSize: 20 }}>›</span>
+                  </div>
+                </Link>
+              </div>
+            )}
+
             {/* Kanji card */}
             {!noVocab && kanjiVocab.length > 0 && (
               <div className="anim-up d1 mb-4">
