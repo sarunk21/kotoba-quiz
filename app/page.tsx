@@ -10,8 +10,19 @@ import { fetchVocabCSV, pushToCloud, syncToCloud, resetCloudData } from '@/lib/c
 import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
 import BottomNav from '@/components/BottomNav'
+import { speakJapanese } from '@/lib/sounds'
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
+
+const FALLBACK_WORDS = [
+  { kanji: '木漏れ日', hiragana: 'こもれび', arti: 'Cahaya matahari yang menyaring melalui celah dedaunan.', category: 'Ungkapan', chapter: 'Keindahan Alam' },
+  { kanji: '生きがい', hiragana: 'いきがい', arti: 'Alasan untuk hidup; makna atau tujuan hidup yang membuat bersemangat bangun pagi.', category: 'Filsafat', chapter: 'Gaya Hidup' },
+  { kanji: '侘寂', hiragana: 'わびさび', arti: 'Menemukan keindahan dalam ketidaksempurnaan dan kesederhanaan.', category: 'Filsafat', chapter: 'Seni' },
+  { kanji: '森林浴', hiragana: 'しんりんよく', arti: 'Menghirup udara hutan untuk ketenangan jiwa (secara harfiah "mandi hutan").', category: 'Ungkapan', chapter: 'Kesehatan' },
+  { kanji: '一期一会', hiragana: 'いちごいちえ', arti: 'Pertemuan sekali seumur hidup; menghargai setiap momen karena tidak akan terulang.', category: 'Yojijukugo', chapter: 'Kebijaksanaan' }
+]
+
+const WEEKDAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
 
 const PULL_THRESHOLD = 80 // px tarik ke bawah sebelum trigger
 
@@ -27,6 +38,8 @@ export default function Home() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [notificationNeed, setNotificationNeed] = useState<{ type: string; message: string } | null>(null)
   const [activeStatusTab, setActiveStatusTab] = useState<'vocab' | 'kanji' | 'kana'>('vocab')
+  const [wordOfTheDay, setWordOfTheDay] = useState<{ kanji: string; hiragana: string; arti: string; category: string; chapter?: string } | null>(null)
+  const [isWotdFlipped, setIsWotdFlipped] = useState(false)
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0)
@@ -127,7 +140,7 @@ export default function Home() {
       setPullY(40); setIsRefreshing(true)
       if (session?.accessToken) await doSync()
       if (savedUrl) await loadVocabData(savedUrl, true)
-      setIsRefreshing(false); window.location.reload()
+      setIsRefreshing(false)
     }
     setPullY(0)
   }
@@ -169,6 +182,63 @@ export default function Home() {
       return { name, summary, pct }
     }).sort((a, b) => a.name.localeCompare(b.name))
   }, [vocab, srsStore])
+
+  const weeklyStreak = useMemo(() => {
+    const today = new Date()
+    const currentDayOfWeek = today.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const mondayIndex = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1
+
+    const streakActiveDays = new Array(7).fill(false)
+
+    if (stats && stats.currentStreak > 0) {
+      const todayDateStr = today.toISOString().split('T')[0]
+      const yesterday = new Date()
+      yesterday.setDate(today.getDate() - 1)
+      const yesterdayDateStr = yesterday.toISOString().split('T')[0]
+
+      const isStreakValid = stats.lastPlayedDate === todayDateStr || stats.lastPlayedDate === yesterdayDateStr
+      if (isStreakValid) {
+        for (let i = 0; i < stats.currentStreak; i++) {
+          const d = new Date()
+          d.setDate(today.getDate() - i)
+          const dayOfWeek = d.getDay()
+          const monIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+          
+          const startOfWeek = new Date(today)
+          startOfWeek.setDate(today.getDate() - mondayIndex)
+          startOfWeek.setHours(0, 0, 0, 0)
+          
+          if (d >= startOfWeek) {
+            streakActiveDays[monIdx] = true
+          }
+        }
+      }
+    }
+    return WEEKDAY_NAMES.map((label, idx) => ({
+      label,
+      active: streakActiveDays[idx],
+      isToday: idx === mondayIndex
+    }))
+  }, [stats])
+
+  useEffect(() => {
+    if (vocab.length > 0) {
+      const dateNum = new Date().getDate()
+      const word = vocab[dateNum % vocab.length]
+      setWordOfTheDay({
+        kanji: word.kanji || '',
+        hiragana: word.hiragana || '',
+        arti: word.arti || '',
+        category: word.category || 'Kata',
+        chapter: word.chapter || ''
+      })
+    } else {
+      const dateNum = new Date().getDate()
+      const word = FALLBACK_WORDS[dateNum % FALLBACK_WORDS.length]
+      setWordOfTheDay(word)
+    }
+    setIsWotdFlipped(false)
+  }, [vocab])
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
@@ -290,6 +360,124 @@ export default function Home() {
               </div>
             )}
 
+            {/* Weekly Streak Tracker */}
+            {stats && (
+              <div className="rounded-3xl p-5 mb-4 anim-up d1 border border-[var(--color-border)] bg-white dark:bg-[#1a1d24]" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+                <div className="flex items-center justify-between mb-3.5">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Rencana Streak Mingguan</p>
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[var(--color-red-light)] text-[var(--color-red)]">
+                    🔥 {stats.currentStreak} Hari
+                  </span>
+                </div>
+                <div className="flex justify-between items-center px-1">
+                  {weeklyStreak.map((day, idx) => (
+                    <div key={idx} className="flex flex-col items-center gap-1.5">
+                      <div 
+                        className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-black transition-all relative ${
+                          day.active 
+                            ? 'bg-gradient-to-tr from-[var(--color-red)] to-[#ff8c42] text-white shadow-[0_3px_10px_rgba(239,68,68,0.25)]' 
+                            : day.isToday 
+                              ? 'border-2 border-dashed border-[var(--color-accent)] text-[var(--color-accent)] bg-[var(--color-accent-light)]' 
+                              : 'bg-[var(--color-bg)] text-[var(--color-text-3)]'
+                        }`}
+                      >
+                        {day.active ? '🔥' : day.label[0]}
+                        {day.isToday && !day.active && (
+                          <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent)] opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-accent)]"></span>
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[9px] font-black uppercase text-[var(--color-text-3)]" style={{ color: day.isToday ? 'var(--color-accent)' : 'var(--color-text-3)' }}>
+                        {day.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Word of the Day (Kata Hari Ini) */}
+            {wordOfTheDay && (
+              <div className="perspective-container h-48 w-full mb-4 anim-up d2 relative">
+                <div className={`flip-card-inner h-full w-full transition-transform duration-500 style-3d ${isWotdFlipped ? 'flip-card-flipped' : ''}`}>
+                  
+                  {/* Front Side */}
+                  <div className="flip-card-front h-full w-full rounded-3xl p-5 flex flex-col justify-between border border-[var(--color-border)] shadow-[0_2px_12px_rgba(0,0,0,0.04)] bg-white dark:bg-[#1a1d24]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] flex items-center gap-1.5">
+                        <span className="text-base">✨</span> KATA HARI INI
+                      </span>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)]">
+                        {wordOfTheDay.category}
+                      </span>
+                    </div>
+
+                    <div className="text-center my-auto flex flex-col items-center justify-center">
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-3xl font-black text-[var(--color-text-1)] jp-serif tracking-wide leading-none">
+                          {wordOfTheDay.kanji || wordOfTheDay.hiragana}
+                        </h2>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            speakJapanese(wordOfTheDay.hiragana || wordOfTheDay.kanji)
+                          }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-90 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0"
+                          title="Putar Suara"
+                        >
+                          <VolumeIcon size={14} />
+                        </button>
+                      </div>
+                      {wordOfTheDay.kanji && wordOfTheDay.kanji !== wordOfTheDay.hiragana && (
+                        <p className="text-xs text-[var(--color-text-3)] mt-1.5 font-bold tracking-widest jp">{wordOfTheDay.hiragana}</p>
+                      )}
+                    </div>
+
+                    <div className="flex justify-center mt-1">
+                      <button 
+                        onClick={() => setIsWotdFlipped(true)}
+                        className="rounded-xl px-4 py-2 text-xs font-extrabold text-white bg-[var(--color-accent)] active:scale-95 transition-transform"
+                      >
+                        Lihat Arti 🔍
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Back Side */}
+                  <div className="flip-card-back h-full w-full rounded-3xl p-5 flex flex-col justify-between border border-[var(--color-border)] shadow-[0_2px_12px_rgba(0,0,0,0.04)] bg-white dark:bg-[#1a1d24]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-1.5">
+                        <span className="text-base">💡</span> ARTI KATA
+                      </span>
+                      {wordOfTheDay.chapter && (
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)]">
+                          📖 {wordOfTheDay.chapter}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="text-center my-auto px-2">
+                      <p className="text-base font-extrabold text-[var(--color-text-1)] leading-relaxed">
+                        {wordOfTheDay.arti}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-center">
+                      <button 
+                        onClick={() => setIsWotdFlipped(false)}
+                        className="rounded-xl px-4 py-2 text-xs font-bold text-[var(--color-text-2)] bg-[var(--color-bg)] active:scale-95 transition-transform"
+                      >
+                        Balik ↩
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
             {/* Consolidated Study Status Tracker */}
             {srs && (
               <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
@@ -394,8 +582,38 @@ export default function Home() {
       {/* Sticky Bottom Nav */}
       <BottomNav />
 
-      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .perspective-container { perspective: 1000px; }
+        .flip-card-inner {
+          position: relative;
+          width: 100%;
+          transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          transform-style: preserve-3d;
+        }
+        .flip-card-flipped { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          top: 0;
+          left: 0;
+        }
+        .flip-card-back { transform: rotateY(180deg); }
+        .style-3d { transform-style: preserve-3d; }
+      `}</style>
     </div>
+  )
+}
+
+function VolumeIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+    </svg>
   )
 }
 
