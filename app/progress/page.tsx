@@ -154,6 +154,15 @@ export default function ProgressPage() {
     setVisibleCount(PAGE_SIZE)
   }, [filter, search, selectedChapter, selectedCategory])
 
+  // Reset filter ketika tipe grouping berubah agar tidak tabrakan
+  useEffect(() => {
+    if (groupBy === 'category') {
+      setSelectedChapter('all')
+    } else if (groupBy === 'chapter') {
+      setSelectedCategory('all')
+    }
+  }, [groupBy])
+
 
   const flattenedVisible = useMemo(() => {
     // We still want to respect visibleCount for performance
@@ -222,7 +231,7 @@ export default function ProgressPage() {
         </div>
 
         {/* Custom Filter Bar */}
-        <div ref={filterBarRef} className="grid grid-cols-2 gap-2 mb-6 anim-up d1 relative z-20">
+        <div ref={filterBarRef} className={`grid ${groupBy === 'none' ? 'grid-cols-2' : 'grid-cols-3'} gap-2 mb-6 anim-up d1 relative z-20`}>
           {/* Status Dropdown */}
           <div className="relative">
             <button onClick={() => setOpenDropdown(openDropdown === 'status' ? null : 'status')}
@@ -259,88 +268,92 @@ export default function ProgressPage() {
           </div>
 
           {/* Tipe Dropdown */}
-          <div className="relative">
-            <button onClick={() => setOpenDropdown(openDropdown === 'category' ? null : 'category')}
-              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
-              style={{
-                background: 'var(--color-white)',
-                color: selectedCategory !== 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
-                borderColor: selectedCategory !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
-                boxShadow: selectedCategory !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
-              }}>
-              <span className="truncate">{selectedCategory === 'all' ? '📂 Tipe' : `📂 ${selectedCategory}`}</span>
-              <span className="text-[8px] opacity-60 shrink-0">▼</span>
-            </button>
-            {openDropdown === 'category' && (
-              <div className="absolute top-full mt-2 right-0 w-[160px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
-                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
-                <button onClick={() => { setSelectedCategory('all'); setOpenDropdown(null) }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
-                  style={{
-                    background: selectedCategory === 'all' ? 'var(--color-accent-light)' : 'transparent',
-                    color: selectedCategory === 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
-                  }}>
-                  📂 Semua Tipe
-                </button>
-                {categories.map(catName => (
-                  <button key={catName} onClick={() => { setSelectedCategory(catName); setOpenDropdown(null) }}
+          {(groupBy === 'none' || groupBy === 'category') && (
+            <div className="relative">
+              <button onClick={() => setOpenDropdown(openDropdown === 'category' ? null : 'category')}
+                className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
+                style={{
+                  background: 'var(--color-white)',
+                  color: selectedCategory !== 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                  borderColor: selectedCategory !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
+                  boxShadow: selectedCategory !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
+                }}>
+                <span className="truncate">{selectedCategory === 'all' ? '📂 Tipe' : `📂 ${selectedCategory}`}</span>
+                <span className="text-[8px] opacity-60 shrink-0">▼</span>
+              </button>
+              {openDropdown === 'category' && (
+                <div className={`absolute top-full mt-2 ${groupBy === 'none' ? 'right-0' : 'left-1/2 -translate-x-1/2'} w-[160px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop`}
+                  style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                  <button onClick={() => { setSelectedCategory('all'); setOpenDropdown(null) }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
                     style={{
-                      background: selectedCategory === catName ? 'var(--color-accent-light)' : 'transparent',
-                      color: selectedCategory === catName ? 'var(--color-accent)' : 'var(--color-text-2)',
+                      background: selectedCategory === 'all' ? 'var(--color-accent-light)' : 'transparent',
+                      color: selectedCategory === 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
                     }}>
-                    📂 {catName}
+                    📂 Semua Tipe
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                  {categories.map(catName => (
+                    <button key={catName} onClick={() => { setSelectedCategory(catName); setOpenDropdown(null) }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                      style={{
+                        background: selectedCategory === catName ? 'var(--color-accent-light)' : 'transparent',
+                        color: selectedCategory === catName ? 'var(--color-accent)' : 'var(--color-text-2)',
+                      }}>
+                      📂 {catName}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Chapter Dropdown */}
-          <div className="relative">
-            <button onClick={() => setOpenDropdown(openDropdown === 'chapter' ? null : 'chapter')}
-              className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
-              style={{
-                background: 'var(--color-white)',
-                color: selectedChapter !== 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
-                borderColor: selectedChapter !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
-                boxShadow: selectedChapter !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
-              }}>
-              <span className="truncate">{selectedChapter === 'all' ? '📖 Bab' : selectedChapter === 'none' ? '📖 Tanpa Bab' : `📖 ${selectedChapter}`}</span>
-              <span className="text-[8px] opacity-60 shrink-0">▼</span>
-            </button>
-            {openDropdown === 'chapter' && (
-              <div className="absolute top-full mt-2 left-0 w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop"
-                style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
-                <button onClick={() => { setSelectedChapter('all'); setOpenDropdown(null) }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
-                  style={{
-                    background: selectedChapter === 'all' ? 'var(--color-accent-light)' : 'transparent',
-                    color: selectedChapter === 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
-                  }}>
-                  📖 Semua Bab
-                </button>
-                <button onClick={() => { setSelectedChapter('none'); setOpenDropdown(null) }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
-                  style={{
-                    background: selectedChapter === 'none' ? 'var(--color-accent-light)' : 'transparent',
-                    color: selectedChapter === 'none' ? 'var(--color-accent)' : 'var(--color-text-2)',
-                  }}>
-                  📖 Tanpa Bab
-                </button>
-                {chapters.map(ch => (
-                  <button key={ch} onClick={() => { setSelectedChapter(ch); setOpenDropdown(null) }}
+          {(groupBy === 'none' || groupBy === 'chapter') && (
+            <div className="relative">
+              <button onClick={() => setOpenDropdown(openDropdown === 'chapter' ? null : 'chapter')}
+                className="w-full flex items-center justify-between gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold border transition-all active:scale-[0.98] select-none text-left"
+                style={{
+                  background: 'var(--color-white)',
+                  color: selectedChapter !== 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                  borderColor: selectedChapter !== 'all' ? 'var(--color-accent)' : 'var(--color-border)',
+                  boxShadow: selectedChapter !== 'all' ? '0 4px 12px rgba(91,94,244,0.12)' : '0 1px 3px rgba(0,0,0,0.04)',
+                }}>
+                <span className="truncate">{selectedChapter === 'all' ? '📖 Bab' : selectedChapter === 'none' ? '📖 Tanpa Bab' : `📖 ${selectedChapter}`}</span>
+                <span className="text-[8px] opacity-60 shrink-0">▼</span>
+              </button>
+              {openDropdown === 'chapter' && (
+                <div className={`absolute top-full mt-2 ${groupBy === 'none' ? 'left-0' : 'left-1/2 -translate-x-1/2'} w-[180px] max-h-[220px] overflow-y-auto no-scrollbar rounded-2xl p-1.5 z-50 border anim-pop`}
+                  style={{ background: 'var(--color-white)', borderColor: 'var(--color-border)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+                  <button onClick={() => { setSelectedChapter('all'); setOpenDropdown(null) }}
                     className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
                     style={{
-                      background: selectedChapter === ch ? 'var(--color-accent-light)' : 'transparent',
-                      color: selectedChapter === ch ? 'var(--color-accent)' : 'var(--color-text-2)',
+                      background: selectedChapter === 'all' ? 'var(--color-accent-light)' : 'transparent',
+                      color: selectedChapter === 'all' ? 'var(--color-accent)' : 'var(--color-text-2)',
                     }}>
-                    📖 {ch}
+                    📖 Semua Bab
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                  <button onClick={() => { setSelectedChapter('none'); setOpenDropdown(null) }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                    style={{
+                      background: selectedChapter === 'none' ? 'var(--color-accent-light)' : 'transparent',
+                      color: selectedChapter === 'none' ? 'var(--color-accent)' : 'var(--color-text-2)',
+                    }}>
+                    📖 Tanpa Bab
+                  </button>
+                  {chapters.map(ch => (
+                    <button key={ch} onClick={() => { setSelectedChapter(ch); setOpenDropdown(null) }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                      style={{
+                        background: selectedChapter === ch ? 'var(--color-accent-light)' : 'transparent',
+                        color: selectedChapter === ch ? 'var(--color-accent)' : 'var(--color-text-2)',
+                      }}>
+                      📖 {ch}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Grouping Dropdown */}
           <div className="relative">
