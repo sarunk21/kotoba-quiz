@@ -9,6 +9,7 @@ import { parseCSVToVocab, type VocabItem, setGlobalVocab } from '@/lib/vocab'
 import { fetchVocabCSV, pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
+import BottomNav from '@/components/BottomNav'
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
 
@@ -25,6 +26,7 @@ export default function Home() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [notificationNeed, setNotificationNeed] = useState<{ type: string; message: string } | null>(null)
+  const [activeStatusTab, setActiveStatusTab] = useState<'vocab' | 'kanji' | 'kana'>('vocab')
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0)
@@ -181,7 +183,7 @@ export default function Home() {
         </div>
       )}
 
-      <div ref={scrollRef} className="max-w-sm mx-auto px-4 pt-12 pb-10 overflow-y-auto"
+      <div ref={scrollRef} className="max-w-sm mx-auto px-4 pt-12 pb-28 overflow-y-auto"
         style={{ minHeight: '100dvh', transform: pullY > 0 ? `translateY(${pullY}px)` : 'none', transition: isPulling ? 'none' : 'transform 0.3s ease' }}
         onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
 
@@ -379,88 +381,85 @@ export default function Home() {
               </div>
             )}
 
-            {/* Vocab status */}
-            {srs && !noVocab && (
+            {/* Consolidated Study Status Tracker */}
+            {srs && (
               <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold">Status Vocab</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
-                        <div className="h-full transition-all duration-700" style={{ width: `${srs.pct}%`, background: srs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }} />
-                      </div>
-                      <span className="text-[10px] font-black" style={{ color: srs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{srs.pct}%</span>
-                    </div>
-                  </div>
-                  <Link href="/progress" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>Lihat semua →</Link>
-                </div>
-                <div className="grid grid-cols-4 gap-2 px-3 pb-4">
+                {/* Custom status tabs */}
+                <div className="flex border-b border-[var(--color-border)] p-1 bg-[var(--color-bg)]/40">
                   {[
-                    { label: 'Review', val: srs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-                    { label: 'Baru',   val: srs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-                    { label: 'Proses', val: srs.learningCount, color: '#a855f7', bg: '#faf0ff' },
-                    { label: 'Hafal', val: srs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
-                  ].map(s => (
-                    <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}><p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p><p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p></div>
-                  ))}
+                    { key: 'vocab', label: 'Kosakata', available: !noVocab },
+                    { key: 'kanji', label: 'Kanji', available: !!kanjiSrs },
+                    { key: 'kana', label: 'Kana', available: true }
+                  ].map(tab => {
+                    const isTabActive = activeStatusTab === tab.key
+                    if (!tab.available) return null
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => setActiveStatusTab(tab.key as any)}
+                        className={`flex-1 text-center py-2.5 text-xs font-black rounded-2xl transition-all ${isTabActive ? 'shadow-sm bg-[var(--color-white)]' : 'opacity-60'}`}
+                        style={{
+                          color: isTabActive ? 'var(--color-accent)' : 'var(--color-text-2)',
+                        }}
+                      >
+                        {tab.label}
+                      </button>
+                    )
+                  })}
                 </div>
+
+                {/* Tab content */}
+                {(() => {
+                  let currentSrs = srs
+                  let linkUrl = '/progress'
+                  let linkText = 'Lihat semua →'
+                  let title = 'Status Kosakata'
+
+                  if (activeStatusTab === 'kanji' && kanjiSrs) {
+                    currentSrs = kanjiSrs
+                    linkUrl = '/quiz?mode=kanji'
+                    linkText = 'Latih kanji →'
+                    title = 'Status Kanji'
+                  } else if (activeStatusTab === 'kana') {
+                    currentSrs = kanaSrs
+                    linkUrl = '/kana'
+                    linkText = 'Latih kana →'
+                    title = 'Status Kana'
+                  }
+
+                  return (
+                    <div className="anim-fade-in">
+                      <div className="px-5 pt-4 pb-3 flex items-center justify-between">
+                        <div>
+                          <p className="font-extrabold text-sm" style={{ color: 'var(--color-text-1)' }}>{title}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
+                              <div className="h-full transition-all duration-700" style={{ width: `${currentSrs.pct}%`, background: currentSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }} />
+                            </div>
+                            <span className="text-[10px] font-black" style={{ color: currentSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{currentSrs.pct}%</span>
+                          </div>
+                        </div>
+                        <Link href={linkUrl} className="text-xs font-bold no-underline" style={{ color: 'var(--color-accent)' }}>{linkText}</Link>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2 px-3 pb-4">
+                        {[
+                          { label: 'Review', val: currentSrs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
+                          { label: 'Baru',   val: currentSrs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
+                          { label: 'Proses', val: currentSrs.learningCount, color: '#a855f7', bg: '#faf0ff' },
+                          { label: 'Hafal',  val: currentSrs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
+                        ].map(s => (
+                          <div key={s.label} className="rounded-2xl py-3 text-center transition-all duration-200" style={{ background: s.bg }}>
+                            <p className="text-base font-extrabold" style={{ color: s.color }}>{s.val}</p>
+                            <p className="text-[10px] font-bold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
             )}
-
-            {/* Kanji status */}
-            {kanjiSrs && (
-              <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold">Status Kanji</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
-                        <div className="h-full transition-all duration-700" style={{ width: `${kanjiSrs.pct}%`, background: kanjiSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }} />
-                      </div>
-                      <span className="text-[10px] font-black" style={{ color: kanjiSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{kanjiSrs.pct}%</span>
-                    </div>
-                  </div>
-                  <Link href="/quiz?mode=kanji" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>Latih kanji →</Link>
-                </div>
-                <div className="grid grid-cols-4 gap-2 px-3 pb-4">
-                  {[
-                    { label: 'Review', val: kanjiSrs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-                    { label: 'Baru',   val: kanjiSrs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-                    { label: 'Proses', val: kanjiSrs.learningCount, color: '#a855f7', bg: '#faf0ff' },
-                    { label: 'Hafal', val: kanjiSrs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
-                  ].map(s => (
-                    <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}><p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p><p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p></div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-
-            {/* Kana status */}
-            <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-                <div>
-                  <p className="font-bold">Status Kana</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-subtle)' }}>
-                      <div className="h-full transition-all duration-700" style={{ width: `${kanaSrs.pct}%`, background: kanaSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }} />
-                    </div>
-                    <span className="text-[10px] font-black" style={{ color: kanaSrs.pct >= 80 ? 'var(--color-green)' : 'var(--color-accent)' }}>{kanaSrs.pct}%</span>
-                  </div>
-                </div>
-                <Link href="/kana" className="text-xs font-semibold no-underline" style={{ color: 'var(--color-accent)' }}>Lanjut belajar →</Link>
-              </div>
-              <div className="grid grid-cols-4 gap-2 px-3 pb-4">
-                {[
-                  { label: 'Review', val: kanaSrs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
-                  { label: 'Baru', val: kanaSrs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-                  { label: 'Proses', val: kanaSrs.learningCount, color: '#a855f7', bg: '#faf0ff' },
-                  { label: 'Hafal', val: kanaSrs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
-                ].map(s => (
-                  <div key={s.label} className="rounded-2xl py-3 text-center" style={{ background: s.bg }}><p className="text-lg font-extrabold" style={{ color: s.color }}>{s.val}</p><p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p></div>
-                ))}
-              </div>
-            </div>
           </>
         )}
 
@@ -484,6 +483,9 @@ export default function Home() {
       )}
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      
+      {/* Sticky Bottom Nav */}
+      <BottomNav />
     </div>
   )
 }

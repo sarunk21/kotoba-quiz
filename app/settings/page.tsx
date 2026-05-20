@@ -7,6 +7,7 @@ import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
 import { parseCSVToVocab } from '@/lib/vocab'
 import { fetchVocabCSV, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud } from '@/lib/cloud'
+import BottomNav from '@/components/BottomNav'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -148,7 +149,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto px-4 pt-12 pb-10">
+      <div className="max-w-sm mx-auto px-4 pt-12 pb-28">
         
         {/* Header */}
         <div className="flex items-center gap-3 mb-8 anim-up">
@@ -352,6 +353,9 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+      
+      {/* Sticky Bottom Nav */}
+      <BottomNav />
     </div>
   )
 }

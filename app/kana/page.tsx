@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import { KANA, kanaId, type KanaType } from '@/lib/kana'
 import { loadSRS, MASTERED_LEVEL, getWordProgress, type SRSStore } from '@/lib/srs'
 import { pullFromCloud } from '@/lib/cloud'
+import BottomNav from '@/components/BottomNav'
 
 const GROUPS = [
   { key: 'vowel',   label: 'Vokal',     short: 'あア' },
@@ -110,7 +111,7 @@ export default function KanaPage() {
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto px-4 pt-12 pb-10">
+      <div className="max-w-sm mx-auto px-4 pt-12 pb-28">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 anim-up">
@@ -283,6 +284,9 @@ export default function KanaPage() {
         </button>
 
       </div>
+      
+      {/* Sticky Bottom Nav */}
+      <BottomNav />
     </div>
   )
 }

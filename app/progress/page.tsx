@@ -7,6 +7,7 @@ import { loadSRS, getWordProgress, MASTERED_LEVEL, type SRSStore } from '@/lib/s
 import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
 import { fetchVocabCSV } from '@/lib/cloud'
 import { speakJapanese } from '@/lib/sounds'
+import BottomNav from '@/components/BottomNav'
 
 
 const CAT: Record<string, { color: string; bg: string }> = {
@@ -187,7 +188,7 @@ export default function ProgressPage() {
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto px-4 pt-12 pb-10">
+      <div className="max-w-sm mx-auto px-4 pt-12 pb-28">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 anim-up">
@@ -500,6 +501,9 @@ export default function ProgressPage() {
           )}
         </div>
       </div>
+      
+      {/* Sticky Bottom Nav */}
+      <BottomNav />
     </div>
   )
 }
