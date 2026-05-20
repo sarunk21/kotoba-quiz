@@ -89,7 +89,12 @@ export function onWrong(store: SRSStore, id: string): SRSStore {
 
 /** 
  * Build a smart quiz queue from vocab list.
- * Priority: due today → new words → future (refreshment filler)
+ * Priority: 
+ * 1. Due today & Belum Hafal (level 1-4)
+ * 2. New words (level 0)
+ * 3. Future / review Belum Hafal (level 1-4, not due yet but unmemorized)
+ * 4. Due today & Sudah Hafal (level 5-6)
+ * 5. Future / review Sudah Hafal (level 5-6)
  */
 export function buildQueue(
   vocabIds: string[],
@@ -98,43 +103,46 @@ export function buildQueue(
 ): { dueIds: string[]; newIds: string[]; refreshIds: string[] } {
   const today = todayStr()
 
-  const due: string[] = []
+  const dueBelumHafal: string[] = []
   const newWords: string[] = []
-  const future: string[] = []
+  const futureBelumHafal: string[] = []
+  const dueSudahHafal: string[] = []
+  const futureSudahHafal: string[] = []
 
   for (const id of vocabIds) {
     const wp = store[id]
     if (!wp || wp.level === 0) {
       newWords.push(id)
-    } else if (wp.nextReview <= today) {
-      due.push(id)
+    } else if (wp.level < MASTERED_LEVEL) {
+      if (wp.nextReview <= today) {
+        dueBelumHafal.push(id)
+      } else {
+        futureBelumHafal.push(id)
+      }
     } else {
-      future.push(id)
+      if (wp.nextReview <= today) {
+        dueSudahHafal.push(id)
+      } else {
+        futureSudahHafal.push(id)
+      }
     }
   }
 
   // Shuffle each bucket
   const shuffle = <T>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5)
-  const dueSh = shuffle(due)
+  const dueBelumHafalSh = shuffle(dueBelumHafal)
   const newSh = shuffle(newWords)
-  const futureSh = shuffle(future)
+  const futureBelumHafalSh = shuffle(futureBelumHafal)
+  const dueSudahHafalSh = shuffle(dueSudahHafal)
+  const futureSudahHafalSh = shuffle(futureSudahHafal)
 
-  // Fill queue: due first, then new, then future as refreshment filler
-  const queue: string[] = []
-  const add = (ids: string[]) => {
-    for (const id of ids) {
-      if (queue.length >= maxCards) break
-      queue.push(id)
-    }
-  }
-  add(dueSh)
-  add(newSh)
-  add(futureSh)
+  // Combined refresh/filler list: prioritizing unmemorized, then mastered
+  const refreshIds = [...futureBelumHafalSh, ...dueSudahHafalSh, ...futureSudahHafalSh]
 
   return {
-    dueIds: dueSh,
+    dueIds: dueBelumHafalSh,
     newIds: newSh,
-    refreshIds: futureSh,
+    refreshIds: refreshIds,
   }
 }
 

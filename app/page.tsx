@@ -253,18 +253,7 @@ export default function Home() {
           </div>
         ) : session && (
           <>
-            {/* Sync Status - Only show when syncing, ok (briefly), or error */}
-            {syncStatus !== 'idle' && (
-              <div className="rounded-2xl px-4 py-3 mb-4 flex items-center justify-between anim-up" style={{ background: 'var(--color-white)', border: '1.5px solid var(--color-border)' }}>
-                <div>
-                  <p className="text-xs font-bold" style={{ color: 'var(--color-text-1)' }}>☁ Status Cloud</p>
-                  <p className="text-[10px] font-semibold" style={{ color: syncStatus === 'error' ? 'var(--color-red)' : 'var(--color-text-2)' }}>
-                    {syncStatus === 'syncing' ? 'Sedang mensinkronisasi...' : syncStatus === 'ok' ? 'Data terbaru sudah aman ✓' : 'Gagal sinkron. Cek koneksi le.'}
-                  </p>
-                </div>
-                {syncStatus === 'syncing' && <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />}
-              </div>
-            )}
+
 
             {noVocab && (
               <div className="rounded-3xl p-6 mb-5 anim-up text-center" style={{ background: 'var(--color-white)', border: '2px solid var(--color-accent)' }}>
