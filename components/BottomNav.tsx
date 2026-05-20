@@ -308,11 +308,11 @@ export default function BottomNav() {
         </div>
       )}
 
-      <style jsx global>{`
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+      <style>{`
+        @keyframes bottomNavSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes bottomNavFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-slide-up { animation: bottomNavSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in { animation: bottomNavFadeIn 0.2s ease-out forwards; }
       `}</style>
     </>
   )
