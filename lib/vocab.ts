@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 
-export type Category = 'Kata Benda' | 'Kata Kerja' | 'Kata Sifat' | 'Ungkapan'
+export type Category = 'Kata Benda' | 'Kata Kerja' | 'Kata Sifat' | 'Ungkapan' | 'Angka' | 'Hari' | 'Uang'
 
 export interface VocabItem {
   id: string

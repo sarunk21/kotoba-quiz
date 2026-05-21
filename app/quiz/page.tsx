@@ -11,6 +11,7 @@ import {
 } from '@/lib/srs'
 import { fetchVocabCSV, pushToCloud } from '@/lib/cloud'
 import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish, speakJapanese } from '@/lib/sounds'
+import { SPECIALIZED_DATA } from '@/lib/specialized'
 
 type Phase = 'loading' | 'question' | 'feedback' | 'result'
 
@@ -48,6 +49,9 @@ function getCategoryStyle(category: string) {
   if (catLower.includes('ungkapan')) return { color: '#d97706', bg: 'rgba(217,119,6,0.12)' }
   if (catLower.includes('keterangan')) return { color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' }
   if (catLower.includes('partikel')) return { color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' }
+  if (catLower.includes('angka')) return { color: 'var(--color-amber)', bg: 'var(--color-amber-light)' }
+  if (catLower.includes('hari')) return { color: 'var(--color-red)', bg: 'var(--color-red-light)' }
+  if (catLower.includes('uang')) return { color: 'var(--color-accent)', bg: 'var(--color-accent-light)' }
   
   return { color: 'var(--color-text-2)', bg: 'var(--color-subtle)' }
 }
@@ -74,8 +78,10 @@ function QuizContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode')
+  const type = searchParams.get('type')
   const chapter = searchParams.get('chapter')
   const isKanjiMode = mode === 'kanji'
+  const isSpecialMode = mode === 'special'
 
   const [vocab, setVocab] = useState<VocabItem[]>([])
   const [phase, setPhase] = useState<'loading' | 'question' | 'feedback' | 'result'>('loading')
@@ -104,8 +110,20 @@ function QuizContent() {
     async function init() {
       if (initialized.current) return
       const store = loadSRS(); srsRef.current = store
+
+      if (isSpecialMode) {
+        const filtered = SPECIALIZED_DATA[type || ''] || []
+        if (filtered.length > 0) {
+          setVocab(filtered)
+          startQuiz(filtered, store)
+          initialized.current = true
+        } else {
+          setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
+        }
+        return
+      }
+
       const url = localStorage.getItem('kotoba_sheets_url')
-      
       let v: VocabItem[] | null = getGlobalVocab()
       
       if (!v && url) {
@@ -139,7 +157,7 @@ function QuizContent() {
       }
     }
     init()
-  }, [isKanjiMode, chapter, startQuiz])
+  }, [isKanjiMode, isSpecialMode, type, chapter, startQuiz])
 
   // Auto-play pronunciation when a new question loads
   useEffect(() => {
@@ -249,6 +267,12 @@ function QuizContent() {
             {isKanjiMode && (
               <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg uppercase tracking-wider"
                 style={{ background: 'var(--color-accent)', color: '#fff' }}>Kanji Mode</span>
+            )}
+            {isSpecialMode && (
+              <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg uppercase tracking-wider"
+                style={{ background: 'var(--color-accent)', color: '#fff' }}>
+                Latihan {type === 'angka' ? 'Angka' : type === 'hari' ? 'Hari/Waktu' : 'Uang'}
+              </span>
             )}
             {isRefresh && (
               <span className="text-xs font-bold px-2.5 py-1 rounded-full"

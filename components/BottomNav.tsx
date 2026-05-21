@@ -261,6 +261,33 @@ export default function BottomNav() {
               </div>
             </Link>
 
+            {/* Latihan Khusus (Angka, Hari, Uang) */}
+            <div className="border-t border-[var(--color-border)] pt-4 mt-2">
+              <div className="flex items-center justify-between mb-3">
+                <p className="font-extrabold text-xs uppercase tracking-wider text-[var(--color-text-3)]">Latihan Khusus</p>
+              </div>
+              <div className="grid grid-cols-3 gap-2.5 mb-2">
+                <Link href="/quiz?mode=special&type=angka" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-95 transition-transform">
+                  <div className="rounded-2xl p-3 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)] transition-all h-24">
+                    <span className="text-2xl mb-1">🔢</span>
+                    <p className="text-[10px] font-black text-[var(--color-text-1)] leading-tight">Angka &<br/>Penghitung</p>
+                  </div>
+                </Link>
+                <Link href="/quiz?mode=special&type=hari" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-95 transition-transform">
+                  <div className="rounded-2xl p-3 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)] transition-all h-24">
+                    <span className="text-2xl mb-1">📅</span>
+                    <p className="text-[10px] font-black text-[var(--color-text-1)] leading-tight">Hari &<br/>Waktu</p>
+                  </div>
+                </Link>
+                <Link href="/quiz?mode=special&type=uang" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-95 transition-transform">
+                  <div className="rounded-2xl p-3 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)] transition-all h-24">
+                    <span className="text-2xl mb-1">💴</span>
+                    <p className="text-[10px] font-black text-[var(--color-text-1)] leading-tight">Uang &<br/>Harga</p>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
             {/* Chapters sub-section inside the Modal */}
             {!noVocab && chapters.length > 0 && (
               <div className="border-t border-[var(--color-border)] pt-4 mt-2">
