@@ -7,6 +7,34 @@ import { loadSRS, getSRSSummary, type SRSStore } from '@/lib/srs'
 import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
 import { fetchVocabCSV } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
+import { SPECIALIZED_DATA } from '@/lib/specialized'
+
+const SPECIAL_CHAPTER_SEQUENCES: Record<string, string[]> = {
+  angka: ['Dasar', 'Ratusan', 'Ribuan', 'Penghitung', 'Orang', 'Batang'],
+  hari: ['Hari', 'Tanggal', 'Waktu', 'Menit'],
+  uang: ['Yen', 'Tanya']
+}
+
+const CHAPTER_METADATA: Record<string, Record<string, { label: string; icon: string }>> = {
+  angka: {
+    Dasar: { label: 'Angka Dasar (1-10)', icon: '🔢' },
+    Ratusan: { label: 'Ratusan (100 - 800)', icon: '💯' },
+    Ribuan: { label: 'Ribuan & Puluh Ribu', icon: '🏔️' },
+    Penghitung: { label: 'Buah & Barang (~tsu)', icon: '📦' },
+    Orang: { label: 'Penghitung Orang (~nin)', icon: '👥' },
+    Batang: { label: 'Batang & Botol (~hon/pon/bon)', icon: '🥢' },
+  },
+  hari: {
+    Hari: { label: 'Nama Hari (Senin - Minggu)', icon: '📅' },
+    Tanggal: { label: 'Tanggal (1-10, 14, 20, 24)', icon: '📆' },
+    Waktu: { label: 'Jam & Waktu (~ji)', icon: '⏰' },
+    Menit: { label: 'Menit (~fun/pun)', icon: '⏱️' },
+  },
+  uang: {
+    Yen: { label: 'Nominal Yen (100 - 10.000)', icon: '💴' },
+    Tanya: { label: 'Kalimat Tanya Harga', icon: '💬' },
+  }
+}
 
 export default function BottomNav() {
   const pathname = usePathname()
@@ -57,6 +85,36 @@ export default function BottomNav() {
       return { name, pct }
     }).sort((a, b) => a.name.localeCompare(b.name))
   }, [vocab, srsStore])
+
+  const getSpecialChapterPct = (type: string, chapterName: string) => {
+    const items = SPECIALIZED_DATA[type] || []
+    const chapterItems = items.filter(v => v.chapter === chapterName)
+    if (chapterItems.length === 0) return 0
+    const MAX_LEVEL = 6
+    let totalLevelsAchieved = 0
+    chapterItems.forEach(item => {
+      const level = srsStore[item.id]?.level || 0
+      totalLevelsAchieved += Math.min(level, MAX_LEVEL)
+    })
+    const maxPossibleLevels = chapterItems.length * MAX_LEVEL
+    return Math.round((totalLevelsAchieved / maxPossibleLevels) * 100)
+  }
+
+  const isSpecialChapterUnlocked = (type: string, chapterName: string) => {
+    const sequence = SPECIAL_CHAPTER_SEQUENCES[type]
+    if (!sequence) return true
+    const index = sequence.indexOf(chapterName)
+    if (index <= 0) return true
+    
+    const prevChapter = sequence[index - 1]
+    const prevPct = getSpecialChapterPct(type, prevChapter)
+    return prevPct >= 40
+  }
+
+  const isAllSpecialChaptersUnlocked = (type: string) => {
+    const sequence = SPECIAL_CHAPTER_SEQUENCES[type] || []
+    return sequence.every(ch => isSpecialChapterUnlocked(type, ch))
+  }
 
   const leftTabs = [
     { name: 'Beranda', path: '/', icon: '🏠' },
@@ -317,80 +375,80 @@ export default function BottomNav() {
               {selectedSpecialType && (
                 <div className="mt-3 p-3.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] space-y-2 animate-slide-up">
                   <p className="font-extrabold text-[9px] uppercase tracking-wider text-[var(--color-text-3)] mb-1">
-                    Fokus Materi ({selectedSpecialType === 'angka' ? 'Angka' : selectedSpecialType === 'hari' ? 'Hari' : 'Uang'}):
+                    Fokus Materi ({selectedSpecialType === 'angka' ? 'Angka' : selectedSpecialType === 'hari' ? 'Hari/Waktu' : 'Uang'}):
                   </p>
                   
                   <div className="grid grid-cols-1 gap-2">
-                    {selectedSpecialType === 'angka' && (
-                      <>
-                        <Link href="/quiz?mode=special&type=angka&chapter=Dasar" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>🔢 Angka Dasar (1-10)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=angka&chapter=Ratusan" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>💯 Ratusan (100 - 800)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=angka&chapter=Ribuan" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>🏔️ Ribuan & Puluh Ribu</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=angka&chapter=Penghitung" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>📦 Buah & Barang (~tsu)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=angka&chapter=Orang" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>👥 Penghitung Orang (~nin)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=angka&chapter=Batang" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>🥢 Batang & Botol (~hon/pon/bon)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                      </>
-                    )}
+                    {(SPECIAL_CHAPTER_SEQUENCES[selectedSpecialType] || []).map((chName) => {
+                      const isUnlocked = isSpecialChapterUnlocked(selectedSpecialType, chName)
+                      const pct = getSpecialChapterPct(selectedSpecialType, chName)
+                      const meta = CHAPTER_METADATA[selectedSpecialType]?.[chName] || { label: chName, icon: '📖' }
+                      
+                      if (isUnlocked) {
+                        return (
+                          <Link 
+                            key={chName}
+                            href={`/quiz?mode=special&type=${selectedSpecialType}&chapter=${chName}`}
+                            onClick={() => setShowPracticeModal(false)}
+                            className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{meta.icon} {meta.label}</span>
+                              <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{
+                                background: pct >= 80 ? 'var(--color-green-light)' : pct > 0 ? 'var(--color-accent-light)' : 'var(--color-subtle)',
+                                color: pct >= 80 ? 'var(--color-green)' : pct > 0 ? 'var(--color-accent)' : 'var(--color-text-3)'
+                              }}>
+                                {pct}%
+                              </span>
+                            </div>
+                            <span className="text-[var(--color-text-3)]">›</span>
+                          </Link>
+                        )
+                      } else {
+                        const sequence = SPECIAL_CHAPTER_SEQUENCES[selectedSpecialType]
+                        const idx = sequence.indexOf(chName)
+                        const prevChName = idx > 0 ? sequence[idx - 1] : ''
+                        const prevMeta = CHAPTER_METADATA[selectedSpecialType]?.[prevChName] || { label: prevChName }
+                        
+                        return (
+                          <div 
+                            key={chName}
+                            className="flex items-center justify-between p-2.5 rounded-xl bg-gray-100/50 dark:bg-gray-800/10 border border-[var(--color-border)] opacity-60 text-[11px] font-bold text-[var(--color-text-3)] cursor-not-allowed select-none"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>🔒 {meta.icon} {meta.label}</span>
+                            </div>
+                            <span className="text-[9px] font-black text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-md">
+                              Butuh 40% di {prevMeta.label.split(' (')[0]}
+                            </span>
+                          </div>
+                        )
+                      }
+                    })}
 
-                    {selectedSpecialType === 'hari' && (
-                      <>
-                        <Link href="/quiz?mode=special&type=hari&chapter=Hari" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>📅 Nama Hari (Senin - Minggu)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=hari&chapter=Tanggal" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>📆 Tanggal (1-10, 14, 20, 24)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=hari&chapter=Waktu" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>⏰ Jam & Waktu (~ji)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=hari&chapter=Menit" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>⏱️ Menit (~fun/pun)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                      </>
-                    )}
-
-                    {selectedSpecialType === 'uang' && (
-                      <>
-                        <Link href="/quiz?mode=special&type=uang&chapter=Yen" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>💴 Nominal Yen (100 - 10.000)</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                        <Link href="/quiz?mode=special&type=uang&chapter=Tanya" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
-                          <span>💬 Kalimat Tanya Harga</span>
-                          <span className="text-[var(--color-text-3)]">›</span>
-                        </Link>
-                      </>
-                    )}
-
-                    <Link 
-                      href={`/quiz?mode=special&type=${selectedSpecialType}`} 
-                      onClick={() => setShowPracticeModal(false)} 
-                      className="flex items-center justify-center p-2.5 rounded-xl no-underline text-[11px] font-black text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] active:scale-[0.98] transition-all mt-1"
-                    >
-                      ⚡ Campur Semua Materi
-                    </Link>
+                    {/* Campur Semua Materi */}
+                    {(() => {
+                      const allUnlocked = isAllSpecialChaptersUnlocked(selectedSpecialType)
+                      if (allUnlocked) {
+                        return (
+                          <Link 
+                            href={`/quiz?mode=special&type=${selectedSpecialType}`} 
+                            onClick={() => setShowPracticeModal(false)} 
+                            className="flex items-center justify-center p-2.5 rounded-xl no-underline text-[11px] font-black text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] active:scale-[0.98] transition-all mt-1"
+                          >
+                            ⚡ Campur Semua Materi
+                          </Link>
+                        )
+                      } else {
+                        return (
+                          <div 
+                            className="flex items-center justify-center p-2.5 rounded-xl text-[11px] font-black text-[var(--color-text-3)] bg-gray-100/50 dark:bg-gray-800/10 border border-[var(--color-border)] opacity-60 cursor-not-allowed select-none mt-1"
+                          >
+                            🔒 Buka semua bab untuk campur materi
+                          </div>
+                        )
+                      }
+                    })()}
                   </div>
                 </div>
               )}

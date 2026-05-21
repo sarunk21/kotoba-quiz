@@ -95,14 +95,14 @@ function QuizContent() {
   const srsRef = useRef<SRSStore>({})
   const initialized = useRef(false)
 
-  const startQuiz = useCallback((v: VocabItem[], store: SRSStore) => {
+  const startQuiz = useCallback((v: VocabItem[], store: SRSStore, fullPool?: VocabItem[]) => {
     const { dueIds, newIds, refreshIds } = buildQueue(v.map(i => i.id), store, TOTAL_QUESTIONS)
     const allIds = [...dueIds, ...newIds, ...refreshIds].slice(0, TOTAL_QUESTIONS)
     const map = Object.fromEntries(v.map(i => [i.id, i]))
     const queue = allIds.map(id => map[id]).filter(Boolean)
     if (!queue.length) { setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result'); return }
     setState({ queue, current: 0, lives: 3, sessionCorrect: 0, sessionAnswered: 0, roundStreak: 0 })
-    setChoices(getChoices(queue[0], v))
+    setChoices(getChoices(queue[0], fullPool || v))
     setSelected(null); setIsCorrect(null); setCardKey(k => k + 1); setPhase('question'); setShowHint(false)
   }, [])
 
@@ -112,13 +112,14 @@ function QuizContent() {
       const store = loadSRS(); srsRef.current = store
 
       if (isSpecialMode) {
-        let filtered = SPECIALIZED_DATA[type || ''] || []
+        const allCategoryItems = SPECIALIZED_DATA[type || ''] || []
+        let filtered = allCategoryItems
         if (chapter) {
-          filtered = filtered.filter(item => item.chapter === chapter)
+          filtered = allCategoryItems.filter(item => item.chapter === chapter)
         }
         if (filtered.length > 0) {
-          setVocab(filtered)
-          startQuiz(filtered, store)
+          setVocab(allCategoryItems)
+          startQuiz(filtered, store, allCategoryItems)
           initialized.current = true
         } else {
           setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
