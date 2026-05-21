@@ -13,18 +13,23 @@ export default function BottomNav() {
   const [showPracticeModal, setShowPracticeModal] = useState(false)
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [vocab, setVocab] = useState<VocabItem[]>([])
+  const [selectedSpecialType, setSelectedSpecialType] = useState<'angka' | 'hari' | 'uang' | null>(null)
 
   // Load local data on mount / open
   useEffect(() => {
-    setSrsStore(loadSRS())
-    const url = typeof window !== 'undefined' ? localStorage.getItem('kotoba_sheets_url') || '' : ''
-    if (url) {
-      fetchVocabCSV(url).then(csv => {
-        if (csv) {
-          const parsed = parseCSVToVocab(csv)
-          setVocab(parsed)
-        }
-      }).catch(() => {})
+    if (showPracticeModal) {
+      setSrsStore(loadSRS())
+      const url = typeof window !== 'undefined' ? localStorage.getItem('kotoba_sheets_url') || '' : ''
+      if (url) {
+        fetchVocabCSV(url).then(csv => {
+          if (csv) {
+            const parsed = parseCSVToVocab(csv)
+            setVocab(parsed)
+          }
+        }).catch(() => {})
+      }
+    } else {
+      setSelectedSpecialType(null)
     }
   }, [showPracticeModal])
 
@@ -267,25 +272,128 @@ export default function BottomNav() {
                 <p className="font-extrabold text-xs uppercase tracking-wider text-[var(--color-text-3)]">Latihan Khusus</p>
               </div>
               <div className="grid grid-cols-3 gap-2.5 mb-2">
-                <Link href="/quiz?mode=special&type=angka" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-95 transition-transform">
-                  <div className="rounded-2xl p-3 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)] transition-all h-24">
+                <button 
+                  onClick={() => setSelectedSpecialType(selectedSpecialType === 'angka' ? null : 'angka')} 
+                  className="block no-underline active:scale-95 transition-transform"
+                >
+                  <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
+                    selectedSpecialType === 'angka' 
+                      ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]' 
+                      : 'border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)]'
+                  }`}>
                     <span className="text-2xl mb-1">🔢</span>
                     <p className="text-[10px] font-black text-[var(--color-text-1)] leading-tight">Angka &<br/>Penghitung</p>
                   </div>
-                </Link>
-                <Link href="/quiz?mode=special&type=hari" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-95 transition-transform">
-                  <div className="rounded-2xl p-3 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)] transition-all h-24">
+                </button>
+                <button 
+                  onClick={() => setSelectedSpecialType(selectedSpecialType === 'hari' ? null : 'hari')} 
+                  className="block no-underline active:scale-95 transition-transform"
+                >
+                  <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
+                    selectedSpecialType === 'hari' 
+                      ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]' 
+                      : 'border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)]'
+                  }`}>
                     <span className="text-2xl mb-1">📅</span>
                     <p className="text-[10px] font-black text-[var(--color-text-1)] leading-tight">Hari &<br/>Waktu</p>
                   </div>
-                </Link>
-                <Link href="/quiz?mode=special&type=uang" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-95 transition-transform">
-                  <div className="rounded-2xl p-3 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)] transition-all h-24">
+                </button>
+                <button 
+                  onClick={() => setSelectedSpecialType(selectedSpecialType === 'uang' ? null : 'uang')} 
+                  className="block no-underline active:scale-95 transition-transform"
+                >
+                  <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
+                    selectedSpecialType === 'uang' 
+                      ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]' 
+                      : 'border-[var(--color-border)] bg-[var(--color-white)] hover:bg-[var(--color-bg)]'
+                  }`}>
                     <span className="text-2xl mb-1">💴</span>
                     <p className="text-[10px] font-black text-[var(--color-text-1)] leading-tight">Uang &<br/>Harga</p>
                   </div>
-                </Link>
+                </button>
               </div>
+
+              {/* Submenu Latihan Khusus */}
+              {selectedSpecialType && (
+                <div className="mt-3 p-3.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] space-y-2 animate-slide-up">
+                  <p className="font-extrabold text-[9px] uppercase tracking-wider text-[var(--color-text-3)] mb-1">
+                    Fokus Materi ({selectedSpecialType === 'angka' ? 'Angka' : selectedSpecialType === 'hari' ? 'Hari' : 'Uang'}):
+                  </p>
+                  
+                  <div className="grid grid-cols-1 gap-2">
+                    {selectedSpecialType === 'angka' && (
+                      <>
+                        <Link href="/quiz?mode=special&type=angka&chapter=Dasar" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>🔢 Angka Dasar (1-10)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=angka&chapter=Ratusan" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>💯 Ratusan (100 - 800)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=angka&chapter=Ribuan" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>🏔️ Ribuan & Puluh Ribu</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=angka&chapter=Penghitung" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>📦 Buah & Barang (~tsu)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=angka&chapter=Orang" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>👥 Penghitung Orang (~nin)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=angka&chapter=Batang" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>🥢 Batang & Botol (~hon/pon/bon)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                      </>
+                    )}
+
+                    {selectedSpecialType === 'hari' && (
+                      <>
+                        <Link href="/quiz?mode=special&type=hari&chapter=Hari" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>📅 Nama Hari (Senin - Minggu)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=hari&chapter=Tanggal" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>📆 Tanggal (1-10, 14, 20, 24)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=hari&chapter=Waktu" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>⏰ Jam & Waktu (~ji)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=hari&chapter=Menit" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>⏱️ Menit (~fun/pun)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                      </>
+                    )}
+
+                    {selectedSpecialType === 'uang' && (
+                      <>
+                        <Link href="/quiz?mode=special&type=uang&chapter=Yen" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>💴 Nominal Yen (100 - 10.000)</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                        <Link href="/quiz?mode=special&type=uang&chapter=Tanya" onClick={() => setShowPracticeModal(false)} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform">
+                          <span>💬 Kalimat Tanya Harga</span>
+                          <span className="text-[var(--color-text-3)]">›</span>
+                        </Link>
+                      </>
+                    )}
+
+                    <Link 
+                      href={`/quiz?mode=special&type=${selectedSpecialType}`} 
+                      onClick={() => setShowPracticeModal(false)} 
+                      className="flex items-center justify-center p-2.5 rounded-xl no-underline text-[11px] font-black text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] active:scale-[0.98] transition-all mt-1"
+                    >
+                      ⚡ Campur Semua Materi
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Chapters sub-section inside the Modal */}

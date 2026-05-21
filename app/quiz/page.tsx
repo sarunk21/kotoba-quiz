@@ -112,7 +112,10 @@ function QuizContent() {
       const store = loadSRS(); srsRef.current = store
 
       if (isSpecialMode) {
-        const filtered = SPECIALIZED_DATA[type || ''] || []
+        let filtered = SPECIALIZED_DATA[type || ''] || []
+        if (chapter) {
+          filtered = filtered.filter(item => item.chapter === chapter)
+        }
         if (filtered.length > 0) {
           setVocab(filtered)
           startQuiz(filtered, store)
@@ -271,7 +274,7 @@ function QuizContent() {
             {isSpecialMode && (
               <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg uppercase tracking-wider"
                 style={{ background: 'var(--color-accent)', color: '#fff' }}>
-                Latihan {type === 'angka' ? 'Angka' : type === 'hari' ? 'Hari/Waktu' : 'Uang'}
+                Latihan {type === 'angka' ? 'Angka' : type === 'hari' ? 'Hari/Waktu' : 'Uang'}{chapter ? ` • ${chapter}` : ''}
               </span>
             )}
             {isRefresh && (
