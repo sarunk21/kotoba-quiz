@@ -35,7 +35,7 @@ export const SPECIALIZED_DATA: Record<string, VocabItem[]> = {
     { id: 'special|angka|sannin', category: 'Angka', hiragana: 'さんにん', kanji: '三人', arti: 'Tiga orang', chapter: 'Orang' },
     { id: 'special|angka|yonin', category: 'Angka', hiragana: 'よにん', kanji: '四人', arti: 'Empat orang (Yonin - irregular)', chapter: 'Orang' },
     { id: 'special|angka|ippon', category: 'Angka', hiragana: 'いっぽん', kanji: '一本', arti: 'Satu batang/botol (Ippon - benda panjang)', chapter: 'Batang' },
-    { id: 'special|angka|nihon', category: 'Angka', hiragana: 'ni', kanji: '二本', arti: 'Dua batang/botol', chapter: 'Batang' },
+    { id: 'special|angka|nihon', category: 'Angka', hiragana: 'にほん', kanji: '二本', arti: 'Dua batang/botol', chapter: 'Batang' },
     { id: 'special|angka|sanbon', category: 'Angka', hiragana: 'さんぼん', kanji: '三本', arti: 'Tiga batang/botol (Sanbon - irregular)', chapter: 'Batang' },
     { id: 'special|angka|roppon', category: 'Angka', hiragana: 'ろっぽん', kanji: '六本', arti: 'Enam batang/botol (Roppon - irregular)', chapter: 'Batang' },
     { id: 'special|angka|happon', category: 'Angka', hiragana: 'はっぽん', kanji: '八本', arti: 'Delapan batang/botol (Happon - irregular)', chapter: 'Batang' },
