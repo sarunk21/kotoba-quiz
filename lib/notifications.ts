@@ -1,4 +1,5 @@
 import { loadStats } from './stats'
+import { getLocalDateString, parseLocalDateString } from './dateUtils'
 
 export type NotificationType = 'reminder' | 'streak_lost' | 'streak_at_risk'
 
@@ -6,11 +7,11 @@ export function checkNotificationNeeds(): { type: NotificationType; message: str
   const stats = loadStats()
   if (!stats.lastPlayedDate) return null
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   if (stats.lastPlayedDate === today) return null
 
-  const lastPlayed = new Date(stats.lastPlayedDate)
-  const todayDate = new Date(today)
+  const lastPlayed = parseLocalDateString(stats.lastPlayedDate)
+  const todayDate = parseLocalDateString(today)
   const diffTime = Math.abs(todayDate.getTime() - lastPlayed.getTime())
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 

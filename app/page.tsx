@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, type GameStats } from '@/lib/stats'
 import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
+import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
 import { parseCSVToVocab, type VocabItem, setGlobalVocab } from '@/lib/vocab'
 import { fetchVocabCSV, pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
@@ -152,7 +153,7 @@ export default function Home() {
   const kanjiVocab = vocab.filter(v => v.kanji && v.kanji !== v.hiragana)
   const kanjiSrs = kanjiVocab.length > 0 ? getSRSSummary(kanjiVocab.map(v => v.id), srsStore) : null
 
-  const todayStr = new Date().toISOString().split('T')[0]
+  const todayStr = getLocalDateString()
   const isStreakActive = stats?.lastPlayedDate === todayStr
 
   const chapters = useMemo(() => {
@@ -190,17 +191,19 @@ export default function Home() {
 
     const streakActiveDays = new Array(7).fill(false)
 
-    if (stats && stats.currentStreak > 0) {
-      const todayDateStr = today.toISOString().split('T')[0]
+    if (stats && stats.currentStreak > 0 && stats.lastPlayedDate) {
+      const todayDateStr = getLocalDateString(today)
       const yesterday = new Date()
       yesterday.setDate(today.getDate() - 1)
-      const yesterdayDateStr = yesterday.toISOString().split('T')[0]
+      const yesterdayDateStr = getLocalDateString(yesterday)
 
       const isStreakValid = stats.lastPlayedDate === todayDateStr || stats.lastPlayedDate === yesterdayDateStr
       if (isStreakValid) {
+        const lastPlayed = parseLocalDateString(stats.lastPlayedDate)
+        
         for (let i = 0; i < stats.currentStreak; i++) {
-          const d = new Date()
-          d.setDate(today.getDate() - i)
+          const d = new Date(lastPlayed)
+          d.setDate(lastPlayed.getDate() - i)
           const dayOfWeek = d.getDay()
           const monIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1
           

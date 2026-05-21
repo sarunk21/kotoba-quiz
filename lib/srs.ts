@@ -1,5 +1,7 @@
 'use client'
 
+import { getLocalDateString, addLocalDateDays } from './dateUtils'
+
 // SRS intervals in days per level
 // Level: 0=new, 1=1d, 2=3d, 3=7d, 4=14d, 5=30d, 6=90d (mastered but refreshed)
 export const SRS_INTERVALS = [0, 1, 3, 7, 14, 30, 90]
@@ -20,13 +22,11 @@ export interface SRSStore {
 }
 
 function todayStr() {
-  return new Date().toISOString().split('T')[0]
+  return getLocalDateString()
 }
 
 function addDays(days: number): string {
-  const d = new Date()
-  d.setDate(d.getDate() + days)
-  return d.toISOString().split('T')[0]
+  return addLocalDateDays(days)
 }
 
 export function loadSRS(): SRSStore {

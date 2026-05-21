@@ -1,5 +1,7 @@
 'use client'
 
+import { getLocalDateString } from './dateUtils'
+
 export interface GameStats {
   currentStreak: number
   longestStreak: number
@@ -24,12 +26,12 @@ const DEFAULT_STATS: GameStats = {
 export function checkAndResetStreak(stats: GameStats): GameStats {
   if (!stats.lastPlayedDate) return stats
   
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
   if (stats.lastPlayedDate === today) return stats
 
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = yesterday.toISOString().split('T')[0]
+  const yesterdayStr = getLocalDateString(yesterday)
 
   // Jika hari terakhir main bukan hari ini DAN bukan kemarin, berarti streak putus
   if (stats.lastPlayedDate !== yesterdayStr) {
@@ -64,7 +66,7 @@ export function saveStats(stats: GameStats) {
 
 export function updateAfterSession(correct: number, total: number): GameStats {
   const stats = loadStats()
-  const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+  const today = getLocalDateString() // YYYY-MM-DD
   
   let newDayStreak = stats.currentStreak
   if (stats.lastPlayedDate !== today) {

@@ -8,6 +8,7 @@ import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
 import { fetchVocabCSV } from '@/lib/cloud'
 import { speakJapanese } from '@/lib/sounds'
 import BottomNav from '@/components/BottomNav'
+import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
 
 
 const CAT: Record<string, { color: string; bg: string }> = {
@@ -418,10 +419,10 @@ export default function ProgressPage() {
                     const barColor = lv >= MASTERED_LEVEL ? 'var(--color-green)' : lv >= 3 ? 'var(--color-accent)' : lv >= 1 ? 'var(--color-amber)' : 'var(--color-subtle)'
                     const cat = getCategoryStyle(v.category)
                     const nextReview = wp.nextReview
-                    const today = new Date().toISOString().split('T')[0]
+                    const today = getLocalDateString()
                     const isDue = nextReview <= today && lv > 0
                     const daysLeft = nextReview > today
-                      ? Math.ceil((new Date(nextReview).getTime() - new Date(today).getTime()) / 86400000)
+                      ? Math.ceil((parseLocalDateString(nextReview).getTime() - parseLocalDateString(today).getTime()) / 86400000)
                       : 0
 
                     return (

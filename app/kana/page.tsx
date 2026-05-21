@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { KANA, kanaId, type KanaType } from '@/lib/kana'
 import { loadSRS, MASTERED_LEVEL, getWordProgress, type SRSStore } from '@/lib/srs'
+import { getLocalDateString } from '@/lib/dateUtils'
 import { pullFromCloud } from '@/lib/cloud'
 import BottomNav from '@/components/BottomNav'
 
@@ -57,7 +58,7 @@ export default function KanaPage() {
   // Overall stats
   const overallStats = useCallback((type: KanaType) => {
     let mastered = 0, learning = 0, newW = 0, due = 0
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     for (const c of KANA) {
       const wp = getWordProgress(srsStore, kanaId(c.id, type))
       if (wp.level >= MASTERED_LEVEL) mastered++
@@ -81,7 +82,7 @@ export default function KanaPage() {
 
   // Refresh mode = mastered yang due
   function getRefreshIds(type: KanaType): string[] {
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalDateString()
     return KANA
       .filter(c => {
         const wp = getWordProgress(srsStore, kanaId(c.id, type))
