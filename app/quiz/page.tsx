@@ -84,6 +84,7 @@ function QuizContent() {
   const isSpecialMode = mode === 'special'
 
   const [vocab, setVocab] = useState<VocabItem[]>([])
+  const [questionPool, setQuestionPool] = useState<VocabItem[]>([])
   const [phase, setPhase] = useState<'loading' | 'question' | 'feedback' | 'result'>('loading')
   const [state, setState] = useState<SessionState | null>(null)
   const [choices, setChoices] = useState<string[]>([])
@@ -119,6 +120,7 @@ function QuizContent() {
         }
         if (filtered.length > 0) {
           setVocab(allCategoryItems)
+          setQuestionPool(filtered)
           startQuiz(filtered, store, allCategoryItems)
           initialized.current = true
         } else {
@@ -141,17 +143,19 @@ function QuizContent() {
       }
 
       if (v && v.length > 0) {
-        let filtered = v
+        let pool = v
         if (isKanjiMode) {
-          filtered = filtered.filter(item => item.kanji && item.kanji !== item.hiragana)
+          pool = pool.filter(item => item.kanji && item.kanji !== item.hiragana)
         }
+        let filtered = pool
         if (chapter) {
-          filtered = filtered.filter(item => item.chapter === chapter)
+          filtered = pool.filter(item => item.chapter === chapter)
         }
 
         if (filtered.length > 0) {
-          setVocab(filtered)
-          startQuiz(filtered, store)
+          setVocab(pool)
+          setQuestionPool(filtered)
+          startQuiz(filtered, store, pool)
           initialized.current = true
         } else {
           setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
@@ -230,7 +234,7 @@ function QuizContent() {
   /* Result */
   if (phase === 'result' && finalStats) {
     return <ResultScreen stats={finalStats} vocab={vocab} srsStore={finalStats.srsStore}
-      onRetry={() => startQuiz(vocab, srsRef.current)} onHome={() => router.replace('/')} isKanji={isKanjiMode} />
+      onRetry={() => startQuiz(questionPool, srsRef.current, vocab)} onHome={() => router.replace('/')} isKanji={isKanjiMode} />
   }
 
   const q = state.queue[state.current]
