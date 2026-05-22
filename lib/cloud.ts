@@ -2,11 +2,13 @@
 
 import { loadSRS, saveSRS, type SRSStore } from './srs'
 import { loadStats, saveStats, type GameStats } from './stats'
+import { loadLocalVocab, saveLocalVocab, type VocabItem } from './vocab'
 
 export interface CloudData {
   srs: SRSStore
   stats: GameStats
-  sheetsUrl: string
+  vocab?: VocabItem[]
+  vocabUpdatedAt?: string
   updatedAt: string
 }
 
@@ -16,7 +18,8 @@ function collectLocalData(): CloudData {
   return {
     srs: loadSRS(),
     stats: stats,
-    sheetsUrl: localStorage.getItem('kotoba_sheets_url') || '',
+    vocab: loadLocalVocab(),
+    vocabUpdatedAt: localStorage.getItem('kotoba_vocab_updated_at') || '',
     updatedAt: stats.updatedAt || '',
   }
 }
@@ -57,20 +60,16 @@ function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
     updatedAt: cloudIsNewer ? (cloudStats.updatedAt || '') : (local.stats.updatedAt || ''),
   }
 
-  // 3. Sheets URL
-  // Jika lokal kosong, ambil cloud. Jika cloud kosong, ambil lokal.
-  // Jika dua-duanya ada, ambil yang paling baru.
-  let mergedUrl = local.sheetsUrl
-  if (!local.sheetsUrl) {
-    mergedUrl = cloud.sheetsUrl || ''
-  } else if (cloud.sheetsUrl && cloudIsNewer) {
-    mergedUrl = cloud.sheetsUrl
-  }
+  // 3. Merge Vocab
+  const cloudVocabIsNewer = (cloud.vocabUpdatedAt || '') > (local.vocabUpdatedAt || '')
+  const mergedVocab = cloudVocabIsNewer ? (cloud.vocab ?? local.vocab) : (local.vocab ?? cloud.vocab)
+  const mergedVocabUpdatedAt = cloudVocabIsNewer ? (cloud.vocabUpdatedAt || '') : (local.vocabUpdatedAt || '')
 
   return {
     srs: mergedSRS,
     stats: mergedStats,
-    sheetsUrl: mergedUrl,
+    vocab: mergedVocab || undefined,
+    vocabUpdatedAt: mergedVocabUpdatedAt,
     updatedAt: cloudIsNewer ? (cloud.updatedAt || '') : (local.updatedAt || ''),
   }
 }
@@ -96,8 +95,12 @@ export async function syncToCloud(): Promise<boolean> {
     // 3. Save merged result to local storage
     saveSRS(finalData.srs)
     saveStats(finalData.stats)
-    // Always set, even if empty (to allow clearing)
-    localStorage.setItem('kotoba_sheets_url', finalData.sheetsUrl || '')
+    if (finalData.vocab) {
+      saveLocalVocab(finalData.vocab)
+    }
+    if (finalData.vocabUpdatedAt) {
+      localStorage.setItem('kotoba_vocab_updated_at', finalData.vocabUpdatedAt)
+    }
     
     // 4. Update timestamp before push to ensure it's marked as the latest
     const now = new Date().toISOString()
@@ -149,37 +152,32 @@ export async function forcePushToCloud(): Promise<boolean> {
 export const pushToCloud = syncToCloud
 
 /** Pull dari cloud + merge ke lokal */
-export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats; sheetsUrl: string } | null> {
+export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats; vocab?: VocabItem[] } | null> {
   try {
     const localData = collectLocalData()
     const t = Date.now()
     const res = await fetch(`/api/sync?t=${t}`, { cache: 'no-store' })
     if (!res.ok) return null
-    const { data: cloudData } = await res.json()
-    if (!cloudData) return null
+    const body = await res.json()
+    if (!body || !body.data) return null
     
-    const finalData = mergeCloudData(localData, cloudData as CloudData)
+    const finalData = mergeCloudData(localData, body.data as CloudData)
     // Simpan hasil merge ke lokal
     saveSRS(finalData.srs)
     saveStats(finalData.stats)
-    if (finalData.sheetsUrl) {
-      localStorage.setItem('kotoba_sheets_url', finalData.sheetsUrl)
+    if (finalData.vocab) {
+      saveLocalVocab(finalData.vocab)
     }
-    return finalData
+    if (finalData.vocabUpdatedAt) {
+      localStorage.setItem('kotoba_vocab_updated_at', finalData.vocabUpdatedAt)
+    }
+    return {
+      srs: finalData.srs,
+      stats: finalData.stats,
+      vocab: finalData.vocab,
+    }
   } catch (e) {
     console.error('[Pull] Error:', e)
-    return null
-  }
-}
-
-/** Fetch CSV vocab via server-side proxy (bypass CORS) */
-export async function fetchVocabCSV(sheetsUrl: string, force = false): Promise<string | null> {
-  try {
-    const t = force ? `&t=${Date.now()}` : ''
-    const res = await fetch(`/api/sheets?url=${encodeURIComponent(sheetsUrl)}${t}`, { cache: 'no-store' })
-    if (!res.ok) return null
-    return await res.text()
-  } catch {
     return null
   }
 }
@@ -187,14 +185,15 @@ export async function fetchVocabCSV(sheetsUrl: string, force = false): Promise<s
 /** Reset total: hapus di cloud dan lokal */
 export async function resetCloudData(): Promise<boolean> {
   try {
-    // 1. Hapus di Drive
+    // 1. Hapus di cloud
     const res = await fetch('/api/sync', { method: 'DELETE' })
     if (!res.ok) return false
     
     // 2. Bersihin lokal
     localStorage.removeItem('kotoba_srs')
     localStorage.removeItem('kotoba_stats')
-    localStorage.removeItem('kotoba_sheets_url')
+    localStorage.removeItem('kotoba_vocab')
+    localStorage.removeItem('kotoba_vocab_updated_at')
     
     return true
   } catch {

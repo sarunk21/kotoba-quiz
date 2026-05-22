@@ -4,8 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 
 import { useRouter } from 'next/navigation'
 import { loadSRS, getWordProgress, MASTERED_LEVEL, type SRSStore } from '@/lib/srs'
-import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
-import { fetchVocabCSV } from '@/lib/cloud'
+import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
 import { speakJapanese } from '@/lib/sounds'
 import BottomNav from '@/components/BottomNav'
 import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
@@ -69,19 +68,9 @@ export default function ProgressPage() {
 
   useEffect(() => {
     setSrsStore(loadSRS())
-    const url = localStorage.getItem('kotoba_sheets_url')
-    async function load() {
-      setLoading(true)
-      if (url) {
-        const csv = await fetchVocabCSV(url)
-        if (csv) {
-          const parsed = parseCSVToVocab(csv)
-          setVocab(parsed)
-        }
-      }
-      setLoading(false)
-    }
-    load()
+    setLoading(true)
+    setVocab(loadLocalVocab())
+    setLoading(false)
   }, [])
 
   // Unique chapters in vocabulary

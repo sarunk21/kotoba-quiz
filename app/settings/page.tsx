@@ -1,20 +1,18 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
-import { parseCSVToVocab } from '@/lib/vocab'
-import { fetchVocabCSV, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud } from '@/lib/cloud'
+import { pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud } from '@/lib/cloud'
 import BottomNav from '@/components/BottomNav'
 
 export default function SettingsPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const [urlInput, setUrlInput] = useState('')
-  const [vocabError, setVocabError] = useState('')
-  const [saving, setSaving] = useState(false)
+  // Removed legacy Sheets state vars
   const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
@@ -22,23 +20,7 @@ export default function SettingsPage() {
   const [syncMode, setSyncMode] = useState<'auto' | 'manual'>('auto')
   const [syncActionStatus, setSyncActionStatus] = useState<string>('')
 
-  function downloadTemplateCSV() {
-    const csvContent = "kategori,hiragana,kanji,arti,bab\n" +
-      "Kata Benda,わたし,私,Saya,Bab 1\n" +
-      "Kata Kerja,ねます,寝ます,Tidur,Bab 1\n" +
-      "Kata Sifat,たのしい,楽しい,Menyenangkan,Bab 2\n" +
-      "Ungkapan,ありがとう,,Terima kasih,Bab 2\n"
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.setAttribute("href", url)
-    link.setAttribute("download", "template_kamus_kotoba.csv")
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+  // Legacy CSV functions removed
 
 
   useEffect(() => {
@@ -57,8 +39,7 @@ export default function SettingsPage() {
     const savedSync = localStorage.getItem('kotoba_sync_mode') as 'auto' | 'manual' | null
     if (savedSync) setSyncMode(savedSync)
 
-    const url = localStorage.getItem('kotoba_sheets_url') || ''
-    setUrlInput(url)
+    // Legacy URL config removed
     if (typeof Notification !== 'undefined') {
       if (Notification.permission === 'granted') setNotifStatus('granted')
       else if (Notification.permission === 'denied') setNotifStatus('denied')
@@ -95,37 +76,7 @@ export default function SettingsPage() {
     touchStats() // Update timestamp for sync
   }
 
-  async function handleSaveUrl() {
-    if (!urlInput.trim()) {
-      setVocabError('URL tidak boleh kosong!')
-      return
-    }
-    if (!urlInput.includes('docs.google.com')) {
-      setVocabError('Harus URL Google Sheets yang valid.')
-      return
-    }
-    if (urlInput.includes('/edit') || !urlInput.includes('output=csv')) {
-      setVocabError('Link kurang tepat! Gunakan link "Publish to web" dengan format CSV.')
-      return
-    }
-
-    setSaving(true)
-    setVocabError('')
-    const csv = await fetchVocabCSV(urlInput, true)
-    if (csv) {
-      const parsed = parseCSVToVocab(csv)
-      if (parsed.length > 0) {
-        localStorage.setItem('kotoba_sheets_url', urlInput)
-        if (session?.accessToken) await pushToCloud()
-        alert('Kamus berhasil diperbarui!')
-      } else {
-        setVocabError('Data kosong! Silakan periksa kembali format kolom Google Sheets kamu.')
-      }
-    } else {
-      setVocabError('Gagal ambil data. Cek koneksi atau status "Publish".')
-    }
-    setSaving(false)
-  }
+  // Removed legacy update handlers
 
   async function enableNotif() {
     const perm = await Notification.requestPermission()
@@ -232,58 +183,17 @@ export default function SettingsPage() {
             </p>
           </div>
 
-          {/* Google Sheets Section */}
+          {/* Vocab Database Section */}
           <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Sumber Kamus</p>
-            <input type="url" value={urlInput} onChange={e => { setUrlInput(e.target.value); setVocabError('') }}
-              placeholder="Paste link CSV Sheets lo..."
-              className="w-full rounded-2xl px-4 py-3 text-sm mb-3 outline-none"
-              style={{ background: 'var(--color-bg)', border: `1.5px solid ${vocabError ? 'var(--color-red)' : 'var(--color-border)'}`, color: 'var(--color-text-1)', fontFamily: 'inherit' }} />
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Database Kosakata</p>
+            <p className="text-xs font-semibold leading-relaxed mb-4" style={{ color: 'var(--color-text-2)' }}>
+              Kelola daftar kosakata kustom kamu secara langsung di aplikasi. Data kamu tersimpan di cloud Firebase secara otomatis.
+            </p>
             
-            {vocabError && (
-              <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-3" style={{ background: 'var(--color-red-light)' }}>
-                <span className="text-sm">⚠️</span>
-                <p className="text-xs font-bold" style={{ color: 'var(--color-red-dark)' }}>{vocabError}</p>
-              </div>
-            )}
-
-            <button onClick={handleSaveUrl} disabled={saving}
-              className="w-full rounded-2xl py-3.5 text-sm font-bold active:scale-95 transition-transform"
-              style={{ background: 'var(--color-accent)', color: '#fff', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(91,94,244,0.2)' }}>
-              {saving ? '⏳ Mengambil data...' : 'Update Kamus'}
-            </button>
-
-            <details className="mt-4">
-              <summary className="text-xs font-semibold cursor-pointer select-none" style={{ color: 'var(--color-text-2)' }}>
-                Cara setup Sheets ▾
-              </summary>
-              <div className="mt-3 text-xs space-y-2 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-                <p>1. Kolom: <span className="font-bold" style={{ color: 'var(--color-accent)' }}>kategori, hiragana, kanji, arti, bab</span></p>
-                <p>2. File → Share → Publish to web → Format: <span className="font-bold">CSV</span></p>
-                <p>3. Copy link yang muncul → paste di atas</p>
-              </div>
-            </details>
-
-            <div className="mt-5 p-4 rounded-2xl border border-[var(--color-border)]" style={{ background: 'var(--color-bg)' }}>
-              <p className="text-xs font-bold mb-1.5" style={{ color: 'var(--color-text-1)' }}>Template Kamus</p>
-              <p className="text-[11px] font-semibold leading-relaxed mb-3.5" style={{ color: 'var(--color-text-2)' }}>
-                Format wajib (5 kolom): <code className="font-mono text-[var(--color-accent)]">kategori, hiragana, kanji, arti, bab</code>.
-              </p>
-              <div className="flex gap-2">
-                <button onClick={downloadTemplateCSV}
-                  className="flex-1 rounded-xl py-2.5 text-[11px] font-extrabold active:scale-95 transition-all"
-                  style={{ background: 'var(--color-white)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                  📥 Download CSV
-                </button>
-                <a href="https://docs.google.com/spreadsheets/d/1vN0Vee6rD0-X20Hn9P9e-YkSwl6i6W4u0N7WlXyC4kM/copy" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   className="flex-1 rounded-xl py-2.5 text-[11px] font-extrabold text-white text-center no-underline active:scale-95 transition-all flex items-center justify-center"
-                   style={{ background: 'var(--color-accent)', boxShadow: '0 4px 10px rgba(91,94,244,0.2)' }}>
-                  📋 Salin Google Sheet
-                </a>
-              </div>
-            </div>
+            <Link href="/vocab" className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold no-underline active:scale-95 transition-transform"
+              style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 4px 12px rgba(91,94,244,0.2)' }}>
+              ⚙️ Kelola Kosakata
+            </Link>
           </div>
 
           {/* Notifications Section */}
@@ -336,7 +246,7 @@ export default function SettingsPage() {
             <div className="text-5xl mb-4">🧨</div>
             <h3 className="text-xl font-extrabold mb-2" style={{ color: 'var(--color-text-1)' }}>Hapus Semua?</h3>
             <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-              Aksi ini akan menghapus riwayat berlatih kamu secara permanen, baik di <span className="text-red-500">lokal</span> maupun di <span className="text-red-500">Google Drive</span>.
+              Aksi ini akan menghapus riwayat berlatih kamu secara permanen, baik di <span className="text-red-500">lokal</span> maupun di <span className="text-red-500">Firebase Cloud</span>.
             </p>
             <div className="flex flex-col gap-2.5">
               <button onClick={handleResetAccount} disabled={resetting}

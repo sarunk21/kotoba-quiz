@@ -1,115 +1,114 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
+import { db } from '@/lib/firebase-admin'
 
-// Satu file nyimpen semua: SRS + stats + settings
-const FILENAME = 'kotoba_data.json'
-const DRIVE_API = 'https://www.googleapis.com/drive/v3'
-const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3'
-
-async function findFile(token: string): Promise<string | null> {
-  const t = Date.now()
-  const res = await fetch(
-    `${DRIVE_API}/files?spaces=appDataFolder&q=name='${FILENAME}'&fields=files(id,modifiedTime)&t=${t}`,
-    { 
-      headers: { Authorization: `Bearer ${token}` },
-      cache: 'no-store'
-    }
-  )
-  const data = await res.json()
-  return data.files?.[0]?.id ?? null
-}
-
-async function upsertFile(token: string, fileId: string | null, content: string): Promise<boolean> {
-  let res
-  if (fileId) {
-    res = await fetch(`${UPLOAD_API}/files/${fileId}?uploadType=media`, {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: content,
-      cache: 'no-store'
-    })
-  } else {
-    const meta = JSON.stringify({ name: FILENAME, parents: ['appDataFolder'] })
-    const boundary = 'boundary_kotoba_v2'
-    const multipart = [
-      `--${boundary}`,
-      'Content-Type: application/json; charset=UTF-8',
-      '',
-      meta,
-      `--${boundary}`,
-      'Content-Type: application/json',
-      '',
-      content,
-      `--${boundary}--`,
-    ].join('\r\n')
-    res = await fetch(`${UPLOAD_API}/files?uploadType=multipart`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': `multipart/related; boundary=${boundary}`,
-      },
-      body: multipart,
-      cache: 'no-store'
-    })
-  }
-  return res.ok
-}
-
-// GET — ambil semua data dari Drive
+// GET — ambil semua data (vocab + srs + stats) dari Firestore
 export async function GET() {
   const session = await auth()
-  if (!session?.accessToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!db) {
+    return NextResponse.json({ error: 'Firebase is not initialized' }, { status: 500 })
+  }
+
+  const email = session.user.email
 
   try {
-    const fileId = await findFile(session.accessToken)
-    if (!fileId) return NextResponse.json({ data: null })
+    // 1. Ambil data progress (srs + stats)
+    const userDoc = await db.collection('users').doc(email).get()
+    const progressData = userDoc.exists ? userDoc.data() : null
 
-    const t = Date.now()
-    const res = await fetch(`${DRIVE_API}/files/${fileId}?alt=media&t=${t}`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-      cache: 'no-store',
+    // 2. Ambil data vocab kustom
+    const vocabDoc = await db.collection('users').doc(email).collection('vocab').doc('data').get()
+    const vocabData = vocabDoc.exists ? vocabDoc.data()?.items : null
+    const vocabUpdatedAt = vocabDoc.exists ? vocabDoc.data()?.updatedAt : null
+
+    return NextResponse.json({
+      data: {
+        srs: progressData?.srs ?? {},
+        stats: progressData?.stats ?? null,
+        updatedAt: progressData?.updatedAt ?? '',
+        vocab: vocabData ?? null,
+        vocabUpdatedAt: vocabUpdatedAt ?? '',
+      }
     })
-    if (!res.ok) return NextResponse.json({ data: null })
-    const data = await res.json()
-    return NextResponse.json({ data })
   } catch (e: unknown) {
     const error = e as Error
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// POST — simpan semua data ke Drive
+// POST — simpan data (srs + stats + vocab) ke Firestore
 export async function POST(req: NextRequest) {
   const session = await auth()
-  if (!session?.accessToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
+  if (!db) {
+    return NextResponse.json({ error: 'Firebase is not initialized' }, { status: 500 })
+  }
+
+  const email = session.user.email
   const body = await req.json()
-  const token = session.accessToken
+  const { srs, stats, vocab, vocabUpdatedAt, updatedAt } = body
 
   try {
-    const fileId = await findFile(token)
-    const ok = await upsertFile(token, fileId, JSON.stringify(body))
-    return NextResponse.json({ ok })
+    const batch = db.batch()
+
+    // 1. Simpan progress (srs + stats) ke dokumen user
+    const userRef = db.collection('users').doc(email)
+    batch.set(userRef, {
+      srs: srs ?? {},
+      stats: stats ?? {},
+      updatedAt: updatedAt ?? new Date().toISOString(),
+    }, { merge: true })
+
+    // 2. Simpan vocab jika disertakan
+    if (vocab !== undefined) {
+      const vocabRef = db.collection('users').doc(email).collection('vocab').doc('data')
+      batch.set(vocabRef, {
+        items: vocab || [],
+        updatedAt: vocabUpdatedAt || new Date().toISOString(),
+      })
+    }
+
+    await batch.commit()
+    return NextResponse.json({ ok: true })
   } catch (e: unknown) {
     const error = e as Error
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// DELETE — hapus file data dari Drive
+// DELETE — hapus semua data dari Firestore
 export async function DELETE() {
   const session = await auth()
-  if (!session?.accessToken) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!db) {
+    return NextResponse.json({ error: 'Firebase is not initialized' }, { status: 500 })
+  }
+
+  const email = session.user.email
 
   try {
-    const fileId = await findFile(session.accessToken)
-    if (!fileId) return NextResponse.json({ ok: true })
+    const batch = db.batch()
 
-    const res = await fetch(`${DRIVE_API}/files/${fileId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    })
-    return NextResponse.json({ ok: res.ok })
+    // Hapus dokumen vocab
+    const vocabRef = db.collection('users').doc(email).collection('vocab').doc('data')
+    batch.delete(vocabRef)
+
+    // Hapus dokumen user
+    const userRef = db.collection('users').doc(email)
+    batch.delete(userRef)
+
+    await batch.commit()
+    return NextResponse.json({ ok: true })
   } catch (e: unknown) {
     const error = e as Error
     return NextResponse.json({ error: error.message }, { status: 500 })

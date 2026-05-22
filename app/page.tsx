@@ -6,8 +6,8 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, type GameStats } from '@/lib/stats'
 import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
 import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
-import { parseCSVToVocab, type VocabItem, setGlobalVocab } from '@/lib/vocab'
-import { fetchVocabCSV, pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
+import { parseCSVToVocab, type VocabItem, setGlobalVocab, loadLocalVocab } from '@/lib/vocab'
+import { pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
 import BottomNav from '@/components/BottomNav'
@@ -32,9 +32,7 @@ export default function Home() {
   const [stats, setStats] = useState<GameStats | null>(null)
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [vocab, setVocab] = useState<VocabItem[]>([])
-  const [savedUrl, setSavedUrl] = useState('')
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
-  const [vocabError, setVocabError] = useState('')
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [notificationNeed, setNotificationNeed] = useState<{ type: string; message: string } | null>(null)
@@ -49,29 +47,13 @@ export default function Home() {
   const touchStartY = useRef(0)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const loadVocabData = useCallback(async (url: string, force = false): Promise<VocabItem[]> => {
-    setVocabError('')
-    if (url.includes('/edit') || !url.includes('output=csv')) {
-      setVocabError('Link salah! Pake link "Publish to web" format CSV ya.')
-      setVocab([]); return []
-    }
-    const csv = await fetchVocabCSV(url, force)
-    if (!csv) {
-      setVocabError('Gagal ambil data.')
-      setVocab([]); return []
-    }
-    const parsed = parseCSVToVocab(csv)
-    setVocab(parsed)
-    setGlobalVocab(parsed)
-    return parsed
-  }, [])
-
   useEffect(() => {
     const s = loadStats(); setStats(s)
     const store = loadSRS(); setSrsStore(store)
-    const url = localStorage.getItem('kotoba_sheets_url') || ''
-    setSavedUrl(url)
-    if (url) loadVocabData(url)
+    
+    // Load local vocabulary
+    const localVocab = loadLocalVocab()
+    setVocab(localVocab)
 
     // Check notifications
     const need = checkNotificationNeeds()
@@ -79,15 +61,17 @@ export default function Home() {
       setNotificationNeed(need)
       showLocalNotification('言葉カード', need.message)
     }
-  }, [loadVocabData])
+  }, [])
 
   // Account Isolation
   useEffect(() => {
     if (session?.user?.email) {
       const lastUser = localStorage.getItem('kotoba_last_user')
       if (lastUser && lastUser !== session.user.email) {
-        localStorage.removeItem('kotoba_srs'); localStorage.removeItem('kotoba_stats')
-        localStorage.removeItem('kotoba_sheets_url')
+        localStorage.removeItem('kotoba_srs')
+        localStorage.removeItem('kotoba_stats')
+        localStorage.removeItem('kotoba_vocab')
+        localStorage.removeItem('kotoba_vocab_updated_at')
         localStorage.setItem('kotoba_last_user', session.user.email)
         window.location.reload()
       } else if (!lastUser) {
@@ -97,32 +81,33 @@ export default function Home() {
   }, [session])
 
   async function handleSignOut() {
-    localStorage.removeItem('kotoba_srs'); localStorage.removeItem('kotoba_stats')
-    localStorage.removeItem('kotoba_sheets_url'); localStorage.removeItem('kotoba_last_user')
+    localStorage.removeItem('kotoba_srs')
+    localStorage.removeItem('kotoba_stats')
+    localStorage.removeItem('kotoba_vocab')
+    localStorage.removeItem('kotoba_vocab_updated_at')
+    localStorage.removeItem('kotoba_last_user')
     await signOut()
   }
 
   const doSync = useCallback(async () => {
-    if (!session?.accessToken) return
+    if (!session?.user?.email) return
     setSyncStatus('syncing')
     const ok = await syncToCloud()
     if (ok) {
-      setSrsStore(loadSRS()); setStats(loadStats())
-      const cloudUrl = localStorage.getItem('kotoba_sheets_url')
-      if (cloudUrl) {
-        setSavedUrl(cloudUrl); await loadVocabData(cloudUrl, true)
-      }
+      setSrsStore(loadSRS())
+      setStats(loadStats())
+      setVocab(loadLocalVocab())
       setSyncStatus('ok')
     } else {
       setSyncStatus('error')
     }
     setTimeout(() => setSyncStatus('idle'), 2500)
-  }, [session?.accessToken, loadVocabData])
+  }, [session?.user?.email])
 
   useEffect(() => {
     const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
-    if (session?.accessToken && isAuto) doSync()
-  }, [session?.accessToken, doSync])
+    if (session?.user?.email && isAuto) doSync()
+  }, [session?.user?.email, doSync])
 
   const onTouchStart = (e: React.TouchEvent) => {
     const el = scrollRef.current
@@ -139,8 +124,7 @@ export default function Home() {
     setIsPulling(false)
     if (pullY >= PULL_THRESHOLD) {
       setPullY(40); setIsRefreshing(true)
-      if (session?.accessToken) await doSync()
-      if (savedUrl) await loadVocabData(savedUrl, true)
+      if (session?.user?.email) await doSync()
       setIsRefreshing(false)
     }
     setPullY(0)
@@ -333,8 +317,14 @@ export default function Home() {
             {noVocab && (
               <div className="rounded-3xl p-6 mb-5 anim-up text-center" style={{ background: 'var(--color-white)', border: '2px solid var(--color-accent)' }}>
                 <div className="text-4xl mb-3">📋</div>
-                <h3 className="font-extrabold text-base mb-2">Kamus kamu belum diatur!</h3>
-                <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>Buka Menu Profil (klik foto profil) &gt; Pengaturan untuk menghubungkan Google Sheets kamu.</p>
+                <h3 className="font-extrabold text-base mb-2">Belum ada kosakata!</h3>
+                <p className="text-xs font-semibold leading-relaxed mb-3" style={{ color: 'var(--color-text-2)' }}>Tambahkan kosakata baru atau impor dari CSV di halaman Kelola Kosakata.</p>
+                <Link 
+                  href="/vocab"
+                  className="inline-block rounded-xl px-4 py-2.5 text-xs font-extrabold text-white no-underline bg-[var(--color-accent)] active:scale-95 transition-transform"
+                >
+                  Kelola Kosakata ⚙️
+                </Link>
               </div>
             )}
 

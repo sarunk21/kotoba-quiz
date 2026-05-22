@@ -4,8 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { loadSRS, getSRSSummary, type SRSStore } from '@/lib/srs'
-import { parseCSVToVocab, type VocabItem } from '@/lib/vocab'
-import { fetchVocabCSV } from '@/lib/cloud'
+import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
 import { KANA } from '@/lib/kana'
 import { SPECIALIZED_DATA } from '@/lib/specialized'
 
@@ -47,15 +46,7 @@ export default function BottomNav() {
   useEffect(() => {
     if (showPracticeModal) {
       setSrsStore(loadSRS())
-      const url = typeof window !== 'undefined' ? localStorage.getItem('kotoba_sheets_url') || '' : ''
-      if (url) {
-        fetchVocabCSV(url).then(csv => {
-          if (csv) {
-            const parsed = parseCSVToVocab(csv)
-            setVocab(parsed)
-          }
-        }).catch(() => {})
-      }
+      setVocab(loadLocalVocab())
     } else {
       setSelectedSpecialType(null)
     }
@@ -264,16 +255,16 @@ export default function BottomNav() {
             {noVocab ? (
               <div className="rounded-2xl p-5 mb-4 text-center border border-[var(--color-accent)] bg-[var(--color-white)]">
                 <div className="text-3xl mb-2">📋</div>
-                <p className="font-extrabold text-sm text-[var(--color-text-1)]">Sheets Belum Diset</p>
+                <p className="font-extrabold text-sm text-[var(--color-text-1)]">Belum Ada Kosakata</p>
                 <p className="text-xs font-semibold text-[var(--color-text-2)] mt-1 mb-3">
-                  Hubungkan Google Sheets kamu di halaman Pengaturan agar dapat berlatih kosakata.
+                  Kelola kosakata kamu terlebih dahulu di halaman Kelola Kosakata agar dapat berlatih.
                 </p>
                 <Link 
-                  href="/settings" 
+                  href="/vocab" 
                   onClick={() => setShowPracticeModal(false)} 
                   className="inline-block rounded-xl px-4 py-2 text-xs font-extrabold text-white no-underline bg-[var(--color-accent)] active:scale-95 transition-transform"
                 >
-                  Ke Pengaturan ⚙️
+                  Kelola Kosakata ⚙️
                 </Link>
               </div>
             ) : (

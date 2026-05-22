@@ -109,3 +109,28 @@ export function getDisplayText(item: VocabItem): { main: string; sub: string } {
     sub: hasKanji ? item.hiragana : '',
   }
 }
+
+export function loadLocalVocab(): VocabItem[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = localStorage.getItem('kotoba_vocab')
+    if (raw) {
+      const items = JSON.parse(raw) as VocabItem[]
+      setGlobalVocab(items)
+      return items
+    }
+  } catch (e) {
+    console.error('[Vocab] Error loading from localStorage:', e)
+  }
+  return []
+}
+
+export function saveLocalVocab(items: VocabItem[]) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem('kotoba_vocab', JSON.stringify(items))
+    setGlobalVocab(items)
+  } catch (e) {
+    console.error('[Vocab] Error saving to localStorage:', e)
+  }
+}

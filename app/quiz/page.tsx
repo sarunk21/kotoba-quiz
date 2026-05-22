@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { parseCSVToVocab, getDisplayText, type VocabItem, getGlobalVocab, setGlobalVocab } from '@/lib/vocab'
+import { loadLocalVocab, getDisplayText, type VocabItem, getGlobalVocab, setGlobalVocab } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 import {
   loadSRS, saveSRS, onCorrect, onWrong,
   buildQueue, getWordProgress, SRS_INTERVALS, MASTERED_LEVEL,
   type SRSStore
 } from '@/lib/srs'
-import { fetchVocabCSV, pushToCloud } from '@/lib/cloud'
+import { pushToCloud } from '@/lib/cloud'
 import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish, speakJapanese } from '@/lib/sounds'
 import { SPECIALIZED_DATA } from '@/lib/specialized'
 
@@ -129,17 +129,9 @@ function QuizContent() {
         return
       }
 
-      const url = localStorage.getItem('kotoba_sheets_url')
       let v: VocabItem[] | null = getGlobalVocab()
-      
-      if (!v && url) {
-        try {
-          const csv = await fetchVocabCSV(url)
-          if (csv) {
-            v = parseCSVToVocab(csv)
-            setGlobalVocab(v)
-          }
-        } catch { }
+      if (!v || v.length === 0) {
+        v = loadLocalVocab()
       }
 
       if (v && v.length > 0) {
