@@ -18,21 +18,21 @@ export function checkNotificationNeeds(): { type: NotificationType; message: str
   if (diffDays === 1) {
     return {
       type: 'streak_at_risk',
-      message: '🔥 Streak lu mau padam le! Latihan bentar yuk biar tetep nyala.'
+      message: '🔥 Streak kamu hampir padam! Mari latihan sebentar agar tetap aktif.'
     }
   }
 
   if (diffDays > 1 && diffDays <= 3) {
     return {
       type: 'streak_lost',
-      message: '🕯️ Streak lu udah padam... Tapi tenang, mending mulai lagi sekarang daripada telat!'
+      message: '🕯️ Streak kamu telah padam... Namun jangan khawatir, mari mulai kembali sekarang!'
     }
   }
 
   if (diffDays > 3) {
     return {
       type: 'reminder',
-      message: '👋 Udah lama gak kelihatan nih. Gaskan latihan lagi biar jago Jepangnya!'
+      message: '👋 Sudah cukup lama tidak berlatih. Mari kembali latihan agar kemampuan bahasa Jepangmu semakin meningkat!'
     }
   }
 

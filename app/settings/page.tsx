@@ -105,7 +105,7 @@ export default function SettingsPage() {
       return
     }
     if (urlInput.includes('/edit') || !urlInput.includes('output=csv')) {
-      setVocabError('Link salah! Pake link "Publish to web" format CSV ya.')
+      setVocabError('Link kurang tepat! Gunakan link "Publish to web" dengan format CSV.')
       return
     }
 
@@ -119,7 +119,7 @@ export default function SettingsPage() {
         if (session?.accessToken) await pushToCloud()
         alert('Kamus berhasil diperbarui!')
       } else {
-        setVocabError('Data kosong! Cek format kolom Sheets lo.')
+        setVocabError('Data kosong! Silakan periksa kembali format kolom Google Sheets kamu.')
       }
     } else {
       setVocabError('Gagal ambil data. Cek koneksi atau status "Publish".')
@@ -298,7 +298,7 @@ export default function SettingsPage() {
                 <div>
                   <p className="text-sm font-bold" style={{ color: 'var(--color-text-1)' }}>Pengingat Harian</p>
                   <p className="text-xs font-semibold" style={{ color: 'var(--color-text-3)' }}>
-                    {notifStatus === 'granted' ? 'Udah aktif nih!' : 'Biar ga lupa latihan'}
+                    {notifStatus === 'granted' ? 'Sudah aktif!' : 'Agar tidak lupa latihan'}
                   </p>
                 </div>
               </div>
@@ -322,7 +322,7 @@ export default function SettingsPage() {
               <span>⚠️</span> Reset Semua Data Akun
             </button>
             <p className="text-[10px] text-center mt-3 font-semibold" style={{ color: 'var(--color-text-3)' }}>
-              Data di lokal & cloud bakal dihapus permanen.
+              Data lokal dan cloud akan dihapus secara permanen.
             </p>
           </div>
         </div>
@@ -336,7 +336,7 @@ export default function SettingsPage() {
             <div className="text-5xl mb-4">🧨</div>
             <h3 className="text-xl font-extrabold mb-2" style={{ color: 'var(--color-text-1)' }}>Hapus Semua?</h3>
             <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-              Aksi ini bakal hapus data latihan lo secara permanen baik di <span className="text-red-500">lokal</span> maupun di <span className="text-red-500">Google Drive</span>.
+              Aksi ini akan menghapus data latihan kamu secara permanen, baik di <span className="text-red-500">lokal</span> maupun di <span className="text-red-500">Google Drive</span>.
             </p>
             <div className="flex flex-col gap-2.5">
               <button onClick={handleResetAccount} disabled={resetting}

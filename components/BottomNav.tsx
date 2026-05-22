@@ -250,7 +250,7 @@ export default function BottomNav() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Pilih Latihan</h3>
-                <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Pilih jenis latihan yang ingin lo jalanin</p>
+                <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Pilih jenis latihan yang ingin kamu ikuti</p>
               </div>
               <button 
                 onClick={() => setShowPracticeModal(false)}
@@ -266,7 +266,7 @@ export default function BottomNav() {
                 <div className="text-3xl mb-2">📋</div>
                 <p className="font-extrabold text-sm text-[var(--color-text-1)]">Sheets Belum Diset</p>
                 <p className="text-xs font-semibold text-[var(--color-text-2)] mt-1 mb-3">
-                  Hubungkan Google Sheets lo di halaman Pengaturan biar bisa latihan kosakata.
+                  Hubungkan Google Sheets kamu di halaman Pengaturan agar dapat berlatih kosakata.
                 </p>
                 <Link 
                   href="/settings" 
@@ -285,7 +285,7 @@ export default function BottomNav() {
                     <div className="flex-1">
                       <p className="font-extrabold text-sm text-[var(--color-text-1)]">Kosakata Harian (SRS)</p>
                       <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                        {srs && srs.dueCount > 0 ? `${srs.dueCount} kata siap direview le` : 'Latih kosakata baru/due hari ini'}
+                        {srs && srs.dueCount > 0 ? `${srs.dueCount} kata siap direview` : 'Latih kosakata baru/due hari ini'}
                       </p>
                     </div>
                     <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>

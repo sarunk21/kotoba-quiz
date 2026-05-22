@@ -469,10 +469,10 @@ function ResultScreen({ stats, vocab, srsStore, onRetry, onHome, isKanji }: {
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">{great ? '🎉' : ok ? '💪' : '📚'}</div>
           <h2 className="font-extrabold mb-2" style={{ fontSize: '1.4rem', color: 'var(--color-text-1)' }}>
-            {great ? 'すごい！ Keren banget!' : ok ? 'Lumayan nih!' : 'Jangan nyerah!'}
+            {great ? 'すごい！ Luar biasa!' : ok ? 'Hasil yang cukup baik!' : 'Jangan menyerah!'}
           </h2>
           <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>
-            {great ? 'Pertahanin terus ya!' : ok ? 'Ulangi biar makin lancar!' : 'Coba lagi, pasti bisa!'}
+            {great ? 'Pertahankan terus ya!' : ok ? 'Ulangi agar semakin lancar!' : 'Coba lagi, pasti bisa!'}
           </p>
         </div>
 

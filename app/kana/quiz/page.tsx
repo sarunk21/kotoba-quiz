@@ -132,10 +132,10 @@ function QuizContent() {
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">{great ? '🎉' : pct >= 50 ? '💪' : '📚'}</div>
             <h2 className="font-extrabold mb-2" style={{ fontSize: '1.4rem', color: 'var(--color-text-1)' }}>
-              {great ? 'すごい！' : pct >= 50 ? 'Lumayan nih!' : 'Jangan nyerah!'}
+              {great ? 'すごい！' : pct >= 50 ? 'Hasil yang cukup baik!' : 'Jangan menyerah!'}
             </h2>
             <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>
-              {kanaType === 'hiragana' ? 'Hiragana' : 'Katakana'} · {great ? 'Makin lancar nih!' : 'Terus latihan ya!'}
+              {kanaType === 'hiragana' ? 'Hiragana' : 'Katakana'} · {great ? 'Semakin lancar!' : 'Teruslah berlatih!'}
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2.5 mb-8">

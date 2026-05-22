@@ -320,7 +320,7 @@ export default function Home() {
             <div className="rounded-3xl p-8 mb-6 text-center" style={{ background: 'var(--color-white)', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
               <div className="text-6xl mb-6">🎌</div>
               <h2 className="text-xl font-extrabold mb-3" style={{ color: 'var(--color-text-1)' }}>Selamat Datang</h2>
-              <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>Simpan progress kosakata & kana lo di cloud. Masuk biar bisa lanjut di mana aja!</p>
+              <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>Simpan progress kosakata & kana kamu di cloud. Masuk agar dapat melanjutkan di mana saja!</p>
               <button onClick={() => signIn('google')} className="w-full flex items-center justify-center gap-3 rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform" style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 8px 20px rgba(91,94,244,0.28)' }}>
                 <GoogleIcon size={20} color="white" /> Masuk dengan Google
               </button>
@@ -333,8 +333,8 @@ export default function Home() {
             {noVocab && (
               <div className="rounded-3xl p-6 mb-5 anim-up text-center" style={{ background: 'var(--color-white)', border: '2px solid var(--color-accent)' }}>
                 <div className="text-4xl mb-3">📋</div>
-                <h3 className="font-extrabold text-base mb-2">Kamus lo belum diset!</h3>
-                <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>Buka Menu Profil (klik foto lo) &gt; Pengaturan untuk menghubungkan Google Sheets lo le.</p>
+                <h3 className="font-extrabold text-base mb-2">Kamus kamu belum diatur!</h3>
+                <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>Buka Menu Profil (klik foto profil) &gt; Pengaturan untuk menghubungkan Google Sheets kamu.</p>
               </div>
             )}
 
@@ -573,7 +573,7 @@ export default function Home() {
           <div className="bg-white rounded-[32px] p-8 w-full max-w-xs relative anim-pop shadow-2xl text-center">
             <div className="text-5xl mb-4">🚪</div>
             <h3 className="text-xl font-extrabold mb-2">Mau Logout?</h3>
-            <p className="text-sm font-semibold mb-8 leading-relaxed">Data lokal di browser ini bakal diapus, tapi tenang aja progress lo aman di cloud.</p>
+            <p className="text-sm font-semibold mb-8 leading-relaxed">Data lokal di browser ini akan dihapus, namun progress kamu tetap aman di cloud.</p>
             <div className="flex flex-col gap-2.5">
               <button onClick={handleSignOut} className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform" style={{ background: 'var(--color-red)', color: '#fff' }}>Ya, Logout 👋</button>
               <button onClick={() => setShowLogoutConfirm(false)} className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform" style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)' }}>Batal</button>
