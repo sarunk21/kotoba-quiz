@@ -106,8 +106,10 @@ export function buildQueue(
   const dueBelumHafal: string[] = []
   const newWords: string[] = []
   const futureBelumHafal: string[] = []
-  const dueSudahHafal: string[] = []
-  const futureSudahHafal: string[] = []
+  const dueLevel5: string[] = []
+  const futureLevel5: string[] = []
+  const dueLevel6: string[] = []
+  const futureLevel6: string[] = []
 
   for (const id of vocabIds) {
     const wp = store[id]
@@ -119,11 +121,17 @@ export function buildQueue(
       } else {
         futureBelumHafal.push(id)
       }
-    } else {
+    } else if (wp.level < MAX_LEVEL) { // Level 5 (Sudah Hafal but not fully complete/Level 6 yet)
       if (wp.nextReview <= today) {
-        dueSudahHafal.push(id)
+        dueLevel5.push(id)
       } else {
-        futureSudahHafal.push(id)
+        futureLevel5.push(id)
+      }
+    } else { // Level 6 (Fully Mastered)
+      if (wp.nextReview <= today) {
+        dueLevel6.push(id)
+      } else {
+        futureLevel6.push(id)
       }
     }
   }
@@ -133,14 +141,21 @@ export function buildQueue(
   const dueBelumHafalSh = shuffle(dueBelumHafal)
   const newSh = shuffle(newWords)
   const futureBelumHafalSh = shuffle(futureBelumHafal)
-  const dueSudahHafalSh = shuffle(dueSudahHafal)
-  const futureSudahHafalSh = shuffle(futureSudahHafal)
+  const dueLevel5Sh = shuffle(dueLevel5)
+  const futureLevel5Sh = shuffle(futureLevel5)
+  const dueLevel6Sh = shuffle(dueLevel6)
+  const futureLevel6Sh = shuffle(futureLevel6)
 
-  // Combined refresh/filler list: prioritizing unmemorized, then mastered
-  const refreshIds = [...futureBelumHafalSh, ...dueSudahHafalSh, ...futureSudahHafalSh]
+  // Combined refresh/filler list: prioritize unmemorized (level 1-4) & level 5, then fully mastered level 6
+  const refreshIds = [
+    ...futureBelumHafalSh,
+    ...futureLevel5Sh,
+    ...dueLevel6Sh,
+    ...futureLevel6Sh
+  ]
 
   return {
-    dueIds: dueBelumHafalSh,
+    dueIds: [...dueBelumHafalSh, ...dueLevel5Sh],
     newIds: newSh,
     refreshIds: refreshIds,
   }
