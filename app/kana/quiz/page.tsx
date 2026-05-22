@@ -155,7 +155,7 @@ function QuizContent() {
             <button onClick={startQuiz}
               className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform"
               style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 8px 20px rgba(91,94,244,0.28)' }}>
-              Latihan lagi 🔄
+              Berlatih lagi 🔄
             </button>
             <button onClick={() => router.replace('/kana')}
               className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform"

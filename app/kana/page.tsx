@@ -166,13 +166,13 @@ export default function KanaPage() {
           style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <div className="p-4 pb-3">
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-3)' }}>
-              Mode Latihan
+              Mode Berlatih
             </p>
             <div className="flex flex-col gap-2">
               {[
                 { key: 'all',     icon: '📚', label: 'Semua karakter', desc: `${KANA.length} karakter` },
                 { key: 'custom',  icon: '🎯', label: 'Pilih grup sendiri', desc: 'Fokus ke baris tertentu' },
-                { key: 'refresh', icon: '🔄', label: 'Refreshment', desc: refreshCount > 0 ? `${refreshCount} karakter siap direview` : 'Belum ada yang perlu direview' },
+                { key: 'refresh', icon: '🔄', label: 'Penyegaran', desc: refreshCount > 0 ? `${refreshCount} karakter siap direview` : 'Belum ada yang perlu direview' },
               ].map(m => (
                 <button key={m.key} onClick={() => setMode(m.key as typeof mode)}
                   disabled={m.key === 'refresh' && refreshCount === 0}
@@ -281,7 +281,7 @@ export default function KanaPage() {
             boxShadow: '0 8px 20px rgba(91,94,244,0.28)',
             opacity: mode === 'custom' && selectedGroups.size === 0 ? 0.4 : 1,
           }}>
-          {mode === 'refresh' ? `🔄 Mulai Refreshment (${refreshCount})` : '練習する — Mulai Latihan →'}
+          {mode === 'refresh' ? `🔄 Mulai Penyegaran (${refreshCount})` : '練習する — Mulai Berlatih →'}
         </button>
 
       </div>

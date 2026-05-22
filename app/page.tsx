@@ -265,7 +265,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>{session ? `おかえり、${session.user?.name?.split(' ')[0]} 👋` : 'おはようございます 👋'}</p>
-              <h1 className="text-2xl font-extrabold leading-tight" style={{ color: 'var(--color-text-1)' }}>{session ? 'Siap latihan hari ini?' : 'Kuasai Kosakata Jepang'}</h1>
+              <h1 className="text-2xl font-extrabold leading-tight" style={{ color: 'var(--color-text-1)' }}>{session ? 'Siap berlatih hari ini?' : 'Kuasai Kosakata Jepang'}</h1>
             </div>
             {status === 'loading' ? <div className="w-10 h-10 rounded-full" style={{ background: 'var(--color-subtle)' }} /> : session ? (
               <div className="relative">
@@ -518,12 +518,12 @@ export default function Home() {
                   if (activeStatusTab === 'kanji' && kanjiSrs) {
                     currentSrs = kanjiSrs
                     linkUrl = '/quiz?mode=kanji'
-                    linkText = 'Latih kanji →'
+                    linkText = 'Berlatih kanji →'
                     title = 'Status Kanji'
                   } else if (activeStatusTab === 'kana') {
                     currentSrs = kanaSrs
                     linkUrl = '/kana'
-                    linkText = 'Latih kana →'
+                    linkText = 'Berlatih kana →'
                     title = 'Status Kana'
                   }
 

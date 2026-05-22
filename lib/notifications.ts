@@ -18,7 +18,7 @@ export function checkNotificationNeeds(): { type: NotificationType; message: str
   if (diffDays === 1) {
     return {
       type: 'streak_at_risk',
-      message: '🔥 Streak kamu hampir padam! Mari latihan sebentar agar tetap aktif.'
+      message: '🔥 Streak kamu hampir padam! Mari berlatih sebentar agar tetap aktif.'
     }
   }
 
@@ -32,7 +32,7 @@ export function checkNotificationNeeds(): { type: NotificationType; message: str
   if (diffDays > 3) {
     return {
       type: 'reminder',
-      message: '👋 Sudah cukup lama tidak berlatih. Mari kembali latihan agar kemampuan bahasa Jepangmu semakin meningkat!'
+      message: '👋 Sudah cukup lama tidak berlatih. Mari kembali berlatih agar kemampuan bahasa Jepangmu semakin meningkat!'
     }
   }
 

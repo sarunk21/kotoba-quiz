@@ -285,7 +285,7 @@ export default function BottomNav() {
                     <div className="flex-1">
                       <p className="font-extrabold text-sm text-[var(--color-text-1)]">Kosakata Harian (SRS)</p>
                       <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                        {srs && srs.dueCount > 0 ? `${srs.dueCount} kata siap direview` : 'Latih kosakata baru/due hari ini'}
+                        {srs && srs.dueCount > 0 ? `${srs.dueCount} kata siap direview` : 'Berlatih kosakata baru/due hari ini'}
                       </p>
                     </div>
                     <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
@@ -300,7 +300,7 @@ export default function BottomNav() {
                       <div className="flex-1">
                         <p className="font-extrabold text-sm text-[var(--color-text-1)]">Fokus Membaca Kanji</p>
                         <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                          Latih {kanjiVocab.length} kata yang menggunakan Kanji
+                          Berlatih {kanjiVocab.length} kata yang menggunakan Kanji
                         </p>
                       </div>
                       <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
@@ -317,7 +317,7 @@ export default function BottomNav() {
                 <div className="flex-1">
                   <p className="font-extrabold text-sm text-[var(--color-text-1)]">Hiragana & Katakana</p>
                   <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                    Latih {KANA.length} karakter dasar Jepang
+                    Berlatih {KANA.length} karakter dasar Jepang
                   </p>
                 </div>
                 <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
