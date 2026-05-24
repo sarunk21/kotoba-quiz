@@ -302,13 +302,41 @@ export default function BottomNav() {
             )}
 
             {/* Option 3 (Always Available): Kana Quiz */}
-            <Link href="/kana" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-4">
+            <Link href="/kana" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
               <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
                 <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8">あ</div>
                 <div className="flex-1">
                   <p className="font-extrabold text-sm text-[var(--color-text-1)]">Hiragana & Katakana</p>
                   <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
                     Berlatih {KANA.length} karakter dasar Jepang
+                  </p>
+                </div>
+                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
+              </div>
+            </Link>
+
+            {/* Option 4 (Always Available): Latihan Partikel */}
+            <Link href="/particles" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
+              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
+                <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8 text-amber-500">助</div>
+                <div className="flex-1">
+                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Latihan Partikel (は, が, を...)</p>
+                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
+                    Kuasai fungsi dan penggunaan partikel dasar Jepang
+                  </p>
+                </div>
+                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
+              </div>
+            </Link>
+
+            {/* Option 5 (Always Available): Penyusunan Kalimat */}
+            <Link href="/sentences" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-4">
+              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
+                <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8 text-green-500">文</div>
+                <div className="flex-1">
+                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Penyusunan Kalimat</p>
+                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
+                    Susun kepingan kata menjadi kalimat Jepang yang benar
                   </p>
                 </div>
                 <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
