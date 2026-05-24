@@ -56,6 +56,13 @@ export default function VocabPage() {
   // CSV Import State
   const [csvInput, setCsvInput] = useState('')
   const [csvError, setCsvError] = useState('')
+  const [importTab, setImportTab] = useState<'text' | 'link'>('text')
+  const [sheetsUrlInput, setSheetsUrlInput] = useState('')
+  const [loadingImportLink, setLoadingImportLink] = useState(false)
+
+  // Bulk Delete State
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [isBulkDelete, setIsBulkDelete] = useState(false)
 
   // Auth Protection
   useEffect(() => {
@@ -199,17 +206,36 @@ export default function VocabPage() {
 
   // Delete Handling
   const askDelete = (item: VocabItem) => {
+    setIsBulkDelete(false)
     setDeletingItem(item)
     setShowDeleteModal(true)
   }
 
   const confirmDelete = async () => {
-    if (!deletingItem) return
-    const updatedList = vocabList.filter(item => item.id !== deletingItem.id)
+    let updatedList: VocabItem[] = []
+    if (isBulkDelete) {
+      updatedList = vocabList.filter(item => !selectedIds.has(item.id))
+      setSelectedIds(new Set())
+      setIsBulkDelete(false)
+    } else {
+      if (!deletingItem) return
+      updatedList = vocabList.filter(item => item.id !== deletingItem.id)
+      setSelectedIds(p => {
+        const next = new Set(p)
+        next.delete(deletingItem.id)
+        return next
+      })
+      setDeletingItem(null)
+    }
     setVocabList(updatedList)
     setShowDeleteModal(false)
-    setDeletingItem(null)
     await triggerSync(updatedList)
+  }
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false)
+    setDeletingItem(null)
+    setIsBulkDelete(false)
   }
 
   // CSV Import handling
@@ -247,6 +273,61 @@ export default function VocabPage() {
       alert(`Berhasil mengimpor ${newItems.length} kosakata baru!`)
     } catch (e: any) {
       setCsvError(`Gagal membaca CSV: ${e.message || e}`)
+    }
+  }
+
+  // Google Sheets URL Import Handling
+  const handleImportFromLink = async () => {
+    if (!sheetsUrlInput.trim()) {
+      setCsvError('Link Google Sheets tidak boleh kosong!')
+      return
+    }
+
+    if (!sheetsUrlInput.includes('docs.google.com') && !sheetsUrlInput.includes('spreadsheets')) {
+      setCsvError('Link harus berupa URL Google Sheets yang valid!')
+      return
+    }
+
+    setLoadingImportLink(true)
+    setCsvError('')
+    
+    try {
+      const t = Date.now()
+      const res = await fetch(`/api/sheets?url=${encodeURIComponent(sheetsUrlInput.trim())}&t=${t}`)
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || `Error status: ${res.status}`)
+      }
+      
+      const csvText = await res.text()
+      const parsed = parseCSVToVocab(csvText)
+      
+      if (parsed.length === 0) {
+        setCsvError('Tidak ada data yang valid yang berhasil diimpor. Periksa format kolom Google Sheets Anda!')
+        return
+      }
+
+      // Merge dengan vocab yang sudah ada
+      const existingIds = new Set(vocabList.map(v => v.id))
+      const newItems = parsed.filter(item => !existingIds.has(item.id))
+
+      if (newItems.length === 0) {
+        alert('Semua kosakata dari link Sheets sudah ada di database!')
+        setShowCsvModal(false)
+        setSheetsUrlInput('')
+        return
+      }
+
+      const updatedList = [...newItems, ...vocabList]
+      setVocabList(updatedList)
+      setShowCsvModal(false)
+      setSheetsUrlInput('')
+      await triggerSync(updatedList)
+      alert(`Berhasil mengimpor ${newItems.length} kosakata baru dari Google Sheets!`)
+    } catch (e: any) {
+      setCsvError(`Gagal mengambil data dari Google Sheets: ${e.message || e}`)
+    } finally {
+      setLoadingImportLink(false)
     }
   }
 
@@ -385,6 +466,51 @@ export default function VocabPage() {
         </div>
       </section>
 
+      {/* Selection Control Bar */}
+      {filteredVocab.length > 0 && (
+        <section className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl shadow-sm">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input 
+              type="checkbox"
+              checked={filteredVocab.length > 0 && filteredVocab.every(item => selectedIds.has(item.id))}
+              onChange={(e) => {
+                const newSelected = new Set(selectedIds)
+                if (e.target.checked) {
+                  filteredVocab.forEach(item => newSelected.add(item.id))
+                } else {
+                  filteredVocab.forEach(item => newSelected.delete(item.id))
+                }
+                setSelectedIds(newSelected)
+              }}
+              className="rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)] cursor-pointer h-4 w-4 border-[var(--color-border)]"
+            />
+            <span className="text-xs font-extrabold text-[var(--color-text-2)]">Pilih Semua ({filteredVocab.length})</span>
+          </label>
+          
+          {selectedIds.size > 0 && (
+            <div className="flex gap-2">
+              <button 
+                onClick={() => {
+                  setSelectedIds(new Set())
+                }}
+                className="text-xs font-bold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
+              >
+                Batal
+              </button>
+              <button 
+                onClick={() => {
+                  setIsBulkDelete(true)
+                  setShowDeleteModal(true)
+                }}
+                className="text-xs font-black px-3 py-2 rounded-xl bg-[var(--color-red)] text-white shadow-red active:scale-95 transition-transform"
+              >
+                🗑️ Hapus Terpilih ({selectedIds.size})
+              </button>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* Vocab Items List */}
       <section className="flex-1 flex flex-col gap-2.5">
         {filteredVocab.length === 0 ? (
@@ -396,6 +522,7 @@ export default function VocabPage() {
         ) : (
           filteredVocab.map((item) => {
             const hasKanji = item.kanji && item.kanji !== item.hiragana
+            const isChecked = selectedIds.has(item.id)
             
             // Assign color badge based on category
             let catClass = 'bg-[var(--color-subtle)] text-[var(--color-text-2)]'
@@ -407,8 +534,24 @@ export default function VocabPage() {
             return (
               <div 
                 key={item.id} 
-                className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 shadow-card flex items-center justify-between gap-3 hover:border-[var(--color-accent)] transition-all"
+                className={`bg-white dark:bg-[#1a1d24] border ${isChecked ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]/25 dark:bg-[var(--color-accent-dark)]/10 shadow-[0_0_8px_rgba(91,94,244,0.1)]' : 'border-[var(--color-border)]'} rounded-2xl p-4 shadow-card flex items-center justify-between gap-3 hover:border-[var(--color-accent)] transition-all`}
               >
+                {/* Checkbox */}
+                <input 
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => {
+                    const newSelected = new Set(selectedIds)
+                    if (isChecked) {
+                      newSelected.delete(item.id)
+                    } else {
+                      newSelected.add(item.id)
+                    }
+                    setSelectedIds(newSelected)
+                  }}
+                  className="rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)] cursor-pointer h-4.5 w-4.5 border-[var(--color-border)] shrink-0"
+                />
+
                 <div className="flex-1 flex flex-col gap-1.5 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`}>
@@ -576,16 +719,42 @@ export default function VocabPage() {
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" 
-            onClick={() => setShowDeleteModal(false)}
+            onClick={cancelDelete}
           />
-          <div className="bg-white dark:bg-[#1a1d24] rounded-[28px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-pop">
-            <h3 className="text-lg font-extrabold text-[var(--color-text-1)] mb-2">Hapus Kosakata?</h3>
-            <p className="text-xs font-semibold text-[var(--color-text-2)] mb-4">
-              Apakah kamu yakin ingin menghapus kata <strong className="text-[var(--color-text-1)] jp">{deletingItem?.kanji || deletingItem?.hiragana}</strong>? Tindakan ini akan menghapus progres SRS untuk kata ini.
-            </p>
+          <div className="bg-white dark:bg-[#1a1d24] rounded-[28px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-pop flex flex-col gap-4">
+            <div>
+              <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">
+                {isBulkDelete ? `Hapus ${selectedIds.size} Kosakata?` : 'Hapus Kosakata?'}
+              </h3>
+              <p className="text-xs font-semibold text-[var(--color-text-2)] mt-1">
+                {isBulkDelete 
+                  ? `Apakah kamu yakin ingin menghapus ${selectedIds.size} kosakata terpilih? Semua progres belajar (SRS) untuk kata-kata ini akan dihapus secara permanen.`
+                  : `Apakah kamu yakin ingin menghapus kata `
+                }
+                {!isBulkDelete && <strong className="text-[var(--color-text-1)] jp">{deletingItem?.kanji || deletingItem?.hiragana}</strong>}
+                {!isBulkDelete && '? Tindakan ini akan menghapus progres SRS untuk kata ini.'}
+              </p>
+            </div>
+
+            {isBulkDelete && (
+              <div className="max-h-32 overflow-y-auto border border-[var(--color-border)] rounded-xl p-3 bg-[var(--color-bg)] flex flex-col gap-1.5">
+                {vocabList.filter(item => selectedIds.has(item.id)).slice(0, 10).map(item => (
+                  <div key={item.id} className="flex justify-between items-baseline gap-2 text-[10px] font-bold text-[var(--color-text-2)] truncate">
+                    <span className="jp font-black text-[var(--color-text-1)]">{item.kanji || item.hiragana}</span>
+                    <span className="truncate">{item.arti}</span>
+                  </div>
+                ))}
+                {selectedIds.size > 10 && (
+                  <p className="text-[10px] text-[var(--color-text-3)] font-bold italic text-center mt-1">
+                    ...dan {selectedIds.size - 10} kosakata lainnya
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-2">
               <button
-                onClick={() => setShowDeleteModal(false)}
+                onClick={cancelDelete}
                 className="flex-1 text-xs font-black py-2.5 rounded-xl border border-[var(--color-border)] text-[var(--color-text-2)] active:scale-95 transition-transform"
               >
                 Batal
@@ -606,41 +775,109 @@ export default function VocabPage() {
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" 
-            onClick={() => setShowCsvModal(false)}
+            onClick={() => {
+              setShowCsvModal(false)
+              setCsvError('')
+            }}
           />
           <div className="bg-white dark:bg-[#1a1d24] rounded-[28px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-pop flex flex-col gap-4">
             <div>
-              <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Impor Kosakata CSV</h3>
+              <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Impor Kosakata</h3>
               <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-relaxed">
-                Tempelkan data CSV kamu dengan format 5 kolom (Kategori, Hiragana, Kanji, Arti, Bab). Baris pertama dapat berupa nama kolom/header.
+                Tambahkan data kosakata massal ke database Anda menggunakan metode di bawah ini.
               </p>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <textarea 
-                placeholder='Contoh:&#10;Kategori,Hiragana,Kanji,Arti,Bab&#10;Kata Benda,わたし,私,Saya,Bab 1&#10;Kata Kerja,ねます,寝ます,Tidur,Bab 1'
-                value={csvInput}
-                onChange={(e) => setCsvInput(e.target.value)}
-                className="w-full h-44 text-xs font-mono p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-1)] focus:outline-none focus:border-[var(--color-accent)] resize-none"
-              />
-              {csvError && (
-                <p className="text-[10px] font-bold text-[var(--color-red)] px-1 leading-normal">{csvError}</p>
-              )}
+            {/* Impor Tabs */}
+            <div className="flex bg-[var(--color-bg)] p-1 rounded-xl gap-1">
+              <button 
+                onClick={() => { setImportTab('text'); setCsvError('') }}
+                className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all ${
+                  importTab === 'text' 
+                    ? 'bg-white dark:bg-[#1a1d24] text-[var(--color-accent)] shadow-sm' 
+                    : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)]'
+                }`}
+              >
+                📝 Tempel Teks CSV
+              </button>
+              <button 
+                onClick={() => { setImportTab('link'); setCsvError('') }}
+                className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all ${
+                  importTab === 'link' 
+                    ? 'bg-white dark:bg-[#1a1d24] text-[var(--color-accent)] shadow-sm' 
+                    : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)]'
+                }`}
+              >
+                🔗 Link Google Sheets
+              </button>
             </div>
+
+            {importTab === 'text' ? (
+              <div className="flex flex-col gap-1.5 animate-fade-in">
+                <textarea 
+                  placeholder='Format: Kategori, Hiragana, Kanji, Arti, Bab&#10;Contoh:&#10;Kata Benda,わたし,私,Saya,Bab 1&#10;Kata Kerja,ねます,寝ます,Tidur,Bab 1'
+                  value={csvInput}
+                  onChange={(e) => setCsvInput(e.target.value)}
+                  className="w-full h-44 text-xs font-mono p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-1)] focus:outline-none focus:border-[var(--color-accent)] resize-none"
+                />
+                {csvError && (
+                  <p className="text-[10px] font-bold text-[var(--color-red)] px-1 leading-normal">{csvError}</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 animate-fade-in">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-2)] px-1">Link Google Sheets (Published CSV)</label>
+                  <input 
+                    type="text"
+                    placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"
+                    value={sheetsUrlInput}
+                    onChange={(e) => setSheetsUrlInput(e.target.value)}
+                    className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-1)] focus:outline-none focus:border-[var(--color-accent)]"
+                  />
+                </div>
+                <div className="rounded-xl p-3 bg-[var(--color-bg)] border border-[var(--color-border)]">
+                  <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-2)] mb-1">💡 Cara Membuat Link CSV:</p>
+                  <ol className="text-[9px] font-semibold text-[var(--color-text-3)] leading-relaxed list-decimal pl-4 space-y-0.5">
+                    <li>Buka spreadsheet Anda di Google Sheets.</li>
+                    <li>Pilih menu <strong>File &gt; Share &gt; Publish to web</strong>.</li>
+                    <li>Ubah format publish dari "Web page" menjadi <strong>Comma-separated values (.csv)</strong>.</li>
+                    <li>Klik <strong>Publish</strong> dan salin link CSV yang dihasilkan.</li>
+                  </ol>
+                </div>
+                {csvError && (
+                  <p className="text-[10px] font-bold text-[var(--color-red)] px-1 leading-normal">{csvError}</p>
+                )}
+              </div>
+            )}
 
             <div className="flex gap-2">
               <button
-                onClick={() => setShowCsvModal(false)}
+                onClick={() => {
+                  setShowCsvModal(false)
+                  setCsvError('')
+                }}
                 className="flex-1 text-xs font-black py-2.5 rounded-xl border border-[var(--color-border)] text-[var(--color-text-2)] active:scale-95 transition-transform"
+                disabled={loadingImportLink}
               >
                 Batal
               </button>
-              <button
-                onClick={handleImportCSV}
-                className="flex-1 text-xs font-black py-2.5 rounded-xl bg-[var(--color-accent)] text-white shadow-btn active:scale-95 transition-transform"
-              >
-                Impor Data
-              </button>
+              {importTab === 'text' ? (
+                <button
+                  onClick={handleImportCSV}
+                  className="flex-1 text-xs font-black py-2.5 rounded-xl bg-[var(--color-accent)] text-white shadow-btn active:scale-95 transition-transform"
+                >
+                  Impor Teks
+                </button>
+              ) : (
+                <button
+                  onClick={handleImportFromLink}
+                  className="flex-1 text-xs font-black py-2.5 rounded-xl bg-[var(--color-accent)] text-white shadow-btn active:scale-95 transition-transform flex items-center justify-center gap-1.5"
+                  disabled={loadingImportLink}
+                >
+                  {loadingImportLink ? '⏳ Mengunduh...' : 'Impor dari Link'}
+                </button>
+              )}
             </div>
           </div>
         </div>
