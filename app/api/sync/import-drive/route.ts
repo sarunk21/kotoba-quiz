@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 
 const DRIVE_API = 'https://www.googleapis.com/drive/v3'
@@ -24,7 +24,7 @@ async function findFile(token: string): Promise<string | null> {
   return data.files?.[0]?.id ?? null
 }
 
-async function getFileContent(token: string, fileId: string): Promise<any> {
+async function getFileContent(token: string, fileId: string): Promise<unknown> {
   const t = Date.now()
   const res = await fetch(`${DRIVE_API}/files/${fileId}?alt=media&t=${t}`, {
     headers: { Authorization: `Bearer ${token}` },

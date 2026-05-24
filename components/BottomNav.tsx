@@ -344,13 +344,27 @@ export default function BottomNav() {
             </Link>
 
             {/* Option 5 (Always Available): Penyusunan Kalimat */}
-            <Link href="/sentences" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-4">
+            <Link href="/sentences" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
               <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
                 <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8 text-green-500">文</div>
                 <div className="flex-1">
                   <p className="font-extrabold text-sm text-[var(--color-text-1)]">Penyusunan Kalimat</p>
                   <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
                     Susun kepingan kata menjadi kalimat Jepang yang benar
+                  </p>
+                </div>
+                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
+              </div>
+            </Link>
+
+            {/* Option 6 (Always Available): Kuis Google Form */}
+            <Link href="/quiz/custom" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-4">
+              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
+                <div className="text-3xl leading-none flex items-center justify-center w-8 text-purple-500">📋</div>
+                <div className="flex-1">
+                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Kuis Google Form</p>
+                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
+                    Impor dan kerjakan latihan soal kustom sendiri
                   </p>
                 </div>
                 <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
