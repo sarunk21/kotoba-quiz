@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useSession, signIn } from 'next-auth/react'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
 import { pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
@@ -80,6 +80,7 @@ export default function SettingsPage() {
           'Izin Google Drive diperlukan untuk memuat file backup kotoba_data.json Anda.\n\nKlik OK untuk masuk kembali dan memberikan izin akses Google Drive.'
         )
         if (confirmGrant) {
+          await signOut({ redirect: false })
           signIn('google', {
             authorizationParams: {
               scope: 'openid email profile https://www.googleapis.com/auth/drive.appdata',
