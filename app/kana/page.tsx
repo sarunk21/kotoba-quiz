@@ -243,6 +243,19 @@ export default function KanaPage() {
           </div>
         )}
 
+        {/* Start button */}
+        <button onClick={startQuiz}
+          disabled={mode === 'custom' && selectedGroups.size === 0}
+          className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform anim-up d4 mb-5"
+          style={{
+            background: 'var(--color-accent)',
+            color: '#fff',
+            boxShadow: '0 8px 20px rgba(91,94,244,0.28)',
+            opacity: mode === 'custom' && selectedGroups.size === 0 ? 0.4 : 1,
+          }}>
+          {mode === 'refresh' ? `🔄 Mulai Penyegaran (${refreshCount})` : '練習する — Mulai Berlatih →'}
+        </button>
+
         {/* Per-group progress overview (always visible) */}
         <div className="rounded-3xl p-4 mb-6 anim-up d3"
           style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
@@ -270,19 +283,6 @@ export default function KanaPage() {
             })}
           </div>
         </div>
-
-        {/* Start button */}
-        <button onClick={startQuiz}
-          disabled={mode === 'custom' && selectedGroups.size === 0}
-          className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform anim-up d4"
-          style={{
-            background: 'var(--color-accent)',
-            color: '#fff',
-            boxShadow: '0 8px 20px rgba(91,94,244,0.28)',
-            opacity: mode === 'custom' && selectedGroups.size === 0 ? 0.4 : 1,
-          }}>
-          {mode === 'refresh' ? `🔄 Mulai Penyegaran (${refreshCount})` : '練習する — Mulai Berlatih →'}
-        </button>
 
       </div>
       
