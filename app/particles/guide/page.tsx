@@ -57,7 +57,11 @@ export default function ParticleGuidePage() {
           <button 
             onClick={() => {
               playTap()
-              router.push('/particles')
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                router.back()
+              } else {
+                router.push('/')
+              }
             }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform shrink-0"
           >
