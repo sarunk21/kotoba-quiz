@@ -170,7 +170,8 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Sync Section */}
+          {/* Sync Section di-hide karena sinkronisasi berjalan otomatis di latar belakang. Hapus komentar untuk memunculkannya kembali. */}
+          {/*
           <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Sinkronisasi</p>
             
@@ -205,14 +206,11 @@ export default function SettingsPage() {
                 </button>
               </div>
               
-              {/* Di-hide agar tidak memenuhi UI. Hapus komentar di bawah ini jika ingin digunakan kembali untuk testing migrasi */}
-              {/*
               <button onClick={handleImportGoogleDrive} disabled={!!syncActionStatus}
                 className="w-full rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all flex items-center justify-center gap-1.5"
                 style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
                 <span>📁</span> {syncActionStatus === 'importing_drive' ? '⏳ Mengimpor dari Drive...' : 'Migrasi Backup dari Google Drive (Legacy)'}
               </button>
-              */}
 
               {syncActionStatus && !['pulling', 'pushing', 'importing_drive'].includes(syncActionStatus) && (
                 <p className="text-center text-[10px] font-bold text-[var(--color-accent)] animate-fade-in">
@@ -227,6 +225,7 @@ export default function SettingsPage() {
                 : 'Pake tombol di atas buat sinkron manual.'}
             </p>
           </div>
+          */}
 
           {/* Vocab Database Section */}
           <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
