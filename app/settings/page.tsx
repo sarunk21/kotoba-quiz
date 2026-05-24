@@ -3,10 +3,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
-import { pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud } from '@/lib/cloud'
+import { pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
 import BottomNav from '@/components/BottomNav'
 
 export default function SettingsPage() {
@@ -63,6 +63,41 @@ export default function SettingsPage() {
     const ok = await forcePushToCloud()
     setSyncActionStatus(ok ? 'Push Berhasil ✓' : 'Push Gagal ✗')
     setTimeout(() => setSyncActionStatus(''), 3000)
+  }
+
+  async function handleImportGoogleDrive() {
+    setSyncActionStatus('importing_drive')
+    const result = await importFromDrive()
+    if (result.success) {
+      setSyncActionStatus('Migrasi Berhasil ✓')
+      setTimeout(() => {
+        setSyncActionStatus('')
+        window.location.reload()
+      }, 3000)
+    } else {
+      if (result.error === 'auth_required') {
+        const confirmGrant = window.confirm(
+          'Izin Google Drive diperlukan untuk memuat file backup kotoba_data.json Anda.\n\nKlik OK untuk masuk kembali dan memberikan izin akses Google Drive.'
+        )
+        if (confirmGrant) {
+          signIn('google', {
+            authorizationParams: {
+              scope: 'openid email profile https://www.googleapis.com/auth/drive.appdata',
+              prompt: 'consent',
+              access_type: 'offline'
+            }
+          })
+        } else {
+          setSyncActionStatus('')
+        }
+      } else if (result.error === 'backup_not_found') {
+        setSyncActionStatus('Backup tidak ditemukan di Drive ✗')
+        setTimeout(() => setSyncActionStatus(''), 4000)
+      } else {
+        setSyncActionStatus(`Migrasi Gagal: ${result.error} ✗`)
+        setTimeout(() => setSyncActionStatus(''), 4000)
+      }
+    }
   }
 
   function toggleTheme(newTheme: 'light' | 'dark') {
@@ -169,7 +204,13 @@ export default function SettingsPage() {
                 </button>
               </div>
               
-              {syncActionStatus && !['pulling', 'pushing'].includes(syncActionStatus) && (
+              <button onClick={handleImportGoogleDrive} disabled={!!syncActionStatus}
+                className="w-full rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
+                <span>📁</span> {syncActionStatus === 'importing_drive' ? '⏳ Mengimpor dari Drive...' : 'Migrasi Backup dari Google Drive (Legacy)'}
+              </button>
+
+              {syncActionStatus && !['pulling', 'pushing', 'importing_drive'].includes(syncActionStatus) && (
                 <p className="text-center text-[10px] font-bold text-[var(--color-accent)] animate-fade-in">
                   {syncActionStatus}
                 </p>

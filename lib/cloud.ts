@@ -207,3 +207,71 @@ export async function resetCloudData(): Promise<boolean> {
     return false
   }
 }
+
+/** Tarik backup dari Google Drive, gabungkan dengan data lokal, lalu kirim ke Firestore */
+export async function importFromDrive(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const localData = collectLocalData()
+    
+    // 1. Ambil data dari endpoint /api/sync/import-drive
+    const res = await fetch('/api/sync/import-drive', { cache: 'no-store' })
+    if (res.status === 401) {
+      return { success: false, error: 'auth_required' }
+    }
+    if (res.status === 404) {
+      return { success: false, error: 'backup_not_found' }
+    }
+    if (!res.ok) {
+      const errBody = await res.json()
+      return { success: false, error: errBody.error || 'Server error' }
+    }
+    
+    const body = await res.json()
+    if (!body || !body.data) {
+      return { success: false, error: 'Data kosong' }
+    }
+    
+    // 2. Gabungkan data (Drive data sebagai "cloud" data)
+    const driveCloudData: CloudData = {
+      srs: body.data.srs || {},
+      stats: body.data.stats || { updatedAt: '' },
+      vocab: body.data.vocab || undefined,
+      vocabUpdatedAt: body.data.vocabUpdatedAt || '',
+      updatedAt: body.data.updatedAt || '',
+    }
+    
+    const finalData = mergeCloudData(localData, driveCloudData)
+    
+    // 3. Simpan hasil merge ke lokal
+    saveSRS(finalData.srs)
+    saveStats(finalData.stats)
+    if (finalData.vocab) {
+      saveLocalVocab(finalData.vocab)
+    }
+    if (finalData.vocabUpdatedAt) {
+      localStorage.setItem('kotoba_vocab_updated_at', finalData.vocabUpdatedAt)
+    }
+    
+    // 4. Update timestamp dan push ke Firestore
+    const now = new Date().toISOString()
+    finalData.updatedAt = now
+    finalData.stats.updatedAt = now
+    saveStats(finalData.stats)
+    
+    const pushRes = await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(finalData),
+      cache: 'no-store',
+    })
+    
+    if (pushRes.ok) {
+      return { success: true }
+    } else {
+      return { success: false, error: 'Gagal push ke Firestore' }
+    }
+  } catch (e) {
+    console.error('[ImportDrive] Error:', e)
+    return { success: false, error: (e as Error).message }
+  }
+}
