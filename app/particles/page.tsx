@@ -137,6 +137,12 @@ export default function ParticlesQuizPage() {
                 Coba Lagi 🔄
               </button>
               <button 
+                onClick={() => router.push('/particles/guide')}
+                className="w-full rounded-2xl py-3.5 text-sm font-bold bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-500 active:scale-95 transition-transform"
+              >
+                Pelajari Panduan Partikel 📖
+              </button>
+              <button 
                 onClick={() => router.push('/')}
                 className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
               >
@@ -173,6 +179,12 @@ export default function ParticlesQuizPage() {
                 Latihan Lagi 🔄
               </button>
               <button 
+                onClick={() => router.push('/particles/guide')}
+                className="w-full rounded-2xl py-3.5 text-sm font-bold bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-500 active:scale-95 transition-transform"
+              >
+                Tinjau Panduan Partikel 📖
+              </button>
+              <button 
                 onClick={() => router.push('/')}
                 className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
               >
@@ -183,6 +195,16 @@ export default function ParticlesQuizPage() {
         ) : (
           /* Active Question Screen */
           <div className="flex-1 flex flex-col justify-between anim-up">
+            {/* Guide Quick Link */}
+            <div className="flex justify-end mb-3">
+              <button 
+                onClick={() => router.push('/particles/guide')}
+                className="text-[10px] font-extrabold text-[var(--color-accent)] hover:underline flex items-center gap-1 active:scale-95 transition-all cursor-pointer bg-[var(--color-accent-light)] px-2.5 py-1 rounded-full"
+              >
+                📖 Lihat Panduan Partikel
+              </button>
+            </div>
+
             {/* Question Card */}
             <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-6 text-center">
               <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-3 block">
