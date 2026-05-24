@@ -123,6 +123,125 @@ export default function ParticleGuidePage() {
 
         {/* Guide Cards List */}
         <div className="space-y-5 flex-1">
+          {/* General Sentence Structure Info Card (only shown when no filters are active) */}
+          {!searchQuery && !selectedTag && (
+            <section className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[28px] p-5 shadow-sm relative overflow-hidden anim-up">
+              {/* Decorative Background */}
+              <span className="absolute -top-6 -right-6 text-7xl font-black text-gray-100/40 dark:text-gray-800/10 jp select-none pointer-events-none">
+                文法
+              </span>
+
+              <header className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-green-500/10 dark:bg-green-500/20 flex items-center justify-center border border-green-500/30">
+                  <span className="text-xl font-black text-green-600 dark:text-green-400 jp leading-none">文</span>
+                </div>
+                <div>
+                  <h2 className="text-sm font-black text-[var(--color-text-1)] leading-snug">
+                    Struktur Kalimat Jepang
+                  </h2>
+                  <p className="text-[9px] font-bold text-[var(--color-text-3)] uppercase tracking-wider">
+                    Pola S-O-P & S-K-P
+                  </p>
+                </div>
+              </header>
+
+              <div className="text-xs font-semibold text-[var(--color-text-2)] leading-relaxed space-y-3">
+                <p>
+                  Berbeda dengan Bahasa Indonesia yang menggunakan pola <strong>S-P-O</strong> (Subjek-Predikat-Objek), Bahasa Jepang memiliki aturan dasar mutlak: <strong>Predikat (Kata Kerja, Kata Sifat, atau Kopula desu) harus selalu berada di akhir kalimat.</strong>
+                </p>
+                
+                <div className="flex flex-wrap gap-1.5 py-1">
+                  <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/40">S: Subjek</span>
+                  <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/40">O: Objek</span>
+                  <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40">K: Keterangan</span>
+                  <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">P: Predikat</span>
+                </div>
+
+                {/* SOP Section */}
+                <div className="rounded-xl p-3 bg-[var(--color-bg)] border border-[var(--color-border)]">
+                  <h4 className="text-[10px] font-black text-rose-500 uppercase tracking-wider mb-1">
+                    1. Pola S - O - P (Subjek - Objek - Predikat)
+                  </h4>
+                  <p className="text-[11px] text-[var(--color-text-2)] mb-2">
+                    Digunakan ketika subjek melakukan tindakan langsung terhadap objek. Objek ditandai dengan partikel <span className="jp font-bold text-rose-500">を (o)</span>.
+                  </p>
+                  
+                  {/* Indo vs JP Comparison */}
+                  <div className="grid grid-cols-1 gap-2 pt-1 border-t border-[var(--color-border)] mt-1.5">
+                    <div>
+                      <p className="text-[9px] font-black text-[var(--color-text-3)] uppercase tracking-wider">Bahasa Indonesia (S-P-O):</p>
+                      <p className="text-xs font-bold text-[var(--color-text-1)]">Saya makan apel.</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-[var(--color-text-3)] uppercase tracking-wider">Bahasa Jepang (S-O-P):</p>
+                      
+                      {/* Playable Row */}
+                      <button
+                        onClick={() => handlePlayVoice('私はリンゴを食べます。')}
+                        className="w-full text-left bg-white/60 hover:bg-white dark:bg-[#1a1d24]/60 dark:hover:bg-[#1a1d24] border border-[var(--color-border)] rounded-lg p-2 flex items-center justify-between gap-3 group active:scale-[0.99] transition-all cursor-pointer"
+                        title="Klik untuk mendengar suara pelafalan"
+                      >
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">私<span className="text-[8px] font-semibold text-[var(--color-text-2)]">は</span></span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400">リンゴ<span className="text-[8px] font-semibold text-[var(--color-text-2)]">を</span></span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">食べます</span>
+                        </div>
+                        <span className="text-xs flex items-center justify-center w-6 h-6 rounded-full bg-[var(--color-accent-light)] text-[var(--color-accent)] group-hover:scale-110 transition-transform shrink-0">
+                          🔊
+                        </span>
+                      </button>
+                      
+                      <p className="text-[9px] font-semibold text-[var(--color-text-2)] italic mt-1 pl-1">
+                        &quot;Watashi wa ringo o tabemasu.&quot;
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SKP Section */}
+                <div className="rounded-xl p-3 bg-[var(--color-bg)] border border-[var(--color-border)]">
+                  <h4 className="text-[10px] font-black text-amber-500 uppercase tracking-wider mb-1">
+                    2. Pola S - K - P (Subjek - Keterangan - Predikat)
+                  </h4>
+                  <p className="text-[11px] text-[var(--color-text-2)] mb-2">
+                    Digunakan ketika kalimat menyertakan keterangan arah, tempat, atau waktu. Ditandai dengan partikel <span className="jp font-bold text-amber-500">へ (e)</span>, <span className="jp font-bold text-amber-500">ni (ni)</span>, atau <span className="jp font-bold text-amber-500">de (de)</span>.
+                  </p>
+                  
+                  {/* Indo vs JP Comparison */}
+                  <div className="grid grid-cols-1 gap-2 pt-1 border-t border-[var(--color-border)] mt-1.5">
+                    <div>
+                      <p className="text-[9px] font-black text-[var(--color-text-3)] uppercase tracking-wider">Bahasa Indonesia (S-P-K):</p>
+                      <p className="text-xs font-bold text-[var(--color-text-1)]">Saya pergi ke sekolah.</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-[var(--color-text-3)] uppercase tracking-wider">Bahasa Jepang (S-K-P):</p>
+                      
+                      {/* Playable Row */}
+                      <button
+                        onClick={() => handlePlayVoice('私は学校へ行きます。')}
+                        className="w-full text-left bg-white/60 hover:bg-white dark:bg-[#1a1d24]/60 dark:hover:bg-[#1a1d24] border border-[var(--color-border)] rounded-lg p-2 flex items-center justify-between gap-3 group active:scale-[0.99] transition-all cursor-pointer"
+                        title="Klik untuk mendengar suara pelafalan"
+                      >
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">私<span className="text-[8px] font-semibold text-[var(--color-text-2)]">は</span></span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">学校<span className="text-[8px] font-semibold text-[var(--color-text-2)]">へ</span></span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">行きます</span>
+                        </div>
+                        <span className="text-xs flex items-center justify-center w-6 h-6 rounded-full bg-[var(--color-accent-light)] text-[var(--color-accent)] group-hover:scale-110 transition-transform shrink-0">
+                          🔊
+                        </span>
+                      </button>
+                      
+                      <p className="text-[9px] font-semibold text-[var(--color-text-2)] italic mt-1 pl-1">
+                        &quot;Watashi wa gakkou e ikimasu.&quot;
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           {filteredData.length === 0 ? (
             <div className="my-auto py-12 text-center rounded-[32px] bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] p-6">
               <span className="text-4xl mb-3 block">🔍</span>
