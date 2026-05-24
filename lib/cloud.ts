@@ -46,7 +46,14 @@ function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
 
   // 2. Merge Stats
   // Ambil yang paling baru updatenya (Last Write Wins)
-  const cloudIsNewer = (cloudStats.updatedAt || '') > (local.stats.updatedAt || '')
+  let cloudIsNewer = (cloudStats.updatedAt || '') > (local.stats.updatedAt || '')
+
+  // Proteksi data kosong: Jika salah satu belum pernah main, gunakan data dari yang sudah pernah main
+  if (local.stats.lastPlayedDate && !cloudStats.lastPlayedDate) {
+    cloudIsNewer = false
+  } else if (!local.stats.lastPlayedDate && cloudStats.lastPlayedDate) {
+    cloudIsNewer = true
+  }
   
   // XP, Sessions, Correct, Answered: Ambil yang TERBESAR (biar ga ilang progress dari device manapun)
   const mergedStats: GameStats = {
