@@ -218,7 +218,7 @@ export default function ParticlesQuizPage() {
               </h2>
               <div className="h-[1.5px] w-full bg-[var(--color-border)] my-4" />
               <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed select-text">
-                🇮🇩 {currentQuestion.translation}
+                Arti: {currentQuestion.translation}
               </p>
             </div>
 

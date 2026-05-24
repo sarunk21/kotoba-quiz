@@ -471,6 +471,25 @@ export default function Home() {
               </div>
             )}
 
+            {/* Materi & Tata Bahasa Quick Access */}
+            <div className="rounded-3xl p-5 mb-4 anim-up d2 border border-[var(--color-border)] bg-white dark:bg-[#1a1d24]" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+              <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] mb-3">Materi & Tata Bahasa</p>
+              <div className="grid grid-cols-3 gap-2.5">
+                <Link href="/particles" className="no-underline flex flex-col items-center justify-center p-3 text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] transition-all active:scale-95">
+                  <span className="text-2xl mb-1 text-amber-500 jp font-extrabold leading-none flex items-center justify-center h-8">助</span>
+                  <span className="text-[9px] font-black text-[var(--color-text-1)] leading-tight">Latihan<br/>Partikel</span>
+                </Link>
+                <Link href="/sentences" className="no-underline flex flex-col items-center justify-center p-3 text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] transition-all active:scale-95">
+                  <span className="text-2xl mb-1 text-green-500 jp font-extrabold leading-none flex items-center justify-center h-8">文</span>
+                  <span className="text-[9px] font-black text-[var(--color-text-1)] leading-tight">Susun<br/>Kalimat</span>
+                </Link>
+                <Link href="/particles/guide" className="no-underline flex flex-col items-center justify-center p-3 text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] transition-all active:scale-95">
+                  <span className="text-2xl mb-1 leading-none flex items-center justify-center h-8">📖</span>
+                  <span className="text-[9px] font-black text-[var(--color-text-1)] leading-tight">Panduan<br/>Partikel</span>
+                </Link>
+              </div>
+            </div>
+
             {/* Consolidated Study Status Tracker */}
             {srs && (
               <div className="rounded-3xl overflow-hidden mb-4 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>

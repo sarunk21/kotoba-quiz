@@ -329,6 +329,20 @@ export default function BottomNav() {
               </div>
             </Link>
 
+            {/* Option 4b (Always Available): Panduan Partikel */}
+            <Link href="/particles/guide" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
+              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
+                <div className="text-3xl leading-none flex items-center justify-center w-8 text-amber-500">📖</div>
+                <div className="flex-1">
+                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Panduan Tata Bahasa Partikel</p>
+                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
+                    Pelajari teori dan contoh kalimat dari partikel Jepang
+                  </p>
+                </div>
+                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
+              </div>
+            </Link>
+
             {/* Option 5 (Always Available): Penyusunan Kalimat */}
             <Link href="/sentences" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-4">
               <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">

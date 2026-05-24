@@ -207,7 +207,7 @@ export default function ParticleGuidePage() {
                         </p>
                         
                         <p className="text-xs font-bold text-[var(--color-text-1)] pl-1">
-                          🇮🇩 {usage.exampleId}
+                          Arti: {usage.exampleId}
                         </p>
 
                         <div className="mt-2 text-[9px] font-semibold text-[var(--color-text-3)] leading-relaxed pl-1 border-l-2 border-[var(--color-border)]">

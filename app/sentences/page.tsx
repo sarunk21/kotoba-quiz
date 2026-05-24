@@ -209,7 +209,7 @@ export default function SentencesQuizPage() {
                   SUSUN KALIMAT UNTUK ARTI DI BAWAH INI:
                 </span>
                 <p className="text-sm font-extrabold text-[var(--color-text-1)] select-text">
-                  🇮🇩 {currentQuestion.indonesian}
+                  Arti: {currentQuestion.indonesian}
                 </p>
               </div>
 
