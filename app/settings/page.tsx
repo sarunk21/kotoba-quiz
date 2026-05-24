@@ -205,11 +205,14 @@ export default function SettingsPage() {
                 </button>
               </div>
               
+              {/* Di-hide agar tidak memenuhi UI. Hapus komentar di bawah ini jika ingin digunakan kembali untuk testing migrasi */}
+              {/*
               <button onClick={handleImportGoogleDrive} disabled={!!syncActionStatus}
                 className="w-full rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all flex items-center justify-center gap-1.5"
                 style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
                 <span>📁</span> {syncActionStatus === 'importing_drive' ? '⏳ Mengimpor dari Drive...' : 'Migrasi Backup dari Google Drive (Legacy)'}
               </button>
+              */}
 
               {syncActionStatus && !['pulling', 'pushing', 'importing_drive'].includes(syncActionStatus) && (
                 <p className="text-center text-[10px] font-bold text-[var(--color-accent)] animate-fade-in">
