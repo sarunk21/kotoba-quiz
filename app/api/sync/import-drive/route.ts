@@ -14,7 +14,11 @@ async function findFile(token: string): Promise<string | null> {
     }
   )
   if (!res.ok) {
-    throw new Error(`Failed to list Google Drive files: ${res.statusText}`)
+    let details = ''
+    try {
+      details = await res.text()
+    } catch {}
+    throw new Error(`Failed to list Google Drive files: ${res.statusText || res.status} - ${details}`)
   }
   const data = await res.json()
   return data.files?.[0]?.id ?? null
@@ -27,7 +31,11 @@ async function getFileContent(token: string, fileId: string): Promise<any> {
     cache: 'no-store',
   })
   if (!res.ok) {
-    throw new Error(`Failed to fetch Google Drive file content: ${res.statusText}`)
+    let details = ''
+    try {
+      details = await res.text()
+    } catch {}
+    throw new Error(`Failed to fetch Google Drive file content: ${res.statusText || res.status} - ${details}`)
   }
   return await res.json()
 }
