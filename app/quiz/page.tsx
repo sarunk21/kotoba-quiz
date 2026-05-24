@@ -28,8 +28,19 @@ const TOTAL_QUESTIONS = 10
 const shuffle = <T,>(a: T[]) => [...a].sort(() => Math.random() - 0.5)
 
 function getChoices(correct: VocabItem, pool: VocabItem[]): string[] {
-  const wrongs = shuffle(pool.filter(v => v.id !== correct.id)).slice(0, 3).map(v => v.arti)
-  return shuffle([correct.arti, ...wrongs])
+  // First, try to get wrong choices of the same category
+  const sameCategoryPool = pool.filter(v => v.id !== correct.id && v.category === correct.category)
+  
+  let wrongs: VocabItem[] = []
+  if (sameCategoryPool.length >= 3) {
+    wrongs = shuffle(sameCategoryPool).slice(0, 3)
+  } else {
+    // If not enough same category items, mix with the rest of the pool
+    const otherPool = pool.filter(v => v.id !== correct.id && v.category !== correct.category)
+    wrongs = [...sameCategoryPool, ...shuffle(otherPool).slice(0, 3 - sameCategoryPool.length)]
+  }
+  
+  return shuffle([correct.arti, ...wrongs.map(v => v.arti)])
 }
 
 const CAT: Record<string, { color: string; bg: string }> = {
