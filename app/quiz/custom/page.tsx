@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { playTap } from '@/lib/sounds'
+import { getApiUrl } from '@/lib/api'
 
 export interface CustomQuestion {
   id: string
@@ -60,7 +61,7 @@ export default function CustomQuizPage() {
     setImportError('')
 
     try {
-      const response = await fetch(`/api/import-form?url=${encodeURIComponent(importUrl)}`)
+      const response = await fetch(getApiUrl(`/api/import-form?url=${encodeURIComponent(importUrl)}`))
       const result = await response.json()
 
       if (!response.ok) {

@@ -13,6 +13,7 @@ import {
 } from '@/lib/vocab'
 import { syncToCloud } from '@/lib/cloud'
 import BottomNav from '@/components/BottomNav'
+import { getApiUrl } from '@/lib/api'
 
 const CATEGORIES: Category[] = [
   'Kata Benda',
@@ -293,7 +294,7 @@ export default function VocabPage() {
     
     try {
       const t = Date.now()
-      const res = await fetch(`/api/sheets?url=${encodeURIComponent(sheetsUrlInput.trim())}&t=${t}`)
+      const res = await fetch(getApiUrl(`/api/sheets?url=${encodeURIComponent(sheetsUrlInput.trim())}&t=${t}`))
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.error || `Error status: ${res.status}`)

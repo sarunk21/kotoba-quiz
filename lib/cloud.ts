@@ -3,6 +3,7 @@
 import { loadSRS, saveSRS, type SRSStore } from './srs'
 import { loadStats, saveStats, type GameStats } from './stats'
 import { loadLocalVocab, saveLocalVocab, type VocabItem } from './vocab'
+import { getApiUrl } from './api'
 
 export interface CloudData {
   srs: SRSStore
@@ -88,7 +89,7 @@ export async function syncToCloud(): Promise<boolean> {
     
     // 1. Pull latest from cloud
     const t = Date.now()
-    const res = await fetch(`/api/sync?t=${t}`, { cache: 'no-store' })
+    const res = await fetch(getApiUrl(`/api/sync?t=${t}`), { cache: 'no-store' })
     
     let finalData = localData
     if (res.ok) {
@@ -116,7 +117,7 @@ export async function syncToCloud(): Promise<boolean> {
     saveStats(finalData.stats) // Save again with new timestamp
 
     // 5. Push merged result back to cloud
-    const pushRes = await fetch('/api/sync', {
+    const pushRes = await fetch(getApiUrl('/api/sync'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(finalData),
@@ -142,7 +143,7 @@ export async function forcePushToCloud(): Promise<boolean> {
     data.stats.updatedAt = now
     saveStats(data.stats)
 
-    const res = await fetch('/api/sync', {
+    const res = await fetch(getApiUrl('/api/sync'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -163,7 +164,7 @@ export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats
   try {
     const localData = collectLocalData()
     const t = Date.now()
-    const res = await fetch(`/api/sync?t=${t}`, { cache: 'no-store' })
+    const res = await fetch(getApiUrl(`/api/sync?t=${t}`), { cache: 'no-store' })
     if (!res.ok) return null
     const body = await res.json()
     if (!body || !body.data) return null
@@ -193,7 +194,7 @@ export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats
 export async function resetCloudData(): Promise<boolean> {
   try {
     // 1. Hapus di cloud
-    const res = await fetch('/api/sync', { method: 'DELETE' })
+    const res = await fetch(getApiUrl('/api/sync'), { method: 'DELETE' })
     if (!res.ok) return false
     
     // 2. Bersihin lokal
@@ -214,7 +215,7 @@ export async function importFromDrive(): Promise<{ success: boolean; error?: str
     const localData = collectLocalData()
     
     // 1. Ambil data dari endpoint /api/sync/import-drive
-    const res = await fetch('/api/sync/import-drive', { cache: 'no-store' })
+    const res = await fetch(getApiUrl('/api/sync/import-drive'), { cache: 'no-store' })
     if (res.status === 401) {
       return { success: false, error: 'auth_required' }
     }
@@ -258,7 +259,7 @@ export async function importFromDrive(): Promise<{ success: boolean; error?: str
     finalData.stats.updatedAt = now
     saveStats(finalData.stats)
     
-    const pushRes = await fetch('/api/sync', {
+    const pushRes = await fetch(getApiUrl('/api/sync'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(finalData),
