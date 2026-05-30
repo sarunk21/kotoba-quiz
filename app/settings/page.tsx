@@ -309,25 +309,7 @@ export default function SettingsPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] block mb-1">
-                      Alamat Web / URL Server
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="https://kotoba-quiz-gilt.vercel.app"
-                      value={customApiBase}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        setCustomApiBase(val)
-                        localStorage.setItem('kotoba_api_base', val.trim())
-                      }}
-                      className="w-full text-xs p-3 border border-[var(--color-border)] bg-[var(--color-bg)] rounded-2xl focus:outline-none focus:border-[var(--color-accent)] dark:text-white dark:bg-zinc-800"
-                    />
-                    <p className="text-[9px] font-semibold text-[var(--color-text-3)] mt-1">
-                      *Masukkan alamat domain web Anda (misal: localhost:3000 untuk pengujian lokal, atau alamat Vercel).
-                    </p>
-                  </div>
+
 
                   <button
                     onClick={() => {
