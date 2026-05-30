@@ -315,7 +315,7 @@ export default function SettingsPage() {
                     </label>
                     <input
                       type="text"
-                      placeholder="https://kotoba-quiz.vercel.app"
+                      placeholder="https://kotoba-quiz-gilt.vercel.app"
                       value={customApiBase}
                       onChange={(e) => {
                         const val = e.target.value
@@ -331,7 +331,7 @@ export default function SettingsPage() {
 
                   <button
                     onClick={() => {
-                      const targetUrl = customApiBase.trim() || 'https://kotoba-quiz.vercel.app'
+                      const targetUrl = customApiBase.trim() || 'https://kotoba-quiz-gilt.vercel.app'
                       const cleanBase = targetUrl.endsWith('/') ? targetUrl.slice(0, -1) : targetUrl
                       window.open(`${cleanBase}/settings`, '_blank')
                     }}

@@ -361,7 +361,7 @@ export default function Home() {
                   <button 
                     onClick={() => {
                       const resolvedUrl = getApiUrl('/settings')
-                      const finalUrl = resolvedUrl.startsWith('http') ? resolvedUrl : 'https://kotoba-quiz.vercel.app/settings'
+                      const finalUrl = resolvedUrl.startsWith('http') ? resolvedUrl : 'https://kotoba-quiz-gilt.vercel.app/settings'
                       window.open(finalUrl, '_blank')
                     }}
                     className="w-full rounded-xl py-2.5 text-xs font-black text-white bg-[var(--color-accent)] active:scale-95 transition-transform"
