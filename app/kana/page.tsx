@@ -35,12 +35,13 @@ export default function KanaPage() {
 
   useEffect(() => {
     setSrsStore(loadSRS())
-    if (session?.accessToken) {
+    const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('kotoba_sync_token')
+    if (session || hasToken) {
       pullFromCloud().then(result => {
         if (result) setSrsStore(result.srs)
       })
     }
-  }, [session?.accessToken])
+  }, [session])
 
   // Stats per group per type
   function groupStats(groupKey: string, type: KanaType) {

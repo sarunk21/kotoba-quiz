@@ -13,6 +13,18 @@ export interface CloudData {
   updatedAt: string
 }
 
+/** Get request headers with optional Authorization bearer token */
+function getHeaders(extraHeaders: Record<string, string> = {}): Record<string, string> {
+  const headers: Record<string, string> = { ...extraHeaders }
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('kotoba_sync_token')
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+  }
+  return headers
+}
+
 /** Kumpulin semua data lokal */
 function collectLocalData(): CloudData {
   const stats = loadStats()
@@ -89,7 +101,7 @@ export async function syncToCloud(): Promise<boolean> {
     
     // 1. Pull latest from cloud
     const t = Date.now()
-    const res = await fetch(getApiUrl(`/api/sync?t=${t}`), { cache: 'no-store' })
+    const res = await fetch(getApiUrl(`/api/sync?t=${t}`), { cache: 'no-store', headers: getHeaders() })
     
     let finalData = localData
     if (res.ok) {
@@ -119,7 +131,7 @@ export async function syncToCloud(): Promise<boolean> {
     // 5. Push merged result back to cloud
     const pushRes = await fetch(getApiUrl('/api/sync'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(finalData),
       cache: 'no-store',
     })
@@ -145,7 +157,7 @@ export async function forcePushToCloud(): Promise<boolean> {
 
     const res = await fetch(getApiUrl('/api/sync'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(data),
       cache: 'no-store',
     })
@@ -164,7 +176,7 @@ export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats
   try {
     const localData = collectLocalData()
     const t = Date.now()
-    const res = await fetch(getApiUrl(`/api/sync?t=${t}`), { cache: 'no-store' })
+    const res = await fetch(getApiUrl(`/api/sync?t=${t}`), { cache: 'no-store', headers: getHeaders() })
     if (!res.ok) return null
     const body = await res.json()
     if (!body || !body.data) return null
@@ -194,7 +206,7 @@ export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats
 export async function resetCloudData(): Promise<boolean> {
   try {
     // 1. Hapus di cloud
-    const res = await fetch(getApiUrl('/api/sync'), { method: 'DELETE' })
+    const res = await fetch(getApiUrl('/api/sync'), { method: 'DELETE', headers: getHeaders() })
     if (!res.ok) return false
     
     // 2. Bersihin lokal
@@ -215,7 +227,7 @@ export async function importFromDrive(): Promise<{ success: boolean; error?: str
     const localData = collectLocalData()
     
     // 1. Ambil data dari endpoint /api/sync/import-drive
-    const res = await fetch(getApiUrl('/api/sync/import-drive'), { cache: 'no-store' })
+    const res = await fetch(getApiUrl('/api/sync/import-drive'), { cache: 'no-store', headers: getHeaders() })
     if (res.status === 401) {
       return { success: false, error: 'auth_required' }
     }
@@ -261,7 +273,7 @@ export async function importFromDrive(): Promise<{ success: boolean; error?: str
     
     const pushRes = await fetch(getApiUrl('/api/sync'), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(finalData),
       cache: 'no-store',
     })

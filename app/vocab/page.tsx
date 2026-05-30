@@ -14,6 +14,8 @@ import {
 import { syncToCloud } from '@/lib/cloud'
 import BottomNav from '@/components/BottomNav'
 import { getApiUrl } from '@/lib/api'
+import { isCapacitor } from '@/lib/platform'
+
 
 const CATEGORIES: Category[] = [
   'Kata Benda',
@@ -67,7 +69,7 @@ export default function VocabPage() {
 
   // Auth Protection
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === 'unauthenticated' && !isCapacitor()) {
       router.push('/')
     }
   }, [status, router])
@@ -83,7 +85,8 @@ export default function VocabPage() {
     saveLocalVocab(updatedList)
     localStorage.setItem('kotoba_vocab_updated_at', new Date().toISOString())
     
-    if (session?.user?.email) {
+    const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('kotoba_sync_token')
+    if (session?.user?.email || hasToken) {
       setLoadingSync(true)
       setSyncStatusMsg('Menyinkronkan...')
       const ok = await syncToCloud()

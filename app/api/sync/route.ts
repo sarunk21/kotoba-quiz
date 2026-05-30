@@ -1,19 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/firebase-admin'
+import { verifySyncToken } from '@/lib/token'
+
+/**
+ * Helper to resolve user email from either Mobile Sync Token or Web Session.
+ */
+async function getEmailFromRequest(req: NextRequest): Promise<string | null> {
+  // 1. Try Authorization header (Mobile/Capacitor client)
+  const authHeader = req.headers.get('Authorization')
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7)
+    const email = verifySyncToken(token)
+    if (email) return email
+  }
+
+  // 2. Try NextAuth session (Web client)
+  const session = await auth()
+  return session?.user?.email || null
+}
 
 // GET — ambil semua data (vocab + srs + stats) dari Firestore
-export async function GET() {
-  const session = await auth()
-  if (!session?.user?.email) {
+export async function GET(req: NextRequest) {
+  const email = await getEmailFromRequest(req)
+  if (!email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   if (!db) {
     return NextResponse.json({ error: 'Firebase is not initialized' }, { status: 500 })
   }
-
-  const email = session.user.email
 
   try {
     // 1. Ambil data progress (srs + stats)
@@ -42,8 +58,8 @@ export async function GET() {
 
 // POST — simpan data (srs + stats + vocab) ke Firestore
 export async function POST(req: NextRequest) {
-  const session = await auth()
-  if (!session?.user?.email) {
+  const email = await getEmailFromRequest(req)
+  if (!email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -51,7 +67,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Firebase is not initialized' }, { status: 500 })
   }
 
-  const email = session.user.email
   const body = await req.json()
   const { srs, stats, vocab, vocabUpdatedAt, updatedAt } = body
 
@@ -84,17 +99,15 @@ export async function POST(req: NextRequest) {
 }
 
 // DELETE — hapus semua data dari Firestore
-export async function DELETE() {
-  const session = await auth()
-  if (!session?.user?.email) {
+export async function DELETE(req: NextRequest) {
+  const email = await getEmailFromRequest(req)
+  if (!email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   if (!db) {
     return NextResponse.json({ error: 'Firebase is not initialized' }, { status: 500 })
   }
-
-  const email = session.user.email
 
   try {
     const batch = db.batch()

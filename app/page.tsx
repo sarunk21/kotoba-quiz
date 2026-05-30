@@ -12,6 +12,8 @@ import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
 import BottomNav from '@/components/BottomNav'
 import { speakJapanese } from '@/lib/sounds'
+import { isCapacitor } from '@/lib/platform'
+
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
 
@@ -39,6 +41,7 @@ export default function Home() {
   const [activeStatusTab, setActiveStatusTab] = useState<'vocab' | 'kanji' | 'kana'>('vocab')
   const [wordOfTheDay, setWordOfTheDay] = useState<{ kanji: string; hiragana: string; arti: string; category: string; chapter?: string } | null>(null)
   const [isWotdFlipped, setIsWotdFlipped] = useState(false)
+  const [syncEmail, setSyncEmail] = useState<string | null>(null)
 
   // Pull-to-refresh
   const [pullY, setPullY] = useState(0)
@@ -61,24 +64,28 @@ export default function Home() {
       setNotificationNeed(need)
       showLocalNotification('言葉カード', need.message)
     }
+
+    // Set sync email from localStorage if exists
+    setSyncEmail(localStorage.getItem('kotoba_sync_email'))
   }, [])
 
   // Account Isolation
   useEffect(() => {
-    if (session?.user?.email) {
+    const currentUserEmail = session?.user?.email || syncEmail
+    if (currentUserEmail) {
       const lastUser = localStorage.getItem('kotoba_last_user')
-      if (lastUser && lastUser !== session.user.email) {
+      if (lastUser && lastUser !== currentUserEmail) {
         localStorage.removeItem('kotoba_srs')
         localStorage.removeItem('kotoba_stats')
         localStorage.removeItem('kotoba_vocab')
         localStorage.removeItem('kotoba_vocab_updated_at')
-        localStorage.setItem('kotoba_last_user', session.user.email)
+        localStorage.setItem('kotoba_last_user', currentUserEmail)
         window.location.reload()
       } else if (!lastUser) {
-        localStorage.setItem('kotoba_last_user', session.user.email)
+        localStorage.setItem('kotoba_last_user', currentUserEmail)
       }
     }
-  }, [session])
+  }, [session, syncEmail])
 
   async function handleSignOut() {
     localStorage.removeItem('kotoba_srs')
@@ -86,11 +93,18 @@ export default function Home() {
     localStorage.removeItem('kotoba_vocab')
     localStorage.removeItem('kotoba_vocab_updated_at')
     localStorage.removeItem('kotoba_last_user')
-    await signOut()
+    localStorage.removeItem('kotoba_sync_token')
+    localStorage.removeItem('kotoba_sync_email')
+    if (session) {
+      await signOut()
+    } else {
+      window.location.reload()
+    }
   }
 
   const doSync = useCallback(async () => {
-    if (!session?.user?.email) return
+    const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('kotoba_sync_token')
+    if (!session?.user?.email && !hasToken) return
     setSyncStatus('syncing')
     const ok = await syncToCloud()
     if (ok) {
@@ -106,7 +120,8 @@ export default function Home() {
 
   useEffect(() => {
     const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
-    if (session?.user?.email && isAuto) doSync()
+    const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('kotoba_sync_token')
+    if ((session?.user?.email || hasToken) && isAuto) doSync()
   }, [session?.user?.email, doSync])
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -124,7 +139,8 @@ export default function Home() {
     setIsPulling(false)
     if (pullY >= PULL_THRESHOLD) {
       setPullY(40); setIsRefreshing(true)
-      if (session?.user?.email) await doSync()
+      const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('kotoba_sync_token')
+      if (session?.user?.email || hasToken) await doSync()
       setIsRefreshing(false)
     }
     setPullY(0)
@@ -227,6 +243,10 @@ export default function Home() {
     setIsWotdFlipped(false)
   }, [vocab])
 
+  const userGreetingName = session?.user?.name?.split(' ')[0] || (syncEmail ? syncEmail.split('@')[0] : null)
+  const isLoggedIn = !!session || !!syncEmail
+  const isCap = isCapacitor()
+
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
       {/* Pull indicator */}
@@ -248,21 +268,37 @@ export default function Home() {
         <div className="anim-up mb-5 relative z-[100]">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>{session ? `おかえり、${session.user?.name?.split(' ')[0]} 👋` : 'おはようございます 👋'}</p>
-              <h1 className="text-2xl font-extrabold leading-tight" style={{ color: 'var(--color-text-1)' }}>{session ? 'Siap berlatih hari ini?' : 'Kuasai Kosakata Jepang'}</h1>
+              <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>
+                {userGreetingName ? `おかえり、${userGreetingName} 👋` : 'おはようございます 👋'}
+              </p>
+              <h1 className="text-2xl font-extrabold leading-tight" style={{ color: 'var(--color-text-1)' }}>
+                {isLoggedIn ? 'Siap berlatih hari ini?' : 'Kuasai Kosakata Jepang'}
+              </h1>
             </div>
-            {status === 'loading' ? <div className="w-10 h-10 rounded-full" style={{ background: 'var(--color-subtle)' }} /> : session ? (
+            {status === 'loading' ? (
+              <div className="w-10 h-10 rounded-full" style={{ background: 'var(--color-subtle)' }} />
+            ) : isLoggedIn ? (
               <div className="relative">
                 <button onClick={() => setShowProfileMenu(s => !s)} className="w-10 h-10 rounded-full overflow-hidden border-2 active:scale-95 transition-transform" style={{ borderColor: 'var(--color-accent)' }}>
-                  {session.user?.image ? <img src={session.user.image} alt="avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-bold text-white" style={{ background: 'var(--color-accent)' }}>{session.user?.name?.[0]}</div>}
+                  {session?.user?.image ? (
+                    <img src={session.user.image} alt="avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center font-bold text-white bg-[var(--color-accent)]">
+                      {(session?.user?.name || syncEmail)?.[0].toUpperCase()}
+                    </div>
+                  )}
                 </button>
                 {showProfileMenu && (
                   <>
                     <div className="fixed inset-0 z-[60]" onClick={() => setShowProfileMenu(false)} />
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl z-[70] border border-[var(--color-border)] overflow-hidden anim-pop">
                       <div className="px-4 py-3 border-b border-[var(--color-border)]">
-                        <p className="text-xs font-bold truncate" style={{ color: 'var(--color-text-1)' }}>{session.user?.name}</p>
-                        <p className="text-[10px] font-semibold truncate" style={{ color: 'var(--color-text-3)' }}>{session.user?.email}</p>
+                        <p className="text-xs font-bold truncate" style={{ color: 'var(--color-text-1)' }}>
+                          {session?.user?.name || syncEmail?.split('@')[0]}
+                        </p>
+                        <p className="text-[10px] font-semibold truncate" style={{ color: 'var(--color-text-3)' }}>
+                          {session?.user?.email || syncEmail}
+                        </p>
                       </div>
                       <Link href="/settings" className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--color-bg)] transition-colors no-underline">
                         <span className="text-sm">⚙️</span><span className="text-sm font-bold" style={{ color: 'var(--color-text-1)' }}>Pengaturan</span>
@@ -279,7 +315,7 @@ export default function Home() {
         </div>
 
         {/* Notification Banner (Passive Aggressive Duolingo style) */}
-        {session && notificationNeed && (
+        {isLoggedIn && notificationNeed && (
           <div className="anim-up mb-6">
             <div className="rounded-3xl p-4 flex items-center gap-4 border-2" 
               style={{ 
@@ -299,7 +335,7 @@ export default function Home() {
           </div>
         )}
 
-        {!session && status !== 'loading' ? (
+        {!isLoggedIn && !isCap && status !== 'loading' ? (
           <div className="anim-up d1">
             <div className="rounded-3xl p-8 mb-6 text-center" style={{ background: 'var(--color-white)', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
               <div className="text-6xl mb-6">🎌</div>
@@ -310,8 +346,35 @@ export default function Home() {
               </button>
             </div>
           </div>
-        ) : session && (
+        ) : (isLoggedIn || isCap) && (
           <>
+            {!isLoggedIn && isCap && (
+              <div className="rounded-3xl p-5 mb-4 anim-up text-center border-2 border-dashed border-[var(--color-accent)] bg-white dark:bg-[#1a1d24]" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+                <div className="text-3xl mb-2">🔄</div>
+                <h3 className="font-extrabold text-sm mb-1 text-[var(--color-text-1)]">Hubungkan Akun</h3>
+                <p className="text-[11px] font-semibold leading-relaxed mb-4 text-[var(--color-text-2)]">
+                  Google memblokir login langsung di aplikasi HP. Silakan login di browser HP Anda untuk menyalin Token Sinkronisasi.
+                </p>
+                <div className="flex flex-col gap-2">
+                  <button 
+                    onClick={() => {
+                      const baseUrl = process.env.NEXT_PUBLIC_API_BASE || 'https://kotoba-quiz.vercel.app'
+                      window.open(`${baseUrl}/settings`, '_blank')
+                    }}
+                    className="w-full rounded-xl py-2.5 text-xs font-black text-white bg-[var(--color-accent)] active:scale-95 transition-transform"
+                  >
+                    🌐 Buka Web & Login Google
+                  </button>
+                  <Link 
+                    href="/settings"
+                    className="w-full rounded-xl py-2.5 text-xs font-bold text-[var(--color-text-2)] bg-[var(--color-bg)] no-underline active:scale-95 transition-transform"
+                  >
+                    🔑 Tempel Token di Sini
+                  </Link>
+                </div>
+              </div>
+            )}
+
 
 
             {noVocab && (
@@ -576,7 +639,7 @@ export default function Home() {
           </>
         )}
 
-    {session && <p className="text-center text-xs mt-8 mb-4" style={{ color: 'var(--color-text-3)' }}>↓ Tarik ke bawah untuk sinkronisasi</p>}
+    {isLoggedIn && <p className="text-center text-xs mt-8 mb-4" style={{ color: 'var(--color-text-3)' }}>↓ Tarik ke bawah untuk sinkronisasi</p>}
   </div>
 
       {/* Logout Modal */}

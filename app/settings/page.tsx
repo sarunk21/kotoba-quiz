@@ -8,6 +8,9 @@ import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
 import { pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
 import BottomNav from '@/components/BottomNav'
+import { isCapacitor } from '@/lib/platform'
+import { getApiUrl } from '@/lib/api'
+
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -20,11 +23,18 @@ export default function SettingsPage() {
   const [syncMode, setSyncMode] = useState<'auto' | 'manual'>('auto')
   const [syncActionStatus, setSyncActionStatus] = useState<string>('')
 
-  // Legacy CSV functions removed
-
+  // Sync token states
+  const [syncEmail, setSyncEmail] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+  const [inputToken, setInputToken] = useState('')
+  const [generateLoading, setGenerateLoading] = useState(false)
+  const [generatedToken, setGeneratedToken] = useState('')
+  const [copysuccess, setCopysuccess] = useState(false)
+  const [connectError, setConnectError] = useState('')
+  const [connectSuccess, setConnectSuccess] = useState('')
 
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/')
+    if (status === 'unauthenticated' && !isCapacitor()) router.push('/')
   }, [status, router])
 
   useEffect(() => {
@@ -44,6 +54,9 @@ export default function SettingsPage() {
       if (Notification.permission === 'granted') setNotifStatus('granted')
       else if (Notification.permission === 'denied') setNotifStatus('denied')
     }
+
+    setIsMobile(isCapacitor())
+    setSyncEmail(localStorage.getItem('kotoba_sync_email'))
   }, [])
 
   function toggleSyncMode(mode: 'auto' | 'manual') {
@@ -170,62 +183,210 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Sync Section di-hide karena sinkronisasi berjalan otomatis di latar belakang. Hapus komentar untuk memunculkannya kembali. */}
-          {/*
-          <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Sinkronisasi</p>
-            
-            <div className="flex gap-2 mb-5">
-              {[
-                { key: 'auto',   label: 'Otomatis', icon: '⚡' },
-                { key: 'manual', label: 'Manual',   icon: '🔘' },
-              ].map(m => (
-                <button key={m.key} onClick={() => toggleSyncMode(m.key as any)}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold transition-all active:scale-95"
-                  style={{
-                    background: syncMode === m.key ? 'var(--color-accent)' : 'var(--color-bg)',
-                    color: syncMode === m.key ? '#fff' : 'var(--color-text-2)',
-                    boxShadow: syncMode === m.key ? '0 4px 12px rgba(91,94,244,0.25)' : 'none',
-                  }}>
-                  <span>{m.icon}</span> {m.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <button onClick={handleManualPull} disabled={!!syncActionStatus}
-                  className="flex-1 rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all"
-                  style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
-                  {syncActionStatus === 'pulling' ? '⏳ Pulling...' : '📥 Tarik Data (Pull)'}
-                </button>
-                <button onClick={handleManualPush} disabled={!!syncActionStatus}
-                  className="flex-1 rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all"
-                  style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
-                  {syncActionStatus === 'pushing' ? '⏳ Pushing...' : '📤 Kirim Data (Push)'}
-                </button>
-              </div>
+          {/* Web View: Token Generator */}
+          {!isMobile && session && (
+            <div className="rounded-3xl p-6 anim-up d1 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--color-text-3)' }}>Token Sinkronisasi HP</p>
+              <p className="text-xs font-semibold leading-relaxed mb-4" style={{ color: 'var(--color-text-2)' }}>
+                Gunakan token ini untuk menghubungkan aplikasi Android dengan akun web ini agar progress kuis Anda tersinkronisasi.
+              </p>
               
-              <button onClick={handleImportGoogleDrive} disabled={!!syncActionStatus}
-                className="w-full rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all flex items-center justify-center gap-1.5"
-                style={{ background: 'var(--color-bg)', color: 'var(--color-text-1)', border: '1.5px solid var(--color-border)' }}>
-                <span>📁</span> {syncActionStatus === 'importing_drive' ? '⏳ Mengimpor dari Drive...' : 'Migrasi Backup dari Google Drive (Legacy)'}
-              </button>
-
-              {syncActionStatus && !['pulling', 'pushing', 'importing_drive'].includes(syncActionStatus) && (
-                <p className="text-center text-[10px] font-bold text-[var(--color-accent)] animate-fade-in">
-                  {syncActionStatus}
-                </p>
+              {generatedToken ? (
+                <div className="space-y-3">
+                  <div className="relative">
+                    <textarea
+                      readOnly
+                      value={generatedToken}
+                      className="w-full text-[11px] font-mono p-3 pr-10 border border-[var(--color-border)] bg-[var(--color-bg)] rounded-2xl resize-none h-20 break-all select-all focus:outline-none dark:text-white dark:bg-zinc-800"
+                    />
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedToken)
+                        setCopysuccess(true)
+                        setTimeout(() => setCopysuccess(false), 2000)
+                      }}
+                      className="absolute right-2 top-2 p-1.5 rounded-xl bg-white dark:bg-zinc-700 border border-[var(--color-border)] text-xs active:scale-95 transition-all"
+                      title="Salin Token"
+                    >
+                      {copysuccess ? '✓' : '📋'}
+                    </button>
+                  </div>
+                  {copysuccess && (
+                    <p className="text-xs text-green-500 font-bold text-center">Token tersalin ke clipboard!</p>
+                  )}
+                  <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold leading-normal">
+                    ⚠️ Token ini bersifat rahasia dan berisi informasi akun Anda. Jangan dibagikan kepada siapa pun.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={async () => {
+                    setGenerateLoading(true)
+                    try {
+                      const res = await fetch('/api/sync/generate-token', { method: 'POST' })
+                      if (res.ok) {
+                        const data = await res.json()
+                        setGeneratedToken(data.token)
+                      } else {
+                        alert('Gagal menghasilkan token. Coba lagi.')
+                      }
+                    } catch (e) {
+                      console.error(e)
+                      alert('Gagal menghubungi server.')
+                    } finally {
+                      setGenerateLoading(false)
+                    }
+                  }}
+                  disabled={generateLoading}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold active:scale-95 transition-transform"
+                  style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 4px 12px rgba(91,94,244,0.2)' }}
+                >
+                  {generateLoading ? '⏳ Menghasilkan...' : '🔑 Buat Token Sinkronisasi'}
+                </button>
               )}
             </div>
-            
-            <p className="text-[10px] text-center mt-3 font-semibold" style={{ color: 'var(--color-text-3)' }}>
-              {syncMode === 'auto' 
-                ? 'Sync jalan otomatis pas buka app & abis kuis.' 
-                : 'Pake tombol di atas buat sinkron manual.'}
-            </p>
-          </div>
-          */}
+          )}
+
+          {/* Mobile View: Account Connection */}
+          {isMobile && (
+            <div className="rounded-3xl p-6 anim-up d1 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--color-text-3)' }}>Sinkronisasi Akun</p>
+              
+              {syncEmail ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/30 flex items-center gap-3">
+                    <span className="text-2xl">🔗</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-green-800 dark:text-green-300">Tautan Aktif</p>
+                      <p className="text-sm font-extrabold text-green-900 dark:text-green-200 truncate">{syncEmail}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        setSyncActionStatus('syncing')
+                        const ok = await pullFromCloud()
+                        if (ok) {
+                          setSyncActionStatus('Sinkronisasi Berhasil ✓')
+                          setTimeout(() => {
+                            setSyncActionStatus('')
+                            window.location.reload()
+                          }, 1500)
+                        } else {
+                          setSyncActionStatus('Gagal Sinkronisasi ✗')
+                          setTimeout(() => setSyncActionStatus(''), 3000)
+                        }
+                      }}
+                      disabled={!!syncActionStatus}
+                      className="flex-1 rounded-2xl py-3 text-xs font-bold active:scale-95 transition-all text-white bg-[var(--color-accent)]"
+                    >
+                      {syncActionStatus === 'syncing' ? '⏳ Sinkronisasi...' : '🔄 Sinkron Sekarang'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Apakah Anda yakin ingin memutuskan tautan akun? Progress lokal saat ini akan dibersihkan untuk isolasi akun.')) {
+                          localStorage.removeItem('kotoba_srs')
+                          localStorage.removeItem('kotoba_stats')
+                          localStorage.removeItem('kotoba_vocab')
+                          localStorage.removeItem('kotoba_vocab_updated_at')
+                          localStorage.removeItem('kotoba_last_user')
+                          localStorage.removeItem('kotoba_sync_token')
+                          localStorage.removeItem('kotoba_sync_email')
+                          window.location.reload()
+                        }
+                      }}
+                      className="rounded-2xl px-4 py-3 text-xs font-bold active:scale-95 transition-all border border-red-200 text-red-600 bg-red-50 dark:bg-red-950/20 dark:border-red-900/30"
+                    >
+                      Putuskan Tautan
+                    </button>
+                  </div>
+                  {syncActionStatus && (
+                    <p className="text-center text-[10px] font-bold text-[var(--color-accent)]">{syncActionStatus}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+                    Masukkan token sinkronisasi dari versi web untuk memuat dan menyinkronkan progress kosakata Anda.
+                  </p>
+
+                  <button
+                    onClick={() => {
+                      const baseUrl = process.env.NEXT_PUBLIC_API_BASE || 'https://kotoba-quiz.vercel.app'
+                      window.open(`${baseUrl}/settings`, '_blank')
+                    }}
+                    className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 text-xs font-bold active:scale-95 transition-transform border border-[var(--color-border)] text-[var(--color-text-2)] bg-[var(--color-bg)] hover:bg-[var(--color-subtle)]"
+                  >
+                    🌐 Buka Pengaturan Web untuk Salin Token
+                  </button>
+
+                  <div className="space-y-2">
+                    <textarea
+                      placeholder="Tempel token di sini..."
+                      value={inputToken}
+                      onChange={(e) => setInputToken(e.target.value)}
+                      className="w-full text-[11px] font-mono p-3 border border-[var(--color-border)] bg-[var(--color-bg)] rounded-2xl resize-none h-20 focus:outline-none focus:border-[var(--color-accent)] dark:text-white dark:bg-zinc-800"
+                    />
+                    {connectError && (
+                      <p className="text-xs text-red-500 font-bold">{connectError}</p>
+                    )}
+                    {connectSuccess && (
+                      <p className="text-xs text-green-500 font-bold">{connectSuccess}</p>
+                    )}
+                    <button
+                      onClick={async () => {
+                        if (!inputToken.trim()) {
+                          setConnectError('Token tidak boleh kosong')
+                          return
+                        }
+                        setConnectError('')
+                        setConnectSuccess('')
+                        setSyncActionStatus('connecting')
+                        try {
+                          const res = await fetch(getApiUrl('/api/sync/verify-token'), {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: inputToken.trim() }),
+                          })
+                          if (res.ok) {
+                            const data = await res.json()
+                            localStorage.setItem('kotoba_sync_token', inputToken.trim())
+                            localStorage.setItem('kotoba_sync_email', data.email)
+                            setSyncEmail(data.email)
+                            setConnectSuccess(`Berhasil terhubung ke ${data.email}! Menyinkronkan data...`)
+                            
+                            // Jalankan sync pertama kali
+                            const ok = await pullFromCloud()
+                            if (ok) {
+                              setConnectSuccess(`Berhasil terhubung ke ${data.email}! Data tersinkronisasi.`)
+                            }
+                            
+                            setTimeout(() => {
+                              window.location.reload()
+                            }, 1500)
+                          } else {
+                            const data = await res.json()
+                            setConnectError(data.error || 'Token tidak valid')
+                          }
+                        } catch (e) {
+                          console.error(e)
+                          setConnectError('Gagal menghubungkan ke server. Periksa koneksi internet Anda.')
+                        } finally {
+                          setSyncActionStatus('')
+                        }
+                      }}
+                      disabled={syncActionStatus === 'connecting'}
+                      className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold active:scale-95 transition-transform"
+                      style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 4px 12px rgba(91,94,244,0.2)' }}
+                    >
+                      {syncActionStatus === 'connecting' ? '⏳ Menghubungkan...' : '🔗 Hubungkan Akun'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Vocab Database Section */}
           <div className="rounded-3xl p-6 anim-up d1" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
