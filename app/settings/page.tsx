@@ -32,6 +32,7 @@ export default function SettingsPage() {
   const [copysuccess, setCopysuccess] = useState(false)
   const [connectError, setConnectError] = useState('')
   const [connectSuccess, setConnectSuccess] = useState('')
+  const [customApiBase, setCustomApiBase] = useState('')
 
   useEffect(() => {
     if (status === 'unauthenticated' && !isCapacitor()) router.push('/')
@@ -57,6 +58,7 @@ export default function SettingsPage() {
 
     setIsMobile(isCapacitor())
     setSyncEmail(localStorage.getItem('kotoba_sync_email'))
+    setCustomApiBase(localStorage.getItem('kotoba_api_base') || process.env.NEXT_PUBLIC_API_BASE || '')
   }, [])
 
   function toggleSyncMode(mode: 'auto' | 'manual') {
@@ -307,19 +309,40 @@ export default function SettingsPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
-                    Masukkan token sinkronisasi dari versi web untuk memuat dan menyinkronkan progress kosakata Anda.
-                  </p>
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] block mb-1">
+                      Alamat Web / URL Server
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="https://kotoba-quiz.vercel.app"
+                      value={customApiBase}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setCustomApiBase(val)
+                        localStorage.setItem('kotoba_api_base', val.trim())
+                      }}
+                      className="w-full text-xs p-3 border border-[var(--color-border)] bg-[var(--color-bg)] rounded-2xl focus:outline-none focus:border-[var(--color-accent)] dark:text-white dark:bg-zinc-800"
+                    />
+                    <p className="text-[9px] font-semibold text-[var(--color-text-3)] mt-1">
+                      *Masukkan alamat domain web Anda (misal: localhost:3000 untuk pengujian lokal, atau alamat Vercel).
+                    </p>
+                  </div>
 
                   <button
                     onClick={() => {
-                      const baseUrl = process.env.NEXT_PUBLIC_API_BASE || 'https://kotoba-quiz.vercel.app'
-                      window.open(`${baseUrl}/settings`, '_blank')
+                      const targetUrl = customApiBase.trim() || 'https://kotoba-quiz.vercel.app'
+                      const cleanBase = targetUrl.endsWith('/') ? targetUrl.slice(0, -1) : targetUrl
+                      window.open(`${cleanBase}/settings`, '_blank')
                     }}
                     className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 text-xs font-bold active:scale-95 transition-transform border border-[var(--color-border)] text-[var(--color-text-2)] bg-[var(--color-bg)] hover:bg-[var(--color-subtle)]"
                   >
                     🌐 Buka Pengaturan Web untuk Salin Token
                   </button>
+
+                  <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+                    Masukkan token sinkronisasi dari versi web untuk memuat dan menyinkronkan progress kosakata Anda.
+                  </p>
 
                   <div className="space-y-2">
                     <textarea

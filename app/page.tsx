@@ -13,6 +13,8 @@ import { checkNotificationNeeds, showLocalNotification } from '@/lib/notificatio
 import BottomNav from '@/components/BottomNav'
 import { speakJapanese } from '@/lib/sounds'
 import { isCapacitor } from '@/lib/platform'
+import { getApiUrl } from '@/lib/api'
+
 
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
@@ -358,8 +360,9 @@ export default function Home() {
                 <div className="flex flex-col gap-2">
                   <button 
                     onClick={() => {
-                      const baseUrl = process.env.NEXT_PUBLIC_API_BASE || 'https://kotoba-quiz.vercel.app'
-                      window.open(`${baseUrl}/settings`, '_blank')
+                      const resolvedUrl = getApiUrl('/settings')
+                      const finalUrl = resolvedUrl.startsWith('http') ? resolvedUrl : 'https://kotoba-quiz.vercel.app/settings'
+                      window.open(finalUrl, '_blank')
                     }}
                     className="w-full rounded-xl py-2.5 text-xs font-black text-white bg-[var(--color-accent)] active:scale-95 transition-transform"
                   >
