@@ -71,11 +71,119 @@ export default function VocabPage() {
     }
   }, [status, router])
 
-  // Load Initial Vocab
+  // Load Initial Vocab & Google Sheets URL
   useEffect(() => {
     const list = loadLocalVocab()
     setVocabList(list)
+
+    const savedUrl = localStorage.getItem('kotoba_sheets_url') || ''
+    if (savedUrl) {
+      setSheetsUrlInput(savedUrl)
+      // Silent background fetch to update words
+      silentSyncFromSheets(savedUrl)
+    }
   }, [])
+
+  const silentSyncFromSheets = async (url: string) => {
+    try {
+      const t = Date.now()
+      const res = await fetch(`/api/sheets?url=${encodeURIComponent(url.trim())}&t=${t}`)
+      if (!res.ok) return
+      const csvText = await res.text()
+      const parsed = parseCSVToVocab(csvText)
+      if (parsed.length === 0) return
+
+      // Merge with existing vocab
+      const localVocab = loadLocalVocab()
+      const existingIds = new Set(localVocab.map(v => v.id))
+      const newItems = parsed.filter(item => !existingIds.has(item.id))
+
+      // Update chapter info for existing items if they changed in the sheet
+      let hasChanges = false
+      const updatedLocalVocab = localVocab.map(localItem => {
+        const parsedItem = parsed.find(p => p.id === localItem.id)
+        if (parsedItem && parsedItem.chapter !== localItem.chapter) {
+          hasChanges = true
+          return { ...localItem, chapter: parsedItem.chapter }
+        }
+        return localItem
+      })
+
+      if (newItems.length > 0 || hasChanges) {
+        const updatedList = [...newItems, ...updatedLocalVocab]
+        setVocabList(updatedList)
+        saveLocalVocab(updatedList)
+        localStorage.setItem('kotoba_vocab_updated_at', new Date().toISOString())
+        
+        if (session?.user?.email) {
+          await syncToCloud() // sync to Firebase in background
+        }
+      }
+    } catch (e) {
+      console.error('[Silent Sheets Sync Error]', e)
+    }
+  }
+
+  const handleSyncFromSavedLink = async () => {
+    const savedUrl = localStorage.getItem('kotoba_sheets_url')
+    if (!savedUrl) return
+    
+    setLoadingImportLink(true)
+    setSyncStatusMsg('Menyinkronkan Sheet...')
+    
+    try {
+      const t = Date.now()
+      const res = await fetch(`/api/sheets?url=${encodeURIComponent(savedUrl.trim())}&t=${t}`)
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || `Error status: ${res.status}`)
+      }
+      
+      const csvText = await res.text()
+      const parsed = parseCSVToVocab(csvText)
+      
+      if (parsed.length === 0) {
+        alert('Gagal mengambil data: Format Google Sheets salah.')
+        return
+      }
+      
+      const existingIds = new Set(vocabList.map(v => v.id))
+      const newItems = parsed.filter(item => !existingIds.has(item.id))
+      
+      // Update chapter info for existing items if they changed in the sheet
+      let hasChanges = false
+      const updatedLocalVocab = vocabList.map(localItem => {
+        const parsedItem = parsed.find(p => p.id === localItem.id)
+        if (parsedItem && parsedItem.chapter !== localItem.chapter) {
+          hasChanges = true
+          return { ...localItem, chapter: parsedItem.chapter }
+        }
+        return localItem
+      })
+      
+      if (newItems.length === 0 && !hasChanges) {
+        setSyncStatusMsg('Sheet Sudah Sinkron ✓')
+        setTimeout(() => setSyncStatusMsg(''), 3000)
+        return
+      }
+      
+      const updatedList = [...newItems, ...updatedLocalVocab]
+      setVocabList(updatedList)
+      await triggerSync(updatedList)
+      
+      const msg = newItems.length > 0 
+        ? `Berhasil Impor ${newItems.length} Kata Baru ✓` 
+        : 'Bab Kosakata Terupdate ✓'
+      setSyncStatusMsg(msg)
+      setTimeout(() => setSyncStatusMsg(''), 3000)
+    } catch (e: any) {
+      alert(`Gagal sinkronisasi Google Sheets: ${e.message || e}`)
+      setSyncStatusMsg('Gagal Sinkron Sheet ✗')
+      setTimeout(() => setSyncStatusMsg(''), 3000)
+    } finally {
+      setLoadingImportLink(false)
+    }
+  }
 
   // Auto-sync function
   const triggerSync = async (updatedList: VocabItem[]) => {
@@ -311,19 +419,34 @@ export default function VocabPage() {
       const existingIds = new Set(vocabList.map(v => v.id))
       const newItems = parsed.filter(item => !existingIds.has(item.id))
 
-      if (newItems.length === 0) {
-        alert('Semua kosakata dari link Sheets sudah ada di database!')
+      // Update chapter info for existing items if they changed in the sheet
+      let hasChanges = false
+      const updatedLocalVocab = vocabList.map(localItem => {
+        const parsedItem = parsed.find(p => p.id === localItem.id)
+        if (parsedItem && parsedItem.chapter !== localItem.chapter) {
+          hasChanges = true
+          return { ...localItem, chapter: parsedItem.chapter }
+        }
+        return localItem
+      })
+
+      if (newItems.length === 0 && !hasChanges) {
+        alert('Semua kosakata dari link Sheets sudah ada di database dan sudah sinkron!')
+        localStorage.setItem('kotoba_sheets_url', sheetsUrlInput.trim())
         setShowCsvModal(false)
-        setSheetsUrlInput('')
         return
       }
 
-      const updatedList = [...newItems, ...vocabList]
+      const updatedList = [...newItems, ...updatedLocalVocab]
       setVocabList(updatedList)
+      localStorage.setItem('kotoba_sheets_url', sheetsUrlInput.trim())
       setShowCsvModal(false)
-      setSheetsUrlInput('')
       await triggerSync(updatedList)
-      alert(`Berhasil mengimpor ${newItems.length} kosakata baru dari Google Sheets!`)
+      
+      const alertMsg = newItems.length > 0 
+        ? `Berhasil mengimpor ${newItems.length} kosakata baru dari Google Sheets!` 
+        : 'Berhasil mengupdate bab kosakata!'
+      alert(alertMsg)
     } catch (e: any) {
       setCsvError(`Gagal mengambil data dari Google Sheets: ${e.message || e}`)
     } finally {
@@ -363,254 +486,269 @@ export default function VocabPage() {
   if (status === 'loading') return null
 
   return (
-    <main className="min-height-100dvh pb-28 pt-6 px-4 max-w-sm mx-auto flex flex-col gap-5 anim-up">
-      {/* Header */}
-      <header className="flex flex-col gap-2 relative">
-        <div className="flex items-center justify-between">
-          <Link 
-            href="/" 
-            className="text-xs font-bold text-[var(--color-text-2)] no-underline flex items-center gap-1 active:scale-95 transition-transform"
-          >
-            ← Kembali
-          </Link>
-          {syncStatusMsg && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-accent-light)] text-[var(--color-accent)] animate-pulse">
-              {syncStatusMsg}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center justify-between mt-1">
-          <div>
-            <h1 className="text-2xl font-black tracking-tight text-[var(--color-text-1)]">Kelola Kosakata</h1>
-            <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Database kamus pribadi kamu</p>
-          </div>
-          <span className="text-xs font-extrabold px-3 py-1.5 rounded-full bg-[var(--color-subtle)] text-[var(--color-text-2)]">
-            {vocabList.length} Kata
-          </span>
-        </div>
-      </header>
-
-      {/* CSV Actions & Stats Banner */}
-      <section className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 shadow-card flex items-center justify-between gap-3">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-3)]">Backup & Restore</span>
-          <span className="text-xs font-bold text-[var(--color-text-1)]">Gunakan format CSV Google Sheets</span>
-        </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => { setCsvError(''); setShowCsvModal(true) }}
-            className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-accent-light)] text-[var(--color-accent)] active:scale-95 transition-transform"
-          >
-            📥 Impor
-          </button>
-          <button 
-            onClick={handleExportCSV}
-            className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
-            disabled={vocabList.length === 0}
-          >
-            📤 Ekspor
-          </button>
-        </div>
-      </section>
-
-      {/* Filters & Search */}
-      <section className="flex flex-col gap-3">
-        <div className="relative">
-          <input 
-            type="text" 
-            placeholder="Cari kata, cara baca, arti..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full text-sm px-4 py-3 rounded-2xl border border-[var(--color-border)] bg-white dark:bg-[#1a1d24] text-[var(--color-text-1)] focus:outline-none focus:border-[var(--color-accent)] transition-colors shadow-sm"
-          />
-          {searchQuery && (
-            <button 
-              onClick={() => setSearchQuery('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--color-text-3)] hover:text-[var(--color-text-2)]"
+    <>
+      <main className="min-height-100dvh pb-28 pt-6 px-4 max-w-sm mx-auto flex flex-col gap-5 anim-up">
+        {/* Header */}
+        <header className="flex flex-col gap-2 relative">
+          <div className="flex items-center justify-between">
+            <Link 
+              href="/" 
+              className="text-xs font-bold text-[var(--color-text-2)] no-underline flex items-center gap-1 active:scale-95 transition-transform"
             >
-              ✕
-            </button>
-          )}
-        </div>
-
-        <div className="flex gap-2">
-          {/* Category Filter */}
-          <div className="flex-1 flex flex-col gap-1">
-            <span className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)] px-1">Kategori</span>
-            <select
-              value={selectedCat}
-              onChange={(e) => setSelectedCat(e.target.value)}
-              className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-border)] bg-white dark:bg-[#1a1d24] text-[var(--color-text-1)] focus:outline-none"
-            >
-              <option value="All">Semua Kategori</option>
-              {CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+              ← Kembali
+            </Link>
+            {syncStatusMsg && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-accent-light)] text-[var(--color-accent)] animate-pulse">
+                {syncStatusMsg}
+              </span>
+            )}
           </div>
-
-          {/* Chapter Filter */}
-          <div className="flex-1 flex flex-col gap-1">
-            <span className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)] px-1">Bab</span>
-            <select
-              value={selectedChapter}
-              onChange={(e) => setSelectedChapter(e.target.value)}
-              className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-border)] bg-white dark:bg-[#1a1d24] text-[var(--color-text-1)] focus:outline-none"
-            >
-              <option value="All">Semua Bab</option>
-              {uniqueChapters.map(ch => (
-                <option key={ch} value={ch}>{ch}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </section>
-
-      {/* Selection Control Bar */}
-      {filteredVocab.length > 0 && (
-        <section className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl shadow-sm">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input 
-              type="checkbox"
-              checked={filteredVocab.length > 0 && filteredVocab.every(item => selectedIds.has(item.id))}
-              onChange={(e) => {
-                const newSelected = new Set(selectedIds)
-                if (e.target.checked) {
-                  filteredVocab.forEach(item => newSelected.add(item.id))
-                } else {
-                  filteredVocab.forEach(item => newSelected.delete(item.id))
-                }
-                setSelectedIds(newSelected)
-              }}
-              className="rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)] cursor-pointer h-4 w-4 border-[var(--color-border)]"
-            />
-            <span className="text-xs font-extrabold text-[var(--color-text-2)]">Pilih Semua ({filteredVocab.length})</span>
-          </label>
-          
-          {selectedIds.size > 0 && (
-            <div className="flex gap-2">
-              <button 
-                onClick={() => {
-                  setSelectedIds(new Set())
-                }}
-                className="text-xs font-bold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
-              >
-                Batal
-              </button>
-              <button 
-                onClick={() => {
-                  setIsBulkDelete(true)
-                  setShowDeleteModal(true)
-                }}
-                className="text-xs font-black px-3 py-2 rounded-xl bg-[var(--color-red)] text-white shadow-red active:scale-95 transition-transform"
-              >
-                🗑️ Hapus Terpilih ({selectedIds.size})
-              </button>
+          <div className="flex items-center justify-between mt-1">
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-[var(--color-text-1)]">Kelola Kosakata</h1>
+              <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Database kamus pribadi kamu</p>
             </div>
-          )}
-        </section>
-      )}
-
-      {/* Vocab Items List */}
-      <section className="flex-1 flex flex-col gap-2.5">
-        {filteredVocab.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl border border-dashed border-[var(--color-border)] bg-white/40 dark:bg-[#1a1d24]/20">
-            <span className="text-3xl">📭</span>
-            <p className="font-extrabold text-sm text-[var(--color-text-2)] mt-2">Tidak ada kosakata ditemukan</p>
-            <p className="text-xs font-semibold text-[var(--color-text-3)] mt-1">Coba sesuaikan pencarian atau filter kamu</p>
+            <span className="text-xs font-extrabold px-3 py-1.5 rounded-full bg-[var(--color-subtle)] text-[var(--color-text-2)]">
+              {vocabList.length} Kata
+            </span>
           </div>
-        ) : (
-          filteredVocab.map((item) => {
-            const hasKanji = item.kanji && item.kanji !== item.hiragana
-            const isChecked = selectedIds.has(item.id)
-            
-            // Assign color badge based on category
-            let catClass = 'bg-[var(--color-subtle)] text-[var(--color-text-2)]'
-            if (item.category === 'Kata Benda') catClass = 'bg-[var(--color-cat-noun-bg)] text-[var(--color-cat-noun)]'
-            else if (item.category === 'Kata Kerja') catClass = 'bg-[var(--color-cat-verb-bg)] text-[var(--color-cat-verb)]'
-            else if (item.category === 'Kata Sifat') catClass = 'bg-[var(--color-cat-adj-bg)] text-[var(--color-cat-adj)]'
-            else if (item.category === 'Ungkapan') catClass = 'bg-amber-100/70 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
+        </header>
 
-            return (
-              <div 
-                key={item.id} 
-                className={`bg-white dark:bg-[#1a1d24] border ${isChecked ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]/25 dark:bg-[var(--color-accent-dark)]/10 shadow-[0_0_8px_rgba(91,94,244,0.1)]' : 'border-[var(--color-border)]'} rounded-2xl p-4 shadow-card flex items-center justify-between gap-3 hover:border-[var(--color-accent)] transition-all`}
+        {/* CSV Actions & Stats Banner */}
+        <section className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 shadow-card flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-3)]">Backup & Restore</span>
+            <span className="text-xs font-bold text-[var(--color-text-1)]">Gunakan format CSV Google Sheets</span>
+          </div>
+          <div className="flex gap-2">
+            {sheetsUrlInput && (
+              <button 
+                onClick={handleSyncFromSavedLink}
+                className="text-xs font-extrabold px-3 py-2 rounded-xl bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-400 active:scale-95 transition-transform flex items-center gap-1"
+                title="Tarik ulang dari Google Sheets"
+                disabled={loadingImportLink}
               >
-                {/* Checkbox */}
-                <input 
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={() => {
-                    const newSelected = new Set(selectedIds)
-                    if (isChecked) {
-                      newSelected.delete(item.id)
-                    } else {
-                      newSelected.add(item.id)
-                    }
-                    setSelectedIds(newSelected)
-                  }}
-                  className="rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)] cursor-pointer h-4.5 w-4.5 border-[var(--color-border)] shrink-0"
-                />
+                {loadingImportLink ? '⏳' : '🔄'} Sync Sheet
+              </button>
+            )}
+            <button 
+              onClick={() => { setCsvError(''); setShowCsvModal(true) }}
+              className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-accent-light)] text-[var(--color-accent)] active:scale-95 transition-transform"
+            >
+              📥 Impor
+            </button>
+            <button 
+              onClick={handleExportCSV}
+              className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
+              disabled={vocabList.length === 0}
+            >
+              📤 Ekspor
+            </button>
+          </div>
+        </section>
 
-                <div className="flex-1 flex flex-col gap-1.5 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`}>
-                      {item.category}
-                    </span>
-                    {item.chapter && (
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-subtle)] text-[var(--color-text-2)]">
-                        {item.chapter}
+        {/* Filters & Search */}
+        <section className="flex flex-col gap-3">
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Cari kata, cara baca, arti..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full text-sm px-4 py-3 rounded-2xl border border-[var(--color-border)] bg-white dark:bg-[#1a1d24] text-[var(--color-text-1)] focus:outline-none focus:border-[var(--color-accent)] transition-colors shadow-sm"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-[var(--color-text-3)] hover:text-[var(--color-text-2)]"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            {/* Category Filter */}
+            <div className="flex-1 flex flex-col gap-1">
+              <span className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)] px-1">Kategori</span>
+              <select
+                value={selectedCat}
+                onChange={(e) => setSelectedCat(e.target.value)}
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-border)] bg-white dark:bg-[#1a1d24] text-[var(--color-text-1)] focus:outline-none"
+              >
+                <option value="All">Semua Kategori</option>
+                {CATEGORIES.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Chapter Filter */}
+            <div className="flex-1 flex flex-col gap-1">
+              <span className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)] px-1">Bab</span>
+              <select
+                value={selectedChapter}
+                onChange={(e) => setSelectedChapter(e.target.value)}
+                className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-border)] bg-white dark:bg-[#1a1d24] text-[var(--color-text-1)] focus:outline-none"
+              >
+                <option value="All">Semua Bab</option>
+                {uniqueChapters.map(ch => (
+                  <option key={ch} value={ch}>{ch}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </section>
+
+        {/* Selection Control Bar */}
+        {filteredVocab.length > 0 && (
+          <section className="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl shadow-sm">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input 
+                type="checkbox"
+                checked={filteredVocab.length > 0 && filteredVocab.every(item => selectedIds.has(item.id))}
+                onChange={(e) => {
+                  const newSelected = new Set(selectedIds)
+                  if (e.target.checked) {
+                    filteredVocab.forEach(item => newSelected.add(item.id))
+                  } else {
+                    filteredVocab.forEach(item => newSelected.delete(item.id))
+                  }
+                  setSelectedIds(newSelected)
+                }}
+                className="rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)] cursor-pointer h-4 w-4 border-[var(--color-border)]"
+              />
+              <span className="text-xs font-extrabold text-[var(--color-text-2)]">Pilih Semua ({filteredVocab.length})</span>
+            </label>
+            
+            {selectedIds.size > 0 && (
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => {
+                    setSelectedIds(new Set())
+                  }}
+                  className="text-xs font-bold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
+                >
+                  Batal
+                </button>
+                <button 
+                  onClick={() => {
+                    setIsBulkDelete(true)
+                    setShowDeleteModal(true)
+                  }}
+                  className="text-xs font-black px-3 py-2 rounded-xl bg-[var(--color-red)] text-white shadow-red active:scale-95 transition-transform"
+                >
+                  🗑️ Hapus Terpilih ({selectedIds.size})
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Vocab Items List */}
+        <section className="flex-1 flex flex-col gap-2.5">
+          {filteredVocab.length === 0 ? (
+            <div className="text-center py-12 rounded-2xl border border-dashed border-[var(--color-border)] bg-white/40 dark:bg-[#1a1d24]/20">
+              <span className="text-3xl">📭</span>
+              <p className="font-extrabold text-sm text-[var(--color-text-2)] mt-2">Tidak ada kosakata ditemukan</p>
+              <p className="text-xs font-semibold text-[var(--color-text-3)] mt-1">Coba sesuaikan pencarian atau filter kamu</p>
+            </div>
+          ) : (
+            filteredVocab.map((item) => {
+              const hasKanji = item.kanji && item.kanji !== item.hiragana
+              const isChecked = selectedIds.has(item.id)
+              
+              // Assign color badge based on category
+              let catClass = 'bg-[var(--color-subtle)] text-[var(--color-text-2)]'
+              if (item.category === 'Kata Benda') catClass = 'bg-[var(--color-cat-noun-bg)] text-[var(--color-cat-noun)]'
+              else if (item.category === 'Kata Kerja') catClass = 'bg-[var(--color-cat-verb-bg)] text-[var(--color-cat-verb)]'
+              else if (item.category === 'Kata Sifat') catClass = 'bg-[var(--color-cat-adj-bg)] text-[var(--color-cat-adj)]'
+              else if (item.category === 'Ungkapan') catClass = 'bg-amber-100/70 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
+
+              return (
+                <div 
+                  key={item.id} 
+                  className={`bg-white dark:bg-[#1a1d24] border ${isChecked ? 'border-[var(--color-accent)] bg-[var(--color-accent-light)]/25 dark:bg-[var(--color-accent-dark)]/10 shadow-[0_0_8px_rgba(91,94,244,0.1)]' : 'border-[var(--color-border)]'} rounded-2xl p-4 shadow-card flex items-center justify-between gap-3 hover:border-[var(--color-accent)] transition-all`}
+                >
+                  {/* Checkbox */}
+                  <input 
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      const newSelected = new Set(selectedIds)
+                      if (isChecked) {
+                        newSelected.delete(item.id)
+                      } else {
+                        newSelected.add(item.id)
+                      }
+                      setSelectedIds(newSelected)
+                    }}
+                    className="rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)] cursor-pointer h-4.5 w-4.5 border-[var(--color-border)] shrink-0"
+                  />
+
+                  <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${catClass}`}>
+                        {item.category}
                       </span>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col gap-0.5 min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <span className="jp text-lg font-black text-[var(--color-text-1)] truncate">
-                        {item.kanji}
-                      </span>
-                      {hasKanji && (
-                        <span className="jp text-xs font-semibold text-[var(--color-text-3)] truncate">
-                          ({item.hiragana})
+                      {item.chapter && (
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-subtle)] text-[var(--color-text-2)]">
+                          {item.chapter}
                         </span>
                       )}
                     </div>
-                    <span className="text-xs font-semibold text-[var(--color-text-2)] truncate">
-                      {item.arti}
-                    </span>
+                    
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <span className="jp text-lg font-black text-[var(--color-text-1)] truncate">
+                          {item.kanji}
+                        </span>
+                        {hasKanji && (
+                          <span className="jp text-xs font-semibold text-[var(--color-text-3)] truncate">
+                            ({item.hiragana})
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs font-semibold text-[var(--color-text-2)] truncate">
+                        {item.arti}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button 
+                      onClick={() => openEditModal(item)}
+                      className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-accent-light)] hover:text-[var(--color-accent)] active:scale-90 transition-all text-sm"
+                      title="Ubah"
+                    >
+                      ✏️
+                    </button>
+                    <button 
+                      onClick={() => askDelete(item)}
+                      className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-red-light)] hover:text-[var(--color-red)] active:scale-90 transition-all text-sm"
+                      title="Hapus"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
+              )
+            })
+          )}
+        </section>
 
-                <div className="flex items-center gap-1 shrink-0">
-                  <button 
-                    onClick={() => openEditModal(item)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-accent-light)] hover:text-[var(--color-accent)] active:scale-90 transition-all text-sm"
-                    title="Ubah"
-                  >
-                    ✏️
-                  </button>
-                  <button 
-                    onClick={() => askDelete(item)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-red-light)] hover:text-[var(--color-red)] active:scale-90 transition-all text-sm"
-                    title="Hapus"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            )
-          })
-        )}
-      </section>
+        {/* Floating Action Button for Add Word */}
+        <button 
+          onClick={openAddModal}
+          className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-gradient-to-tr from-[var(--color-accent)] to-[var(--color-accent-dark)] shadow-[0_6px_20px_rgba(91,94,244,0.4)] active:scale-90 transition-all flex items-center justify-center text-white text-2xl border-4 border-white dark:border-[#1a1d24]"
+          title="Tambah Kosakata Baru"
+        >
+          ➕
+        </button>
 
-      {/* Floating Action Button for Add Word */}
-      <button 
-        onClick={openAddModal}
-        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-gradient-to-tr from-[var(--color-accent)] to-[var(--color-accent-dark)] shadow-[0_6px_20px_rgba(91,94,244,0.4)] active:scale-90 transition-all flex items-center justify-center text-white text-2xl border-4 border-white dark:border-[#1a1d24]"
-        title="Tambah Kosakata Baru"
-      >
-        ➕
-      </button>
+        {/* Bottom Navigation */}
+        <BottomNav />
+      </main>
 
       {/* ── MODAL: Add / Edit Word ── */}
       {showAddEditModal && (
@@ -882,9 +1020,7 @@ export default function VocabPage() {
           </div>
         </div>
       )}
-
-      {/* Bottom Navigation */}
-      <BottomNav />
-    </main>
+    </>
   )
 }
+

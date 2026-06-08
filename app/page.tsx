@@ -6,7 +6,7 @@ import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, type GameStats } from '@/lib/stats'
 import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
 import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
-import { parseCSVToVocab, type VocabItem, setGlobalVocab, loadLocalVocab } from '@/lib/vocab'
+import { parseCSVToVocab, type VocabItem, setGlobalVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
 import { pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
@@ -47,6 +47,46 @@ export default function Home() {
   const touchStartY = useRef(0)
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  const silentSyncFromSheets = async (url: string) => {
+    try {
+      const t = Date.now()
+      const res = await fetch(`/api/sheets?url=${encodeURIComponent(url.trim())}&t=${t}`)
+      if (!res.ok) return
+      const csvText = await res.text()
+      const parsed = parseCSVToVocab(csvText)
+      if (parsed.length === 0) return
+
+      // Merge with existing vocab
+      const localVocab = loadLocalVocab()
+      const existingIds = new Set(localVocab.map(v => v.id))
+      const newItems = parsed.filter(item => !existingIds.has(item.id))
+
+      // Update chapter info for existing items if they changed in the sheet
+      let hasChanges = false
+      const updatedLocalVocab = localVocab.map(localItem => {
+        const parsedItem = parsed.find(p => p.id === localItem.id)
+        if (parsedItem && parsedItem.chapter !== localItem.chapter) {
+          hasChanges = true
+          return { ...localItem, chapter: parsedItem.chapter }
+        }
+        return localItem
+      })
+
+      if (newItems.length > 0 || hasChanges) {
+        const updatedList = [...newItems, ...updatedLocalVocab]
+        setVocab(updatedList)
+        saveLocalVocab(updatedList)
+        localStorage.setItem('kotoba_vocab_updated_at', new Date().toISOString())
+        
+        if (session?.user?.email) {
+          await syncToCloud() // sync to Firebase in background
+        }
+      }
+    } catch (e) {
+      console.error('[Silent Sheets Sync Error]', e)
+    }
+  }
+
   useEffect(() => {
     const s = loadStats(); setStats(s)
     const store = loadSRS(); setSrsStore(store)
@@ -60,6 +100,12 @@ export default function Home() {
     if (need) {
       setNotificationNeed(need)
       showLocalNotification('言葉カード', need.message)
+    }
+
+    // Silent background fetch to update words from Sheets URL
+    const savedUrl = localStorage.getItem('kotoba_sheets_url') || ''
+    if (savedUrl) {
+      silentSyncFromSheets(savedUrl)
     }
   }, [])
 
