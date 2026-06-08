@@ -6,13 +6,18 @@ import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
-import { pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
+import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
+import { parseCSVToVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
 import BottomNav from '@/components/BottomNav'
 
 export default function SettingsPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  // Removed legacy Sheets state vars
+  // Sheets state vars
+  const [sheetsUrl, setSheetsUrl] = useState<string>('')
+  const [syncStatusMsg, setSyncStatusMsg] = useState<string>('')
+  const [loadingSync, setLoadingSync] = useState<boolean>(false)
+  
   const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
@@ -20,8 +25,75 @@ export default function SettingsPage() {
   const [syncMode, setSyncMode] = useState<'auto' | 'manual'>('auto')
   const [syncActionStatus, setSyncActionStatus] = useState<string>('')
 
-  // Legacy CSV functions removed
+  // Sync Sheets manually
+  async function handleSyncSheets() {
+    if (!sheetsUrl) return
+    setLoadingSync(true)
+    setSyncStatusMsg('Menyinkronkan Sheet...')
+    try {
+      const t = Date.now()
+      const res = await fetch(`/api/sheets?url=${encodeURIComponent(sheetsUrl.trim())}&t=${t}`)
+      if (!res.ok) {
+        throw new Error(`Error status: ${res.status}`)
+      }
+      const csvText = await res.text()
+      const parsed = parseCSVToVocab(csvText)
+      if (parsed.length === 0) {
+        alert('Gagal mengambil data: Format Google Sheets salah.')
+        setSyncStatusMsg('Format Salah ✗')
+        setTimeout(() => setSyncStatusMsg(''), 3000)
+        return
+      }
 
+      const localVocab = loadLocalVocab()
+      const existingIds = new Set(localVocab.map(v => v.id))
+      const newItems = parsed.filter(item => !existingIds.has(item.id))
+
+      // Update chapter info for existing items if they changed in the sheet
+      let hasChanges = false
+      const updatedLocalVocab = localVocab.map(localItem => {
+        const parsedItem = parsed.find(p => p.id === localItem.id)
+        if (parsedItem && parsedItem.chapter !== localItem.chapter) {
+          hasChanges = true
+          return { ...localItem, chapter: parsedItem.chapter }
+        }
+        return localItem
+      })
+
+      if (newItems.length === 0 && !hasChanges) {
+        setSyncStatusMsg('Sheet Sudah Sinkron ✓')
+        setTimeout(() => setSyncStatusMsg(''), 3000)
+        return
+      }
+
+      const updatedList = [...newItems, ...updatedLocalVocab]
+      saveLocalVocab(updatedList)
+      localStorage.setItem('kotoba_vocab_updated_at', new Date().toISOString())
+
+      // Sync to Firebase Cloud if logged in
+      if (session?.user?.email) {
+        setSyncStatusMsg('Menyinkronkan ke Cloud...')
+        const ok = await syncToCloud()
+        if (ok) {
+          setSyncStatusMsg('Tersinkronisasi ke Cloud ✓')
+        } else {
+          setSyncStatusMsg('Gagal Sinkronisasi Cloud ✗')
+        }
+      } else {
+        const msg = newItems.length > 0 
+          ? `Berhasil Impor ${newItems.length} Kata Baru ✓` 
+          : 'Bab Kosakata Terupdate ✓'
+        setSyncStatusMsg(msg)
+      }
+      setTimeout(() => setSyncStatusMsg(''), 3000)
+    } catch (e: any) {
+      console.error(e)
+      setSyncStatusMsg('Gagal Sinkron Sheet ✗')
+      setTimeout(() => setSyncStatusMsg(''), 3000)
+    } finally {
+      setLoadingSync(false)
+    }
+  }
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/')
@@ -39,7 +111,9 @@ export default function SettingsPage() {
     const savedSync = localStorage.getItem('kotoba_sync_mode') as 'auto' | 'manual' | null
     if (savedSync) setSyncMode(savedSync)
 
-    // Legacy URL config removed
+    const savedUrl = localStorage.getItem('kotoba_sheets_url') || ''
+    setSheetsUrl(savedUrl)
+
     if (typeof Notification !== 'undefined') {
       if (Notification.permission === 'granted') setNotifStatus('granted')
       else if (Notification.permission === 'denied') setNotifStatus('denied')
@@ -240,8 +314,44 @@ export default function SettingsPage() {
             </Link>
           </div>
 
-          {/* Notifications Section */}
+          {/* Google Sheets Sync Section */}
           <div className="rounded-3xl p-6 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Google Sheets</p>
+            
+            {sheetsUrl ? (
+              <div className="space-y-4">
+                <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+                  Tarik paksa pembaruan kosakata atau bab baru langsung dari spreadsheet Google Sheets kamu yang terhubung.
+                </p>
+                <button 
+                  onClick={handleSyncSheets}
+                  disabled={loadingSync}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold active:scale-95 transition-transform"
+                  style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 4px 12px rgba(91,94,244,0.2)' }}
+                >
+                  {loadingSync ? '⏳ Menyinkronkan...' : '🔄 Sinkron Google Sheets'}
+                </button>
+                {syncStatusMsg && (
+                  <p className="text-center text-xs font-bold animate-pulse" style={{ color: 'var(--color-accent)' }}>
+                    {syncStatusMsg}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+                  Hubungkan Google Sheets kamu untuk mempermudah impor kosakata dan manajemen bab secara massal.
+                </p>
+                <Link href="/vocab" className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 text-xs font-bold no-underline active:scale-95 transition-transform border border-[var(--color-border)]"
+                  style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)' }}>
+                  🔗 Hubungkan Google Sheets
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Notifications Section */}
+          <div className="rounded-3xl p-6 anim-up d3" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Notifikasi</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -268,7 +378,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Danger Zone */}
-          <div className="rounded-3xl p-6 anim-up d3" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+          <div className="rounded-3xl p-6 anim-up d4" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-red)' }}>Zona Bahaya</p>
             <button onClick={() => setShowResetConfirm(true)}
               className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold active:scale-95 transition-transform"
