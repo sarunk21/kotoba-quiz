@@ -211,7 +211,7 @@ export default function Home() {
       const pct = maxPossibleLevels > 0 ? Math.round((totalLevelsAchieved / maxPossibleLevels) * 100) : 0
 
       return { name, summary, pct }
-    }).sort((a, b) => a.name.localeCompare(b.name))
+    }).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
   }, [vocab, srsStore])
 
   const weeklyStreak = useMemo(() => {

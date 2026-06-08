@@ -79,7 +79,7 @@ export default function ProgressPage() {
     vocab.forEach(v => {
       if (v.chapter) set.add(v.chapter)
     })
-    return Array.from(set).sort()
+    return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
   }, [vocab])
 
   // Unique categories in vocabulary

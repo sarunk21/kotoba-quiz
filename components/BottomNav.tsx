@@ -74,7 +74,7 @@ export default function BottomNav() {
       const maxPossibleLevels = ids.length * MAX_LEVEL
       const pct = maxPossibleLevels > 0 ? Math.round((totalLevelsAchieved / maxPossibleLevels) * 100) : 0
       return { name, pct }
-    }).sort((a, b) => a.name.localeCompare(b.name))
+    }).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
   }, [vocab, srsStore])
 
   const getSpecialChapterPct = (type: string, chapterName: string) => {

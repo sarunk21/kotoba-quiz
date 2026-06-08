@@ -214,7 +214,7 @@ export default function VocabPage() {
         chapters.add('Tanpa Bab')
       }
     })
-    return Array.from(chapters).sort()
+    return Array.from(chapters).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
   }, [vocabList])
 
   // Filtered list
