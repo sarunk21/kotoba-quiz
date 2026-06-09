@@ -119,7 +119,8 @@ export default function SettingsPage() {
     const savedSync = localStorage.getItem('kotoba_sync_mode') as 'auto' | 'manual' | null
     if (savedSync) setSyncMode(savedSync)
 
-    const savedUrl = localStorage.getItem('kotoba_sheets_url') || ''
+    const DEFAULT_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9UYAD3iOYHLFUeMh-uHUi9cbk6ejo7oUcrKEMtNgg2AZL37fSxvNOxjItQtunRb3DyjsKTct8hfvW/pub?gid=1283721307&single=true&output=csv'
+    const savedUrl = localStorage.getItem('kotoba_sheets_url') || DEFAULT_SHEETS_URL
     setSheetsUrl(savedUrl)
 
     async function initNotifications() {

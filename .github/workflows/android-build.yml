@@ -66,15 +66,22 @@ jobs:
           path: android/app/build/outputs/apk/debug/kotoba-quiz.apk
           if-no-files-found: error
 
+      - name: Get Version from package.json
+        id: package-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=v$VERSION" >> $GITHUB_OUTPUT
+
       - name: Publish Raw APK to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: Latest Android Build
+          tag_name: ${{ steps.package-version.outputs.version }}
+          name: Release ${{ steps.package-version.outputs.version }}
           body: "Unduh file APK langsung di bawah ini untuk dicoba di HP Anda."
           draft: false
           prerelease: false
           files: android/app/build/outputs/apk/debug/kotoba-quiz.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 

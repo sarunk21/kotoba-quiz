@@ -24,6 +24,8 @@ const CATEGORIES: Category[] = [
   'Uang'
 ]
 
+const DEFAULT_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9UYAD3iOYHLFUeMh-uHUi9cbk6ejo7oUcrKEMtNgg2AZL37fSxvNOxjItQtunRb3DyjsKTct8hfvW/pub?gid=1283721307&single=true&output=csv'
+
 export default function VocabPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
@@ -76,12 +78,10 @@ export default function VocabPage() {
     const list = loadLocalVocab()
     setVocabList(list)
 
-    const savedUrl = localStorage.getItem('kotoba_sheets_url') || ''
-    if (savedUrl) {
-      setSheetsUrlInput(savedUrl)
-      // Silent background fetch to update words
-      silentSyncFromSheets(savedUrl)
-    }
+    const savedUrl = localStorage.getItem('kotoba_sheets_url') || DEFAULT_SHEETS_URL
+    setSheetsUrlInput(savedUrl)
+    // Silent background fetch to update words
+    silentSyncFromSheets(savedUrl)
   }, [])
 
   const silentSyncFromSheets = async (url: string) => {
@@ -125,8 +125,7 @@ export default function VocabPage() {
   }
 
   const handleSyncFromSavedLink = async () => {
-    const savedUrl = localStorage.getItem('kotoba_sheets_url')
-    if (!savedUrl) return
+    const savedUrl = localStorage.getItem('kotoba_sheets_url') || DEFAULT_SHEETS_URL
     
     setLoadingImportLink(true)
     setSyncStatusMsg('Menyinkronkan Sheet...')

@@ -27,6 +27,26 @@ const WEEKDAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
 
 const PULL_THRESHOLD = 140 // px tarik ke bawah sebelum trigger
 
+const DEFAULT_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9UYAD3iOYHLFUeMh-uHUi9cbk6ejo7oUcrKEMtNgg2AZL37fSxvNOxjItQtunRb3DyjsKTct8hfvW/pub?gid=1283721307&single=true&output=csv'
+
+const CURRENT_VERSION = '0.1.0'
+
+function isNewerVersion(current: string, remote: string): boolean {
+  const cleanCurrent = current.replace(/^v/, '')
+  const cleanRemote = remote.replace(/^v/, '')
+  
+  const currentParts = cleanCurrent.split('.').map(Number)
+  const remoteParts = cleanRemote.split('.').map(Number)
+  
+  for (let i = 0; i < Math.max(currentParts.length, remoteParts.length); i++) {
+    const curVal = currentParts[i] || 0
+    const remVal = remoteParts[i] || 0
+    if (remVal > curVal) return true
+    if (curVal > remVal) return false
+  }
+  return false
+}
+
 export default function Home() {
   const { data: session, status } = useSession()
   const [stats, setStats] = useState<GameStats | null>(null)
@@ -35,6 +55,7 @@ export default function Home() {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [updateInfo, setUpdateInfo] = useState<{ versionName: string; downloadUrl: string } | null>(null)
   const [notificationNeed, setNotificationNeed] = useState<{ type: string; message: string } | null>(null)
   const [activeStatusTab, setActiveStatusTab] = useState<'vocab' | 'kanji' | 'kana'>('vocab')
   const [wordOfTheDay, setWordOfTheDay] = useState<{ kanji: string; hiragana: string; arti: string; category: string; chapter?: string } | null>(null)
@@ -103,10 +124,34 @@ export default function Home() {
     }
 
     // Silent background fetch to update words from Sheets URL
-    const savedUrl = localStorage.getItem('kotoba_sheets_url') || ''
-    if (savedUrl) {
-      silentSyncFromSheets(savedUrl)
+    const savedUrl = localStorage.getItem('kotoba_sheets_url') || DEFAULT_SHEETS_URL
+    silentSyncFromSheets(savedUrl)
+
+    // Check for updates if running natively
+    const checkAppUpdate = async () => {
+      try {
+        const { Capacitor } = await import('@capacitor/core')
+        if (!Capacitor.isNativePlatform()) return
+
+        const res = await fetch('https://api.github.com/repos/sarunk21/kotoba-quiz/releases/latest')
+        if (!res.ok) return
+        const data = await res.json()
+        
+        const remoteVersion = data.tag_name // e.g. "v0.1.1"
+        if (remoteVersion && isNewerVersion(CURRENT_VERSION, remoteVersion)) {
+          const apkAsset = data.assets?.find((asset: any) => asset.name.endsWith('.apk'))
+          const downloadUrl = apkAsset?.browser_download_url || 'https://github.com/sarunk21/kotoba-quiz/releases/latest/download/kotoba-quiz.apk'
+          
+          setUpdateInfo({
+            versionName: remoteVersion,
+            downloadUrl
+          })
+        }
+      } catch (e) {
+        console.error('[Update Check Error]', e)
+      }
     }
+    checkAppUpdate()
   }, [])
 
   // Account Isolation
@@ -693,6 +738,31 @@ export default function Home() {
             <div className="flex flex-col gap-2.5">
               <button onClick={handleSignOut} className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform" style={{ background: 'var(--color-red)', color: '#fff' }}>Ya, Logout 👋</button>
               <button onClick={() => setShowLogoutConfirm(false)} className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform" style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)' }}>Batal</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Update Available Modal */}
+      {updateInfo && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center px-6">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-8 w-full max-w-xs relative anim-pop shadow-2xl text-center">
+            <div className="text-5xl mb-4">✨</div>
+            <h3 className="text-xl font-extrabold mb-2" style={{ color: 'var(--color-text-1)' }}>Update Tersedia!</h3>
+            <p className="text-sm font-semibold mb-6 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
+              Versi baru <strong>{updateInfo.versionName}</strong> telah dirilis. Unduh sekarang untuk mendapatkan fitur terbaru dan perbaikan sistem.
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <button onClick={() => {
+                window.open(updateInfo.downloadUrl, '_system')
+                setUpdateInfo(null)
+              }} className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform text-white" style={{ background: 'var(--color-accent)', boxShadow: '0 8px 20px rgba(91,94,244,0.28)' }}>
+                Unduh Update 🚀
+              </button>
+              <button onClick={() => setUpdateInfo(null)} className="w-full rounded-2xl py-4 text-base font-bold active:scale-95 transition-transform" style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)' }}>
+                Nanti Saja
+              </button>
             </div>
           </div>
         </div>
