@@ -9,6 +9,12 @@ import { loadSRS } from '@/lib/srs'
 import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
 import { parseCSVToVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
 import BottomNav from '@/components/BottomNav'
+import { 
+  checkNotificationPermission, 
+  requestNotificationPermission, 
+  scheduleDailyReminder, 
+  cancelDailyReminder 
+} from '@/lib/notifications'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -19,6 +25,8 @@ export default function SettingsPage() {
   const [loadingSync, setLoadingSync] = useState<boolean>(false)
   
   const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
+  const [reminderEnabled, setReminderEnabled] = useState<boolean>(true)
+  const [reminderTime, setReminderTime] = useState<string>('20:00')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -114,10 +122,19 @@ export default function SettingsPage() {
     const savedUrl = localStorage.getItem('kotoba_sheets_url') || ''
     setSheetsUrl(savedUrl)
 
-    if (typeof Notification !== 'undefined') {
-      if (Notification.permission === 'granted') setNotifStatus('granted')
-      else if (Notification.permission === 'denied') setNotifStatus('denied')
+    async function initNotifications() {
+      const status = await checkNotificationPermission()
+      if (status === 'default' || status === 'prompt') {
+        setNotifStatus('idle')
+      } else {
+        setNotifStatus(status)
+      }
+      const enabled = localStorage.getItem('kotoba_reminder_enabled') !== 'false'
+      setReminderEnabled(enabled)
+      const time = localStorage.getItem('kotoba_reminder_time') || '20:00'
+      setReminderTime(time)
     }
+    initNotifications()
   }, [])
 
   function toggleSyncMode(mode: 'auto' | 'manual') {
@@ -188,9 +205,44 @@ export default function SettingsPage() {
 
   // Removed legacy update handlers
 
-  async function enableNotif() {
-    const perm = await Notification.requestPermission()
-    setNotifStatus(perm === 'granted' ? 'granted' : 'denied')
+  async function handleToggleReminder() {
+    const status = await checkNotificationPermission()
+    const savedTime = localStorage.getItem('kotoba_reminder_time') || '20:00'
+    const [h, m] = savedTime.split(':').map(Number)
+    
+    if (status !== 'granted') {
+      const granted = await requestNotificationPermission()
+      if (granted) {
+        setNotifStatus('granted')
+        setReminderEnabled(true)
+        localStorage.setItem('kotoba_reminder_enabled', 'true')
+        await scheduleDailyReminder(h, m)
+      } else {
+        setNotifStatus('denied')
+        alert('Izin notifikasi ditolak. Harap izinkan notifikasi untuk Kotoba Quiz di pengaturan sistem perangkat Anda.')
+      }
+      return
+    }
+
+    const nextState = !reminderEnabled
+    setReminderEnabled(nextState)
+    localStorage.setItem('kotoba_reminder_enabled', String(nextState))
+    
+    if (nextState) {
+      await scheduleDailyReminder(h, m)
+    } else {
+      await cancelDailyReminder()
+    }
+  }
+
+  async function handleTimeChange(newTime: string) {
+    setReminderTime(newTime)
+    localStorage.setItem('kotoba_reminder_time', newTime)
+    
+    if (notifStatus === 'granted' && reminderEnabled) {
+      const [h, m] = newTime.split(':').map(Number)
+      await scheduleDailyReminder(h, m)
+    }
   }
 
   async function handleResetAccount() {
@@ -356,25 +408,47 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: notifStatus === 'granted' ? 'var(--color-green-light)' : 'var(--color-amber-light)' }}>
+                  style={{ 
+                    background: (notifStatus === 'granted' && reminderEnabled) ? 'var(--color-green-light)' : 'var(--color-amber-light)' 
+                  }}>
                   <span className="text-lg">🔔</span>
                 </div>
                 <div>
                   <p className="text-sm font-bold" style={{ color: 'var(--color-text-1)' }}>Pengingat Harian</p>
                   <p className="text-xs font-semibold" style={{ color: 'var(--color-text-3)' }}>
-                    {notifStatus === 'granted' ? 'Sudah aktif!' : 'Agar tidak lupa berlatih'}
+                    {notifStatus === 'denied' ? 'Izin ditolak (aktifkan di sistem)' :
+                     (notifStatus === 'granted' && reminderEnabled) ? `Aktif (Setiap jam ${reminderTime})` :
+                     (notifStatus === 'granted' && !reminderEnabled) ? 'Dinonaktifkan sementara' :
+                     'Agar tidak lupa berlatih'}
                   </p>
                 </div>
               </div>
-              {notifStatus === 'idle' && (
-                <button onClick={enableNotif} className="rounded-xl px-4 py-2 text-sm font-bold active:scale-95"
-                  style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)' }}>
-                  Aktifkan
-                </button>
-              )}
-              {notifStatus === 'granted' && <span className="text-green-500 font-bold text-sm">✓</span>}
-              {notifStatus === 'denied' && <span className="text-red-500 font-bold text-sm">Off</span>}
+              <button 
+                onClick={handleToggleReminder} 
+                className="rounded-xl px-4 py-2 text-sm font-bold active:scale-95 transition-all"
+                style={{ 
+                  background: (notifStatus === 'granted' && reminderEnabled) ? 'var(--color-red-light)' : 'var(--color-accent-light)', 
+                  color: (notifStatus === 'granted' && reminderEnabled) ? 'var(--color-red)' : 'var(--color-accent)' 
+                }}
+              >
+                {notifStatus === 'idle' ? 'Aktifkan' : 
+                 notifStatus === 'denied' ? 'Buka Izin' :
+                 reminderEnabled ? 'Matikan' : 'Aktifkan'}
+              </button>
             </div>
+            
+            {notifStatus === 'granted' && reminderEnabled && (
+              <div className="mt-4 pt-4 border-t border-[var(--color-border)] flex items-center justify-between anim-up">
+                <p className="text-xs font-bold" style={{ color: 'var(--color-text-2)' }}>Waktu Pengingat</p>
+                <input 
+                  type="time" 
+                  value={reminderTime} 
+                  onChange={(e) => handleTimeChange(e.target.value)}
+                  className="rounded-xl px-3 py-1.5 text-sm font-bold border border-[var(--color-border)] outline-none bg-[var(--color-bg)] transition-all focus:border-[var(--color-accent)]"
+                  style={{ color: 'var(--color-text-1)' }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Danger Zone */}
