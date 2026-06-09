@@ -56,11 +56,14 @@ jobs:
           cd android
           ./gradlew assembleDebug
 
+      - name: Rename APK File
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/kotoba-quiz.apk
+
       - name: Upload Debug APK Artifact (Fallback)
         uses: actions/upload-artifact@v4
         with:
-          name: kotoba-quiz-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: kotoba-quiz
+          path: android/app/build/outputs/apk/debug/kotoba-quiz.apk
           if-no-files-found: error
 
       - name: Publish Raw APK to GitHub Releases
@@ -71,7 +74,7 @@ jobs:
           body: "Unduh file APK langsung di bawah ini untuk dicoba di HP Anda."
           draft: false
           prerelease: false
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+          files: android/app/build/outputs/apk/debug/kotoba-quiz.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
