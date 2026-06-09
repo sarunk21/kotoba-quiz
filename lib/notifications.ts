@@ -128,7 +128,17 @@ export async function scheduleDailyReminder(hour: number = 20, minute: number = 
     // Cancel existing reminder first to prevent duplication
     await LocalNotifications.cancel({ notifications: [{ id: 1 }] })
 
-    // Schedule daily repeating reminder
+    // Hitung tanggal target pertama (hari ini atau besok jika jamnya sudah lewat)
+    const now = new Date()
+    const target = new Date()
+    target.setHours(hour, minute, 0, 0)
+    
+    // Jika waktu yang dipilih sudah lewat untuk hari ini, jadwalkan mulai besok
+    if (target <= now) {
+      target.setDate(target.getDate() + 1)
+    }
+
+    // Schedule daily repeating reminder starting from the calculated target date
     await LocalNotifications.schedule({
       notifications: [
         {
@@ -136,16 +146,14 @@ export async function scheduleDailyReminder(hour: number = 20, minute: number = 
           title: '言葉カード — Kotoba Quiz',
           body: '🔥 Streak kamu hampir padam! Yuk luangkan waktu 2 menit untuk berlatih hari ini.',
           schedule: {
-            on: {
-              hour,
-              minute
-            },
-            repeats: true
+            at: target,
+            every: 'day',
+            allowWhileIdle: true
           }
         }
       ]
     })
-    console.log(`Daily native reminder scheduled at ${hour}:${minute} successfully.`)
+    console.log(`Daily native reminder scheduled at ${target.toString()} (repeats daily) successfully.`)
   } catch (e) {
     console.error('Failed to schedule native reminder:', e)
   }
