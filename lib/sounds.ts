@@ -139,19 +139,19 @@ export function playLoseHeart() {
 export function speakJapanese(text: string, slow = false) {
   if (typeof window === 'undefined') return
   
-  // Jika online, gunakan Google Translate TTS karena kualitasnya sangat bagus dan 100% jalan di semua device
+  // Gunakan Youdao Japanese TTS API (le=jap) karena tidak memblokir WebView mobile
   if (navigator.onLine) {
     try {
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`
+      const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=jap`
       const audio = new Audio(url)
       audio.playbackRate = slow ? 0.65 : 0.95
       audio.play().catch(e => {
-        console.warn('Google Translate TTS failed, falling back to local speech synthesis:', e)
+        console.warn('Youdao TTS failed, falling back to local speech synthesis:', e)
         speakLocal(text, slow)
       })
       return
     } catch (e) {
-      console.warn('Google Translate TTS error, falling back to local:', e)
+      console.warn('Youdao TTS error, falling back to local:', e)
     }
   }
 
