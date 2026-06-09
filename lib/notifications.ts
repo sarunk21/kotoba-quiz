@@ -86,12 +86,13 @@ export async function showLocalNotification(title: string, body: string) {
 
   if (Capacitor.isNativePlatform()) {
     try {
+      // Use a fixed ID (2) to prevent duplicate notifications from stacking up
       await LocalNotifications.schedule({
         notifications: [
           {
             title,
             body,
-            id: Math.floor(Math.random() * 100000),
+            id: 2,
             extra: { tag: 'kotoba-reminder' }
           }
         ]
