@@ -135,6 +135,63 @@ export default function Home() {
     await signOut()
   }
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const { Capacitor } = await import('@capacitor/core')
+      
+      if (Capacitor.isNativePlatform()) {
+        setSyncStatus('syncing')
+        
+        // 1. Get Client ID
+        const clientRes = await fetch('/api/auth/google-client-id')
+        const { clientId } = await clientRes.json()
+        if (!clientId) {
+          throw new Error('Google Client ID not configured on server')
+        }
+
+        // 2. Initialize and Sign In
+        const { GoogleSignIn } = await import('@capawesome/capacitor-google-sign-in')
+        await GoogleSignIn.initialize({
+          clientId: clientId,
+        })
+
+        const result = await GoogleSignIn.signIn()
+        if (!result.idToken) {
+          throw new Error('Gagal mendapatkan token masuk Google')
+        }
+
+        // 3. Authenticate with NextAuth
+        const authRes = await signIn('google-native', {
+          idToken: result.idToken,
+          redirect: false,
+        })
+
+        if (authRes?.error) {
+          throw new Error(authRes.error)
+        }
+
+        // Force reload page to initialize session
+        window.location.reload()
+      } else {
+        signIn('google')
+      }
+    } catch (err: any) {
+      console.error('[Google Native Auth Error]', err)
+      const msg = String(err?.message || err)
+      // Do not alert if user cancelled or dismissed the sign-in dialog
+      if (
+        !msg.includes('cancelled') && 
+        !msg.includes('canceled') && 
+        !msg.includes('12501') && 
+        !msg.includes('10')
+      ) {
+        alert('Gagal masuk: ' + msg)
+      }
+    } finally {
+      setSyncStatus('idle')
+    }
+  }
+
   const doSync = useCallback(async () => {
     if (!session?.user?.email) return
     setSyncStatus('syncing')
@@ -351,7 +408,7 @@ export default function Home() {
               <div className="text-6xl mb-6">🎌</div>
               <h2 className="text-xl font-extrabold mb-3" style={{ color: 'var(--color-text-1)' }}>Selamat Datang</h2>
               <p className="text-sm font-semibold mb-8 leading-relaxed" style={{ color: 'var(--color-text-2)' }}>Simpan progress kosakata & kana kamu di cloud. Masuk agar dapat melanjutkan di mana saja!</p>
-              <button onClick={() => signIn('google')} className="w-full flex items-center justify-center gap-3 rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform" style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 8px 20px rgba(91,94,244,0.28)' }}>
+              <button onClick={handleGoogleSignIn} className="w-full flex items-center justify-center gap-3 rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform" style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 8px 20px rgba(91,94,244,0.28)' }}>
                 <GoogleIcon size={20} color="white" /> Masuk dengan Google
               </button>
             </div>
