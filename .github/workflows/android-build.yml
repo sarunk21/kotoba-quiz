@@ -1,0 +1,59 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Android App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Next.js App
+        run: npm run build
+        env:
+          # Matikan error env Firebase untuk build time
+          FIREBASE_PROJECT_ID: "placeholder"
+          FIREBASE_CLIENT_EMAIL: "placeholder@placeholder.iam.gserviceaccount.com"
+          FIREBASE_PRIVATE_KEY: "placeholder"
+
+      - name: Sync Capacitor Assets
+        run: npx cap sync
+
+      - name: Setup JDK 17 (Android Compatible)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build Android Debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotoba-quiz-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
