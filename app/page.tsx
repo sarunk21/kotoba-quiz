@@ -25,7 +25,7 @@ const FALLBACK_WORDS = [
 
 const WEEKDAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
 
-const PULL_THRESHOLD = 80 // px tarik ke bawah sebelum trigger
+const PULL_THRESHOLD = 140 // px tarik ke bawah sebelum trigger
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -164,12 +164,12 @@ export default function Home() {
   const onTouchMove = (e: React.TouchEvent) => {
     if (!isPulling) return
     const dy = e.touches[0].clientY - touchStartY.current
-    if (dy > 0) setPullY(Math.min(dy * 0.5, PULL_THRESHOLD + 20))
+    if (dy > 0) setPullY(Math.min(dy * 0.4, PULL_THRESHOLD + 20))
   }
   const onTouchEnd = async () => {
     setIsPulling(false)
     if (pullY >= PULL_THRESHOLD) {
-      setPullY(40); setIsRefreshing(true)
+      setPullY(50); setIsRefreshing(true)
       if (session?.user?.email) await doSync()
       setIsRefreshing(false)
     }
@@ -278,7 +278,7 @@ export default function Home() {
       {/* Pull indicator */}
       {(pullY > 0 || isRefreshing) && (
         <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 transition-all"
-          style={{ transform: `translateY(${Math.min(pullY, 44)}px)`, opacity: Math.min(pullY / PULL_THRESHOLD, 1) }}>
+          style={{ transform: `translateY(${Math.min(pullY, 70)}px)`, opacity: Math.min(pullY / PULL_THRESHOLD, 1) }}>
           <div className="rounded-full px-4 py-1.5 flex items-center gap-2 text-xs font-bold"
             style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.1)', color: 'var(--color-accent)' }}>
             <span>{isRefreshing ? '⏳ Sinkronisasi...' : pullY >= PULL_THRESHOLD ? '↑ Lepas untuk sinkron' : '↓ Tarik untuk sinkron'}</span>
