@@ -137,7 +137,29 @@ export function playLoseHeart() {
 
 /** Speak Japanese text using Web Speech API */
 export function speakJapanese(text: string, slow = false) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return
+  if (typeof window === 'undefined') return
+  
+  // Jika online, gunakan Google Translate TTS karena kualitasnya sangat bagus dan 100% jalan di semua device
+  if (navigator.onLine) {
+    try {
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ja&client=tw-ob&q=${encodeURIComponent(text)}`
+      const audio = new Audio(url)
+      audio.playbackRate = slow ? 0.65 : 0.95
+      audio.play().catch(e => {
+        console.warn('Google Translate TTS failed, falling back to local speech synthesis:', e)
+        speakLocal(text, slow)
+      })
+      return
+    } catch (e) {
+      console.warn('Google Translate TTS error, falling back to local:', e)
+    }
+  }
+
+  speakLocal(text, slow)
+}
+
+function speakLocal(text: string, slow: boolean) {
+  if (!window.speechSynthesis) return
   
   window.speechSynthesis.cancel()
 
