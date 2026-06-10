@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { SENTENCE_QUESTIONS, type SentenceQuestion } from '@/lib/sentences-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap, speakJapanese } from '@/lib/sounds'
+import { addFuriganaToSentence } from '@/lib/vocab'
 
 export default function SentencesQuizPage() {
   const router = useRouter()
@@ -22,6 +23,14 @@ export default function SentencesQuizPage() {
   const [score, setScore] = useState(0)
   const [isGameOver, setIsGameOver] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
+
+  const [showFurigana, setShowFurigana] = useState(false)
+
+  // Initialize showFurigana state on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('kotoba_show_furigana')
+    setShowFurigana(saved !== 'false') // default to true
+  }, [])
 
   const currentQuestion = useMemo(() => {
     return questions[currentIndex] || null
@@ -203,6 +212,27 @@ export default function SentencesQuizPage() {
           /* Active Question Screen */
           <div className="flex-1 flex flex-col justify-between anim-up">
             <div>
+              {/* Furigana Toggle */}
+              <div className="flex justify-between items-center mb-3">
+                <button 
+                  onClick={() => {
+                    const newVal = !showFurigana
+                    setShowFurigana(newVal)
+                    localStorage.setItem('kotoba_show_furigana', String(newVal))
+                    playTap()
+                  }}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border transition-all active:scale-95 cursor-pointer ${
+                    showFurigana 
+                      ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
+                      : 'bg-white dark:bg-[#1a1d24] text-[var(--color-text-3)] border-[var(--color-border)]'
+                  }`}
+                  title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
+                >
+                  <span>あ</span>
+                  <span>Furigana: {showFurigana ? 'ON' : 'OFF'}</span>
+                </button>
+              </div>
+
               {/* Meaning Hint Box */}
               <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[24px] p-4 shadow-sm mb-5 text-center">
                 <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] mb-1 block">
@@ -234,7 +264,11 @@ export default function SentencesQuizPage() {
                       disabled={isChecked}
                       className="rounded-xl px-3 py-2 text-xs font-bold bg-white dark:bg-[#1a1d24] border-2 border-[var(--color-border)] text-[var(--color-text-1)] shadow-sm active:scale-90 transition-transform jp"
                     >
-                      {block}
+                      {showFurigana ? (
+                        <span dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(block) }} />
+                      ) : (
+                        block
+                      )}
                     </button>
                   ))
                 )}
@@ -249,7 +283,11 @@ export default function SentencesQuizPage() {
                     disabled={isChecked}
                     className="rounded-xl px-4 py-2.5 text-xs font-bold bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] text-[var(--color-text-1)] shadow-sm active:scale-90 transition-transform hover:border-[var(--color-accent)] jp"
                   >
-                    {block}
+                    {showFurigana ? (
+                      <span dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(block) }} />
+                    ) : (
+                      block
+                    )}
                   </button>
                 ))}
               </div>
@@ -273,7 +311,11 @@ export default function SentencesQuizPage() {
                 {!isCorrect && (
                   <div className="mb-2">
                     <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Kunci Jawaban:</p>
-                    <p className="text-xs font-black text-green-600 dark:text-green-500 jp">{currentQuestion.japanese}</p>
+                    {showFurigana ? (
+                      <p className="text-xs font-black text-green-600 dark:text-green-500 jp" dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(currentQuestion.japanese) }} />
+                    ) : (
+                      <p className="text-xs font-black text-green-600 dark:text-green-500 jp">{currentQuestion.japanese}</p>
+                    )}
                   </div>
                 )}
                 <div>

@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
+import { addFuriganaToSentence } from '@/lib/vocab'
 
 function generateQuestions(particle: string): ParticleQuestion[] {
   if (particle === 'all') {
@@ -74,6 +75,14 @@ function ParticlesQuizContent() {
       setSelectedParticle(null)
     }
   }, [pParam])
+
+  const [showFurigana, setShowFurigana] = useState(false)
+
+  // Initialize showFurigana state on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('kotoba_show_furigana')
+    setShowFurigana(saved !== 'false') // default to true
+  }, [])
 
   // Game States
   const [questions, setQuestions] = useState<ParticleQuestion[]>([])
@@ -363,11 +372,34 @@ function ParticlesQuizContent() {
         ) : (
           /* Active Question Screen */
           <div className="flex-1 flex flex-col justify-between anim-up">
-            {/* Guide Quick Link */}
-            <div className="flex justify-end mb-3">
+            {/* Guide Quick Link & Furigana Toggle */}
+            <div className="flex justify-between items-center mb-3">
+              {/* Furigana Toggle */}
               <button 
-                onClick={() => router.push('/particles/guide')}
-                className="text-[10px] font-extrabold text-[var(--color-accent)] hover:underline flex items-center gap-1 active:scale-95 transition-all cursor-pointer bg-[var(--color-accent-light)] px-2.5 py-1 rounded-full"
+                onClick={() => {
+                  const newVal = !showFurigana
+                  setShowFurigana(newVal)
+                  localStorage.setItem('kotoba_show_furigana', String(newVal))
+                  playTap()
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border transition-all active:scale-95 cursor-pointer ${
+                  showFurigana 
+                    ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
+                    : 'bg-white dark:bg-[#1a1d24] text-[var(--color-text-3)] border-[var(--color-border)]'
+                }`}
+                title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
+              >
+                <span>あ</span>
+                <span>Furigana: {showFurigana ? 'ON' : 'OFF'}</span>
+              </button>
+
+              {/* Guide Link */}
+              <button 
+                onClick={() => {
+                  playTap()
+                  router.push('/particles/guide')
+                }}
+                className="text-[10px] font-extrabold text-[var(--color-accent)] hover:underline flex items-center gap-1 active:scale-95 transition-all cursor-pointer bg-[var(--color-accent-light)] px-2.5 py-1 rounded-full border-none"
               >
                 📖 Lihat Panduan Partikel
               </button>
@@ -379,10 +411,19 @@ function ParticlesQuizContent() {
                 PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS MEMBEDAKAN ${selectedParticle?.toUpperCase()}`})
               </span>
               <h2 className="text-2xl font-black jp tracking-wide leading-relaxed text-[var(--color-text-1)] mb-4 select-text">
-                {isChecked 
-                  ? currentQuestion.sentence.replace('___', ` 【 ${currentQuestion.correct} 】 `) 
-                  : currentQuestion.sentence
-                }
+                {showFurigana ? (
+                  <span dangerouslySetInnerHTML={{ 
+                    __html: addFuriganaToSentence(
+                      isChecked 
+                        ? currentQuestion.sentence.replace('___', ` 【 ${currentQuestion.correct} 】 `) 
+                        : currentQuestion.sentence
+                    ) 
+                  }} />
+                ) : (
+                  isChecked 
+                    ? currentQuestion.sentence.replace('___', ` 【 ${currentQuestion.correct} 】 `) 
+                    : currentQuestion.sentence
+                )}
               </h2>
               <div className="h-[1.5px] w-full bg-[var(--color-border)] my-4" />
               <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed select-text">
