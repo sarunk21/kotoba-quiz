@@ -37,8 +37,8 @@ export function checkAndResetStreak(stats: GameStats): GameStats {
   if (stats.lastPlayedDate !== yesterdayStr) {
     const updated = {
       ...stats,
-      currentStreak: 0,
-      updatedAt: new Date().toISOString()
+      currentStreak: 0
+      // Keep original stats.updatedAt to prevent passive resets from overriding newer cloud sync states
     }
     saveStats(updated)
     return updated

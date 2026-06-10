@@ -89,3 +89,31 @@ export const SPECIALIZED_DATA: Record<string, VocabItem[]> = {
     { id: 'special|uang|nanen', category: 'Uang', hiragana: 'なんえん', kanji: '何円', arti: 'Berapa Yen? (Nan-en)', chapter: 'Tanya' }
   ]
 }
+
+export const SPECIAL_CHAPTER_SEQUENCES: Record<string, string[]> = {
+  angka: ['Dasar', 'Ratusan', 'Ribuan', 'Penghitung', 'Orang', 'Batang'],
+  hari: ['Hari', 'Tanggal', 'Waktu', 'Menit'],
+  uang: ['Yen', 'Tanya']
+}
+
+export const CHAPTER_METADATA: Record<string, Record<string, { label: string; icon: string }>> = {
+  angka: {
+    Dasar: { label: 'Angka Dasar (1-10)', icon: '🔢' },
+    Ratusan: { label: 'Ratusan (100 - 800)', icon: '💯' },
+    Ribuan: { label: 'Ribuan & Puluh Ribu', icon: '🏔️' },
+    Penghitung: { label: 'Buah & Barang (~tsu)', icon: '📦' },
+    Orang: { label: 'Penghitung Orang (~nin)', icon: '👥' },
+    Batang: { label: 'Batang & Botol (~hon/pon/bon)', icon: '🥢' },
+  },
+  hari: {
+    Hari: { label: 'Nama Hari (Senin - Minggu)', icon: '📅' },
+    Tanggal: { label: 'Tanggal (1-10, 14, 20, 24)', icon: '📆' },
+    Waktu: { label: 'Jam & Waktu (~ji)', icon: '⏰' },
+    Menit: { label: 'Menit (~fun/pun)', icon: '⏱️' },
+  },
+  uang: {
+    Yen: { label: 'Nominal Yen (100 - 10.000)', icon: '💴' },
+    Tanya: { label: 'Kalimat Tanya Harga', icon: '💬' },
+  }
+}
+

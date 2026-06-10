@@ -120,7 +120,6 @@ export default function Home() {
     const need = checkNotificationNeeds()
     if (need) {
       setNotificationNeed(need)
-      showLocalNotification('言葉カード', need.message)
     }
 
     // Silent background fetch to update words from Sheets URL
