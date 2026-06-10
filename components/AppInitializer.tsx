@@ -1,11 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
 export default function AppInitializer() {
   const router = useRouter()
   const pathname = usePathname()
+
+  // Keep a mutable reference to the latest pathname
+  const pathnameRef = useRef(pathname)
+  pathnameRef.current = pathname
 
   useEffect(() => {
     let active = true
@@ -17,20 +21,22 @@ export default function AppInitializer() {
 
         const { App } = await import('@capacitor/app')
 
-        // Clean up listeners for App before registering new ones
+        // Clean up listeners for App before registering our single stable listener
         await App.removeAllListeners()
 
         await App.addListener('backButton', () => {
           if (!active) return
 
-          if (pathname === '/') {
+          const currentPath = pathnameRef.current
+          if (currentPath === '/') {
             if (window.history.state?.modal === 'practice') {
               window.history.back()
             } else {
               App.exitApp()
             }
           } else {
-            router.back()
+            // For other subpages, navigate back in the browser history stack
+            window.history.back()
           }
         })
       } catch (e) {
@@ -43,7 +49,8 @@ export default function AppInitializer() {
     return () => {
       active = false
     }
-  }, [pathname, router])
+  }, []) // Empty dependency array: runs only once on mount!
 
   return null
 }
+

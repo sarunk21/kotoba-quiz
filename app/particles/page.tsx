@@ -1,15 +1,46 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
 
-export default function ParticlesQuizPage() {
+function ParticlesQuizContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const pParam = searchParams.get('p')
 
   // Selection state (null = show particle category selector screen)
   const [selectedParticle, setSelectedParticle] = useState<string | null>(null)
+
+  // Initialize and sync quiz when query parameter 'p' changes
+  useEffect(() => {
+    if (pParam) {
+      let pool = PARTICLE_QUESTIONS
+      if (pParam !== 'all') {
+        if (pParam === 'lainnya') {
+          pool = PARTICLE_QUESTIONS.filter(q => {
+            const p = q.correct
+            return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
+          })
+        } else {
+          pool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(pParam))
+        }
+      }
+      const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10)
+      setQuestions(shuffled)
+      setSelectedParticle(pParam)
+      setCurrentIndex(0)
+      setSelectedOption(null)
+      setIsChecked(false)
+      setLives(3)
+      setScore(0)
+      setIsGameOver(false)
+      setIsFinished(false)
+    } else {
+      setSelectedParticle(null)
+    }
+  }, [pParam])
 
   // Game States
   const [questions, setQuestions] = useState<ParticleQuestion[]>([])
@@ -93,27 +124,7 @@ export default function ParticlesQuizPage() {
 
   const startQuizWithParticle = (part: string) => {
     playTap()
-    let pool = PARTICLE_QUESTIONS
-    if (part !== 'all') {
-      if (part === 'lainnya') {
-        pool = PARTICLE_QUESTIONS.filter(q => {
-          const p = q.correct
-          return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
-        })
-      } else {
-        pool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(part))
-      }
-    }
-    const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10)
-    setQuestions(shuffled)
-    setSelectedParticle(part)
-    setCurrentIndex(0)
-    setSelectedOption(null)
-    setIsChecked(false)
-    setLives(3)
-    setScore(0)
-    setIsGameOver(false)
-    setIsFinished(false)
+    router.push(`/particles?p=${part}`)
   }
 
   // Render Selection Screen
@@ -228,7 +239,7 @@ export default function ParticlesQuizPage() {
           <button 
             onClick={() => {
               playTap()
-              setSelectedParticle(null) // Return to selection screen
+              router.push('/particles') // Return to selection screen
             }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform"
           >
@@ -276,7 +287,7 @@ export default function ParticlesQuizPage() {
                 Pelajari Panduan Partikel 📖
               </button>
               <button 
-                onClick={() => setSelectedParticle(null)}
+                onClick={() => router.push('/particles')}
                 className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
               >
                 Pilih Partikel Lain
@@ -318,7 +329,7 @@ export default function ParticlesQuizPage() {
                 Tinjau Panduan Partikel 📖
               </button>
               <button 
-                onClick={() => setSelectedParticle(null)}
+                onClick={() => router.push('/particles')}
                 className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
               >
                 Pilih Partikel Lain
@@ -454,5 +465,13 @@ export default function ParticlesQuizPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function ParticlesQuizPage() {
+  return (
+    <Suspense fallback={<div className="min-h-dvh flex items-center justify-center bg-[var(--color-bg)]"><p className="text-sm font-bold text-[var(--color-text-2)]">Memuat halaman kuis...</p></div>}>
+      <ParticlesQuizContent />
+    </Suspense>
   )
 }
