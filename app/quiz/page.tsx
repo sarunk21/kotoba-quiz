@@ -13,6 +13,7 @@ import { pushToCloud } from '@/lib/cloud'
 import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish, speakJapanese } from '@/lib/sounds'
 import { SPECIALIZED_DATA } from '@/lib/specialized'
 import { getWordJLPTLevel } from '@/lib/jlpt'
+import { rescheduleDailyReminderIfNeeded } from '@/lib/notifications'
 
 type Phase = 'loading' | 'question' | 'feedback' | 'result'
 
@@ -218,6 +219,7 @@ function QuizContent() {
       saveSRS(srsRef.current)
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered, srsStore: srsRef.current }
       updateAfterSession(fs.correct, fs.total)
+      rescheduleDailyReminderIfNeeded()
       
       const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
       if (isAuto) pushToCloud() // sync ke drive (Background sync biar ga stuck)

@@ -39,6 +39,25 @@ export default function AppInitializer() {
             window.history.back()
           }
         })
+
+        // Reschedule daily reminder on start
+        import('@/lib/notifications').then(({ rescheduleDailyReminderIfNeeded }) => {
+          rescheduleDailyReminderIfNeeded()
+        }).catch(err => {
+          console.error('Failed to load notifications module in AppInitializer start:', err)
+        })
+
+        // Listen for app coming to foreground (resume) to update reminder
+        await App.addListener('appStateChange', ({ isActive }) => {
+          if (!active) return
+          if (isActive) {
+            import('@/lib/notifications').then(({ rescheduleDailyReminderIfNeeded }) => {
+              rescheduleDailyReminderIfNeeded()
+            }).catch(err => {
+              console.error('Failed to load notifications module in AppInitializer appStateChange:', err)
+            })
+          }
+        })
       } catch (e) {
         console.error('[Capacitor App Listener Error]', e)
       }

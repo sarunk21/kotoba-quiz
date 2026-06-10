@@ -12,6 +12,7 @@ import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playFinish, s
 
 import { updateAfterSession } from '@/lib/stats'
 import { pushToCloud } from '@/lib/cloud'
+import { rescheduleDailyReminderIfNeeded } from '@/lib/notifications'
 
 type Phase = 'question' | 'feedback' | 'result'
 type QuizMode = 'kana→romaji' | 'romaji→kana'
@@ -108,6 +109,7 @@ function QuizContent() {
       const fs = { correct: state.sessionCorrect, total: state.sessionAnswered }
       setFinalStats(fs)
       updateAfterSession(fs.correct, fs.total)
+      rescheduleDailyReminderIfNeeded()
       
       const isAuto = localStorage.getItem('kotoba_sync_mode') !== 'manual'
       if (isAuto) pushToCloud() // sync ke drive (Background sync biar ga stuck)

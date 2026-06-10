@@ -9,7 +9,7 @@ import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
 import { parseCSVToVocab, type VocabItem, setGlobalVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
 import { pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
-import { checkNotificationNeeds, showLocalNotification } from '@/lib/notifications'
+import { checkNotificationNeeds, showLocalNotification, rescheduleDailyReminderIfNeeded } from '@/lib/notifications'
 import BottomNav from '@/components/BottomNav'
 import { speakJapanese } from '@/lib/sounds'
 
@@ -257,6 +257,7 @@ export default function Home() {
       setStats(loadStats())
       setVocab(loadLocalVocab())
       setSyncStatus('ok')
+      rescheduleDailyReminderIfNeeded()
     } else {
       setSyncStatus('error')
     }

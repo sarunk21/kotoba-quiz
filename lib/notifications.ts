@@ -133,8 +133,13 @@ export async function scheduleDailyReminder(hour: number = 20, minute: number = 
     const target = new Date()
     target.setHours(hour, minute, 0, 0)
     
-    // Jika waktu yang dipilih sudah lewat untuk hari ini, jadwalkan mulai besok
-    if (target <= now) {
+    // Check if user has already played today
+    const stats = loadStats()
+    const today = getLocalDateString()
+    const alreadyPlayedToday = stats.lastPlayedDate === today
+
+    // Jika waktu yang dipilih sudah lewat untuk hari ini ATAU user sudah bermain hari ini, jadwalkan mulai besok
+    if (target <= now || alreadyPlayedToday) {
       target.setDate(target.getDate() + 1)
     }
 
@@ -167,6 +172,27 @@ export async function cancelDailyReminder() {
     console.log('Daily native reminder cancelled successfully.')
   } catch (e) {
     console.error('Failed to cancel native reminder:', e)
+  }
+}
+
+export async function rescheduleDailyReminderIfNeeded() {
+  if (typeof window === 'undefined' || !Capacitor.isNativePlatform()) return
+
+  try {
+    const isEnabled = localStorage.getItem('kotoba_reminder_enabled') !== 'false'
+    if (!isEnabled) {
+      await cancelDailyReminder()
+      return
+    }
+
+    const permissionStatus = await checkNotificationPermission()
+    if (permissionStatus !== 'granted') return
+
+    const savedTime = localStorage.getItem('kotoba_reminder_time') || '20:00'
+    const [h, m] = savedTime.split(':').map(Number)
+    await scheduleDailyReminder(h, m)
+  } catch (e) {
+    console.error('Failed to reschedule daily reminder:', e)
   }
 }
 
