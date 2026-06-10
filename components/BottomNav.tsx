@@ -57,6 +57,14 @@ export default function BottomNav() {
     }
   }
 
+  const togglePracticeModal = () => {
+    if (showPracticeModal) {
+      closeModal()
+    } else {
+      setShowPracticeModal(true)
+    }
+  }
+
   // Handler for link clicks to ensure we replace state (clear modal from history)
   // so going back from next page returns to a closed modal
   const handleLinkClick = () => {
@@ -87,7 +95,7 @@ export default function BottomNav() {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-4 pb-4 select-none">
+      <div className="fixed bottom-0 left-0 right-0 z-[130] flex justify-center px-4 pb-4 select-none">
         <div 
           className="w-full max-w-sm rounded-[28px] flex items-center justify-between py-2 px-3 border border-[var(--color-border)] bg-white/90 dark:bg-[#1a1d24]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)] transition-all duration-300 relative"
         >
@@ -136,10 +144,12 @@ export default function BottomNav() {
           {/* Center Float Button */}
           <div className="flex justify-center px-1 shrink-0">
             <button 
-              onClick={() => setShowPracticeModal(true)}
+              onClick={togglePracticeModal}
               className="flex items-center justify-center select-none no-underline w-14 h-14 rounded-full bg-gradient-to-tr from-[var(--color-accent)] to-[var(--color-accent-dark)] shadow-[0_6px_20px_rgba(91,94,244,0.4)] active:scale-90 transition-all -mt-8 border-4 border-white dark:border-[#1a1d24]"
             >
-              <span className="text-xl text-white">🎯</span>
+              <span className="text-xl text-white transition-all duration-300 block" style={{ transform: showPracticeModal ? 'rotate(90deg)' : 'none' }}>
+                {showPracticeModal ? '✕' : '🎯'}
+              </span>
             </button>
           </div>
 
@@ -195,7 +205,7 @@ export default function BottomNav() {
             onClick={closeModal} 
           />
           <div 
-            className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up no-scrollbar"
+            className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] pt-6 px-6 pb-24 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up no-scrollbar"
             style={{
               maxHeight: '85dvh',
               overflowY: 'auto'

@@ -106,8 +106,14 @@ function QuizContent() {
   const [cardKey, setCardKey] = useState(0)
   const [finalStats, setFinalStats] = useState<{ correct: number; total: number; srsStore: SRSStore } | null>(null)
   const [showHint, setShowHint] = useState(false)
+  const [showFurigana, setShowFurigana] = useState(false)
   const srsRef = useRef<SRSStore>({})
   const initialized = useRef(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kotoba_show_furigana')
+    setShowFurigana(saved !== 'false') // default to true
+  }, [])
 
   const startQuiz = useCallback((v: VocabItem[], store: SRSStore, fullPool?: VocabItem[]) => {
     const { dueIds, newIds, refreshIds } = buildQueue(v.map(i => i.id), store, TOTAL_QUESTIONS)
@@ -326,6 +332,25 @@ function QuizContent() {
           
           {/* Pronunciation buttons */}
           <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+            {/* Furigana Toggle */}
+            {sub && (
+              <button 
+                onClick={() => {
+                  const newVal = !showFurigana
+                  setShowFurigana(newVal)
+                  localStorage.setItem('kotoba_show_furigana', String(newVal))
+                  playTap()
+                }}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-xs active:scale-95 transition-all border ${
+                  showFurigana 
+                    ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
+                    : 'bg-[var(--color-bg)] text-[var(--color-text-3)] border-[var(--color-border)]'
+                }`}
+                title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
+              >
+                あ
+              </button>
+            )}
             {/* Turtle (Slow-mo) */}
             <button onClick={() => speakJapanese(q.hiragana || q.kanji, true)}
               className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-sm border border-[var(--color-border)]"
@@ -343,7 +368,7 @@ function QuizContent() {
 
           
           <div className="min-h-[20px] mb-2 flex justify-center">
-            {sub && (isKanjiMode ? (
+            {sub && !showFurigana && (isKanjiMode ? (
               showHint ? (
                 <p className="relative jp text-xs anim-pop" style={{ color: 'var(--color-text-3)', letterSpacing: '0.1em' }}>{sub}</p>
               ) : (
@@ -361,7 +386,16 @@ function QuizContent() {
             fontSize: main.length > 6 ? '2.2rem' : main.length > 3 ? '2.8rem' : '3.5rem',
             fontWeight: 700, color: 'var(--color-text-1)', lineHeight: 1.2,
           }}>
-            {main}
+            {sub && showFurigana ? (
+              <ruby className="ruby-text">
+                {main}
+                <rt className="font-semibold text-[var(--color-text-3)] dark:text-gray-400 select-none tracking-normal opacity-85 block pb-1" style={{ fontSize: '0.38em' }}>
+                  {sub}
+                </rt>
+              </ruby>
+            ) : (
+              main
+            )}
           </p>
           {/* Level dot */}
           <div className="relative mt-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
