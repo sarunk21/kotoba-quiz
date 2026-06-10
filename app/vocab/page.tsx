@@ -86,6 +86,15 @@ export default function VocabPage() {
 
   const silentSyncFromSheets = async (url: string) => {
     try {
+      // Throttle: check if last sync was less than 1 hour ago
+      const THROTTLE_TIME = 1000 * 60 * 60 // 1 hour
+      const lastSync = localStorage.getItem('kotoba_sheets_sync_timestamp')
+      const now = Date.now()
+      if (lastSync && now - parseInt(lastSync, 10) < THROTTLE_TIME) {
+        console.log('[Sheets] Skipping silent sync, last sync was less than 1 hour ago.')
+        return
+      }
+
       const t = Date.now()
       const res = await fetch(`/api/sheets?url=${encodeURIComponent(url.trim())}&t=${t}`)
       if (!res.ok) return
@@ -108,6 +117,9 @@ export default function VocabPage() {
         }
         return localItem
       })
+
+      // Update timestamp on successful fetch
+      localStorage.setItem('kotoba_sheets_sync_timestamp', now.toString())
 
       if (newItems.length > 0 || hasChanges) {
         const updatedList = [...newItems, ...updatedLocalVocab]
@@ -145,6 +157,9 @@ export default function VocabPage() {
         alert('Gagal mengambil data: Format Google Sheets salah.')
         return
       }
+
+      // Update timestamp on successful fetch
+      localStorage.setItem('kotoba_sheets_sync_timestamp', Date.now().toString())
       
       const existingIds = new Set(vocabList.map(v => v.id))
       const newItems = parsed.filter(item => !existingIds.has(item.id))

@@ -135,27 +135,65 @@ export function playLoseHeart() {
   o.start(t); o.stop(t + 0.22)
 }
 
-/** Speak Japanese text using Web Speech API */
+/** Speak Japanese text using Web Speech API with caching */
 export function speakJapanese(text: string, slow = false) {
   if (typeof window === 'undefined') return
-  
-  // Gunakan Youdao Japanese TTS API (le=jap) karena tidak memblokir WebView mobile
-  if (navigator.onLine) {
-    try {
-      const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=jap`
-      const audio = new Audio(url)
-      audio.playbackRate = slow ? 0.65 : 0.95
-      audio.play().catch(e => {
-        console.warn('Youdao TTS failed, falling back to local speech synthesis:', e)
-        speakLocal(text, slow)
-      })
-      return
-    } catch (e) {
-      console.warn('Youdao TTS error, falling back to local:', e)
-    }
-  }
 
-  speakLocal(text, slow)
+  // Run async code in IIFE to keep the outer signature synchronous
+  ;(async () => {
+    const localProxyUrl = `/api/audio?text=${encodeURIComponent(text)}`
+    
+    // 1. Try to find audio in Cache Storage
+    try {
+      if ('caches' in window) {
+        const cache = await caches.open('kotoba-audio-cache')
+        const cachedResponse = await cache.match(localProxyUrl)
+        if (cachedResponse) {
+          const blob = await cachedResponse.blob()
+          const blobUrl = URL.createObjectURL(blob)
+          const audio = new Audio(blobUrl)
+          audio.playbackRate = slow ? 0.65 : 0.95
+          audio.onended = () => URL.revokeObjectURL(blobUrl)
+          audio.onerror = () => URL.revokeObjectURL(blobUrl)
+          await audio.play()
+          return
+        }
+      }
+    } catch (e) {
+      console.warn('[Audio Cache] Failed to load from cache:', e)
+    }
+
+    // 2. Fetch via proxy and save to cache if online
+    if (navigator.onLine) {
+      try {
+        const res = await fetch(localProxyUrl)
+        if (res.ok) {
+          const resClone = res.clone()
+          
+          // Play audio first
+          const blob = await res.blob()
+          const blobUrl = URL.createObjectURL(blob)
+          const audio = new Audio(blobUrl)
+          audio.playbackRate = slow ? 0.65 : 0.95
+          audio.onended = () => URL.revokeObjectURL(blobUrl)
+          audio.onerror = () => URL.revokeObjectURL(blobUrl)
+          await audio.play()
+
+          // Store in cache asynchronously
+          if ('caches' in window) {
+            const cache = await caches.open('kotoba-audio-cache')
+            await cache.put(localProxyUrl, resClone)
+          }
+          return
+        }
+      } catch (e) {
+        console.warn('[Audio Cache] Fetch via proxy failed, falling back to local TTS:', e)
+      }
+    }
+
+    // 3. Fallback if offline & uncached, or if fetch failed
+    speakLocal(text, slow)
+  })()
 }
 
 function speakLocal(text: string, slow: boolean) {
