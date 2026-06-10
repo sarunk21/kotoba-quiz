@@ -1,6 +1,19 @@
 'use client'
 
 let ctx: AudioContext | null = null
+let currentAudio: HTMLAudioElement | null = null
+
+function stopCurrentAudio() {
+  if (currentAudio) {
+    try {
+      currentAudio.pause()
+    } catch (e) {}
+    currentAudio = null
+  }
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    window.speechSynthesis.cancel()
+  }
+}
 
 function getCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
@@ -139,9 +152,33 @@ export function playLoseHeart() {
 export function speakJapanese(text: string, slow = false) {
   if (typeof window === 'undefined') return
 
+  // Stop any currently playing audio or speech synthesis
+  stopCurrentAudio()
+
   // Run async code in IIFE to keep the outer signature synchronous
   ;(async () => {
     const localProxyUrl = `/api/audio?text=${encodeURIComponent(text)}`
+    
+    // Helper to setup and play HTMLAudioElement
+    const playAudioElement = async (blob: Blob) => {
+      const blobUrl = URL.createObjectURL(blob)
+      const audio = new Audio(blobUrl)
+      currentAudio = audio
+      audio.playbackRate = slow ? 0.65 : 0.95
+      audio.onended = () => {
+        URL.revokeObjectURL(blobUrl)
+        if (currentAudio === audio) {
+          currentAudio = null
+        }
+      }
+      audio.onerror = () => {
+        URL.revokeObjectURL(blobUrl)
+        if (currentAudio === audio) {
+          currentAudio = null
+        }
+      }
+      await audio.play()
+    }
     
     // 1. Try to find audio in Cache Storage
     try {
@@ -150,12 +187,7 @@ export function speakJapanese(text: string, slow = false) {
         const cachedResponse = await cache.match(localProxyUrl)
         if (cachedResponse) {
           const blob = await cachedResponse.blob()
-          const blobUrl = URL.createObjectURL(blob)
-          const audio = new Audio(blobUrl)
-          audio.playbackRate = slow ? 0.65 : 0.95
-          audio.onended = () => URL.revokeObjectURL(blobUrl)
-          audio.onerror = () => URL.revokeObjectURL(blobUrl)
-          await audio.play()
+          await playAudioElement(blob)
           return
         }
       }
@@ -172,12 +204,7 @@ export function speakJapanese(text: string, slow = false) {
           
           // Play audio first
           const blob = await res.blob()
-          const blobUrl = URL.createObjectURL(blob)
-          const audio = new Audio(blobUrl)
-          audio.playbackRate = slow ? 0.65 : 0.95
-          audio.onended = () => URL.revokeObjectURL(blobUrl)
-          audio.onerror = () => URL.revokeObjectURL(blobUrl)
-          await audio.play()
+          await playAudioElement(blob)
 
           // Store in cache asynchronously
           if ('caches' in window) {
