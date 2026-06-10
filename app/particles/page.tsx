@@ -5,6 +5,50 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
 
+function generateQuestions(particle: string): ParticleQuestion[] {
+  if (particle === 'all') {
+    return [...PARTICLE_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10)
+  }
+
+  let targetPool: ParticleQuestion[] = []
+  let distractorPool: ParticleQuestion[] = []
+
+  if (particle === 'lainnya') {
+    const lainnyaList = ['へ', 'と', 'も', 'から', 'まで']
+    targetPool = PARTICLE_QUESTIONS.filter(q => {
+      return lainnyaList.some(p => q.correct.includes(p))
+    })
+    distractorPool = PARTICLE_QUESTIONS.filter(q => {
+      const isTarget = lainnyaList.some(p => q.correct.includes(p))
+      const hasOption = lainnyaList.some(p => q.options.includes(p))
+      return !isTarget && hasOption
+    })
+  } else {
+    targetPool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(particle))
+    distractorPool = PARTICLE_QUESTIONS.filter(q => !q.correct.includes(particle) && q.options.includes(particle))
+  }
+
+  const shuffledTargets = [...targetPool].sort(() => Math.random() - 0.5)
+  const shuffledDistractors = [...distractorPool].sort(() => Math.random() - 0.5)
+
+  // Aim for a mix: up to 5 target questions, and the rest distractors to make 10 total
+  const targetCount = Math.min(5, shuffledTargets.length)
+  const distractorCount = Math.min(10 - targetCount, shuffledDistractors.length)
+
+  const selectedTargets = shuffledTargets.slice(0, targetCount)
+  const selectedDistractors = shuffledDistractors.slice(0, distractorCount)
+
+  let combined = [...selectedTargets, ...selectedDistractors]
+  if (combined.length < 10) {
+    const remainingTargets = shuffledTargets.slice(targetCount)
+    const needed = 10 - combined.length
+    combined = [...combined, ...remainingTargets.slice(0, needed)]
+  }
+
+  // Shuffle final list so they are mixed in order
+  return combined.sort(() => Math.random() - 0.5)
+}
+
 function ParticlesQuizContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -16,19 +60,8 @@ function ParticlesQuizContent() {
   // Initialize and sync quiz when query parameter 'p' changes
   useEffect(() => {
     if (pParam) {
-      let pool = PARTICLE_QUESTIONS
-      if (pParam !== 'all') {
-        if (pParam === 'lainnya') {
-          pool = PARTICLE_QUESTIONS.filter(q => {
-            const p = q.correct
-            return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
-          })
-        } else {
-          pool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(pParam))
-        }
-      }
-      const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10)
-      setQuestions(shuffled)
+      const selectedPool = generateQuestions(pParam)
+      setQuestions(selectedPool)
       setSelectedParticle(pParam)
       setCurrentIndex(0)
       setSelectedOption(null)
@@ -99,27 +132,18 @@ function ParticlesQuizContent() {
   }
 
   const handleRestart = () => {
-    playTap()
-    let pool = PARTICLE_QUESTIONS
-    if (selectedParticle !== 'all' && selectedParticle !== null) {
-      if (selectedParticle === 'lainnya') {
-        pool = PARTICLE_QUESTIONS.filter(q => {
-          const p = q.correct
-          return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
-        })
-      } else {
-        pool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(selectedParticle))
-      }
+    if (selectedParticle) {
+      playTap()
+      const selectedPool = generateQuestions(selectedParticle)
+      setQuestions(selectedPool)
+      setCurrentIndex(0)
+      setSelectedOption(null)
+      setIsChecked(false)
+      setLives(3)
+      setScore(0)
+      setIsGameOver(false)
+      setIsFinished(false)
     }
-    const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10)
-    setQuestions(shuffled)
-    setCurrentIndex(0)
-    setSelectedOption(null)
-    setIsChecked(false)
-    setLives(3)
-    setScore(0)
-    setIsGameOver(false)
-    setIsFinished(false)
   }
 
   const startQuizWithParticle = (part: string) => {
@@ -352,7 +376,7 @@ function ParticlesQuizContent() {
             {/* Question Card */}
             <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-6 text-center">
               <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-3 block">
-                PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS ${selectedParticle?.toUpperCase()}`})
+                PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS MEMBEDAKAN ${selectedParticle?.toUpperCase()}`})
               </span>
               <h2 className="text-2xl font-black jp tracking-wide leading-relaxed text-[var(--color-text-1)] mb-4 select-text">
                 {isChecked 
