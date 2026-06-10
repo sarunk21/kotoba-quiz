@@ -330,8 +330,8 @@ function QuizContent() {
             background: `radial-gradient(ellipse at 50% 0%, ${cat.bg} 0%, transparent 60%)`,
           }} />
           
-          {/* Pronunciation buttons */}
-          <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+          {/* Card Header Actions */}
+          <div className="flex justify-end items-center gap-1.5 mb-2 relative z-10">
             {/* Furigana Toggle */}
             {sub && (
               <button 
@@ -341,7 +341,7 @@ function QuizContent() {
                   localStorage.setItem('kotoba_show_furigana', String(newVal))
                   playTap()
                 }}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-xs active:scale-95 transition-all border ${
+                className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-[11px] active:scale-95 transition-all border ${
                   showFurigana 
                     ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
                     : 'bg-[var(--color-bg)] text-[var(--color-text-3)] border-[var(--color-border)]'
@@ -353,15 +353,15 @@ function QuizContent() {
             )}
             {/* Turtle (Slow-mo) */}
             <button onClick={() => speakJapanese(q.hiragana || q.kanji, true)}
-              className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-sm border border-[var(--color-border)]"
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-xs border border-[var(--color-border)]"
               title="Pelafalan Lambat (Slow-mo)">
               🐢
             </button>
             {/* Normal */}
             <button onClick={() => speakJapanese(q.hiragana || q.kanji, false)}
-              className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)]"
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)]"
               title="Pelafalan Normal">
-              <VolumeIcon size={16} />
+              <VolumeIcon size={14} />
             </button>
           </div>
 
@@ -389,7 +389,7 @@ function QuizContent() {
             {sub && showFurigana ? (
               <ruby className="ruby-text">
                 {main}
-                <rt className="font-semibold text-[var(--color-text-3)] dark:text-gray-400 select-none tracking-normal opacity-85 block pb-1" style={{ fontSize: '0.38em' }}>
+                <rt className="font-semibold text-[var(--color-text-3)] dark:text-gray-400 select-none tracking-normal opacity-85" style={{ fontSize: '0.38em' }}>
                   {sub}
                 </rt>
               </ruby>
