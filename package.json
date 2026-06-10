@@ -1,6 +1,6 @@
 {
   "name": "kotoba-quiz",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@auth/core": "^0.41.2",
+    "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.4.0",
     "@capacitor/local-notifications": "^8.2.0",
     "@capawesome/capacitor-google-sign-in": "^0.1.2",

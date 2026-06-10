@@ -8,11 +8,11 @@ import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/li
 export default function ParticlesQuizPage() {
   const router = useRouter()
 
+  // Selection state (null = show particle category selector screen)
+  const [selectedParticle, setSelectedParticle] = useState<string | null>(null)
+
   // Game States
-  // Shuffle questions on mount
-  const [questions, setQuestions] = useState<ParticleQuestion[]>(() => {
-    return [...PARTICLE_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10)
-  })
+  const [questions, setQuestions] = useState<ParticleQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [isChecked, setIsChecked] = useState(false)
@@ -69,7 +69,18 @@ export default function ParticlesQuizPage() {
 
   const handleRestart = () => {
     playTap()
-    const shuffled = [...PARTICLE_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10)
+    let pool = PARTICLE_QUESTIONS
+    if (selectedParticle !== 'all' && selectedParticle !== null) {
+      if (selectedParticle === 'lainnya') {
+        pool = PARTICLE_QUESTIONS.filter(q => {
+          const p = q.correct
+          return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
+        })
+      } else {
+        pool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(selectedParticle))
+      }
+    }
+    const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10)
     setQuestions(shuffled)
     setCurrentIndex(0)
     setSelectedOption(null)
@@ -80,10 +91,129 @@ export default function ParticlesQuizPage() {
     setIsFinished(false)
   }
 
-  if (questions.length === 0 || !currentQuestion) {
+  const startQuizWithParticle = (part: string) => {
+    playTap()
+    let pool = PARTICLE_QUESTIONS
+    if (part !== 'all') {
+      if (part === 'lainnya') {
+        pool = PARTICLE_QUESTIONS.filter(q => {
+          const p = q.correct
+          return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
+        })
+      } else {
+        pool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(part))
+      }
+    }
+    const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10)
+    setQuestions(shuffled)
+    setSelectedParticle(part)
+    setCurrentIndex(0)
+    setSelectedOption(null)
+    setIsChecked(false)
+    setLives(3)
+    setScore(0)
+    setIsGameOver(false)
+    setIsFinished(false)
+  }
+
+  // Render Selection Screen
+  if (selectedParticle === null) {
+    const particleCounts = {
+      all: PARTICLE_QUESTIONS.length,
+      'は': PARTICLE_QUESTIONS.filter(q => q.correct.includes('は')).length,
+      'が': PARTICLE_QUESTIONS.filter(q => q.correct.includes('が')).length,
+      'を': PARTICLE_QUESTIONS.filter(q => q.correct.includes('を')).length,
+      'に': PARTICLE_QUESTIONS.filter(q => q.correct.includes('に')).length,
+      'で': PARTICLE_QUESTIONS.filter(q => q.correct.includes('で')).length,
+      'の': PARTICLE_QUESTIONS.filter(q => q.correct.includes('の')).length,
+      'lainnya': PARTICLE_QUESTIONS.filter(q => {
+        const p = q.correct
+        return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
+      }).length
+    }
+
     return (
-      <div className="min-h-dvh flex items-center justify-center" style={{ background: 'var(--color-bg)' }}>
-        <p className="text-sm font-bold text-[var(--color-text-2)]">Memuat latihan...</p>
+      <div className="min-h-dvh flex flex-col justify-between" style={{ background: 'var(--color-bg)' }}>
+        <div className="max-w-sm mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
+          {/* Top Header */}
+          <header className="flex items-center gap-4 mb-8 anim-up">
+            <button 
+              onClick={() => router.push('/')}
+              className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform shrink-0"
+            >
+              ←
+            </button>
+            <div>
+              <h1 className="text-lg font-black text-[var(--color-text-1)] leading-tight">Latihan Partikel</h1>
+              <p className="text-xs font-semibold text-[var(--color-text-2)]">Pilih fokus partikel yang ingin kamu latih</p>
+            </div>
+          </header>
+
+          <div className="space-y-4 my-auto">
+            {/* Campur Semua */}
+            <button 
+              onClick={() => startQuizWithParticle('all')}
+              className="w-full text-left bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-dark)] text-white rounded-[24px] p-5 shadow-[0_8px_24px_rgba(91,94,244,0.25)] border-none active:scale-[0.98] transition-transform cursor-pointer"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-black">⚡ Campur Semua</h3>
+                  <p className="text-[10px] opacity-85 font-bold mt-1">Latihan gabungan dari seluruh partikel ({particleCounts.all} soal)</p>
+                </div>
+                <span className="text-2xl">🎯</span>
+              </div>
+            </button>
+
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { key: 'は', title: 'Topik (は)', desc: 'Penunjuk Topik utama', icon: 'は', bg: 'bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/40' },
+                { key: 'が', title: 'Subjek (が)', desc: 'Penunjuk Pelaku/Eksistensi', icon: 'が', bg: 'bg-cyan-50 dark:bg-cyan-950/20 text-cyan-600 dark:text-cyan-400 border-cyan-100 dark:border-cyan-900/40' },
+                { key: 'を', title: 'Objek (を)', desc: 'Penunjuk Target tindakan', icon: 'を', bg: 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-900/40' },
+                { key: 'に', title: 'Koordinat (に)', desc: 'Waktu spesifik / Tempat diam', icon: 'に', bg: 'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-500 border-amber-100 dark:border-amber-900/40' },
+                { key: 'で', title: 'Aktivitas (で)', desc: 'Latar aksi / Alat bantu', icon: 'で', bg: 'bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-900/40' },
+                { key: 'の', title: 'Kepunyaan (の)', desc: 'Lem perekat Kata Benda', icon: 'の', bg: 'bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/40' }
+              ].map(p => (
+                <button
+                  key={p.key}
+                  onClick={() => startQuizWithParticle(p.key)}
+                  className="rounded-[24px] p-4 text-left border flex flex-col justify-between h-32 active:scale-95 transition-transform cursor-pointer bg-white dark:bg-[#1a1d24] border-[var(--color-border)] shadow-sm"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black jp text-base ${p.bg}`}>
+                      {p.icon}
+                    </span>
+                    <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)] border border-[var(--color-border)]">
+                      {(particleCounts as any)[p.key]} soal
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-[var(--color-text-1)] mt-2">{p.title}</h4>
+                    <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-tight">{p.desc}</p>
+                  </div>
+                </button>
+              ))}
+
+              {/* Lainnya */}
+              <button
+                onClick={() => startQuizWithParticle('lainnya')}
+                className="col-span-2 rounded-[24px] p-4 text-left border flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer bg-white dark:bg-[#1a1d24] border-[var(--color-border)] shadow-sm"
+              >
+                <div className="flex items-center gap-3.5">
+                  <span className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg bg-gray-100 dark:bg-gray-800 text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0">
+                    🔗
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-black text-[var(--color-text-1)]">Partikel Lainnya (へ, と, も, から, まで)</h4>
+                    <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-tight">Menyatakan arah, penyerta, kesamaan, awal/akhir</p>
+                  </div>
+                </div>
+                <span className="text-[9px] font-black px-2.5 py-1 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0">
+                  {particleCounts.lainnya} soal
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -96,7 +226,10 @@ export default function ParticlesQuizPage() {
         {/* Top Header */}
         <header className="flex items-center justify-between gap-4 mb-8 anim-up">
           <button 
-            onClick={() => router.push('/')}
+            onClick={() => {
+              playTap()
+              setSelectedParticle(null) // Return to selection screen
+            }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform"
           >
             ←
@@ -143,10 +276,10 @@ export default function ParticlesQuizPage() {
                 Pelajari Panduan Partikel 📖
               </button>
               <button 
-                onClick={() => router.push('/')}
+                onClick={() => setSelectedParticle(null)}
                 className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
               >
-                Kembali ke Beranda
+                Pilih Partikel Lain
               </button>
             </div>
           </div>
@@ -163,11 +296,11 @@ export default function ParticlesQuizPage() {
             <div className="grid grid-cols-2 gap-4 w-full mb-8">
               <div className="rounded-2xl p-4 bg-[var(--color-accent-light)] border border-[var(--color-border)]">
                 <p className="text-xs font-bold text-[var(--color-text-2)]">Benar</p>
-                <p className="text-2xl font-black text-[var(--color-accent)] mt-1">{score} / 10</p>
+                <p className="text-2xl font-black text-[var(--color-accent)] mt-1">{score} / {questions.length}</p>
               </div>
               <div className="rounded-2xl p-4 bg-green-50 dark:bg-green-950/20 border border-[var(--color-border)]">
                 <p className="text-xs font-bold text-[var(--color-text-2)]">Akurasi</p>
-                <p className="text-2xl font-black text-green-500 mt-1">{Math.round((score / 10) * 100)}%</p>
+                <p className="text-2xl font-black text-green-500 mt-1">{Math.round((score / questions.length) * 100)}%</p>
               </div>
             </div>
 
@@ -185,10 +318,10 @@ export default function ParticlesQuizPage() {
                 Tinjau Panduan Partikel 📖
               </button>
               <button 
-                onClick={() => router.push('/')}
+                onClick={() => setSelectedParticle(null)}
                 className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
               >
-                Kembali ke Beranda
+                Pilih Partikel Lain
               </button>
             </div>
           </div>
@@ -208,7 +341,7 @@ export default function ParticlesQuizPage() {
             {/* Question Card */}
             <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-6 text-center">
               <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-3 block">
-                PILIH PARTIKEL YANG TEPAT
+                PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS ${selectedParticle?.toUpperCase()}`})
               </span>
               <h2 className="text-2xl font-black jp tracking-wide leading-relaxed text-[var(--color-text-1)] mb-4 select-text">
                 {isChecked 

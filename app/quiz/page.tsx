@@ -12,6 +12,7 @@ import {
 import { pushToCloud } from '@/lib/cloud'
 import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish, speakJapanese } from '@/lib/sounds'
 import { SPECIALIZED_DATA } from '@/lib/specialized'
+import { getWordJLPTLevel } from '@/lib/jlpt'
 
 type Phase = 'loading' | 'question' | 'feedback' | 'result'
 
@@ -91,6 +92,7 @@ function QuizContent() {
   const mode = searchParams.get('mode')
   const type = searchParams.get('type')
   const chapter = searchParams.get('chapter')
+  const level = searchParams.get('level')
   const isKanjiMode = mode === 'kanji'
   const isSpecialMode = mode === 'special'
 
@@ -154,6 +156,9 @@ function QuizContent() {
         if (chapter) {
           filtered = pool.filter(item => item.chapter === chapter)
         }
+        if (level) {
+          filtered = filtered.filter(item => getWordJLPTLevel(item.kanji, item.chapter) === level)
+        }
 
         if (filtered.length > 0) {
           setVocab(pool)
@@ -168,7 +173,7 @@ function QuizContent() {
       }
     }
     init()
-  }, [isKanjiMode, isSpecialMode, type, chapter, startQuiz])
+  }, [isKanjiMode, isSpecialMode, type, chapter, level, startQuiz])
 
   // Auto-play pronunciation when a new question loads
   useEffect(() => {
@@ -277,7 +282,9 @@ function QuizContent() {
           <div className="flex items-center gap-2">
             {isKanjiMode && (
               <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg uppercase tracking-wider"
-                style={{ background: 'var(--color-accent)', color: '#fff' }}>Kanji Mode</span>
+                style={{ background: 'var(--color-accent)', color: '#fff' }}>
+                {level ? `Kanji JLPT ${level}` : 'Kanji Mode'}
+              </span>
             )}
             {isSpecialMode && (
               <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg uppercase tracking-wider"

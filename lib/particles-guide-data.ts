@@ -19,23 +19,23 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'wa',
     particle: 'は',
     romaji: 'wa',
-    title: 'Penanda Topik (Topic Marker)',
-    summary: 'Menandai topik pembicaraan utama dalam kalimat.',
-    description: 'Partikel は (ditulis sebagai "ha" tetapi dibaca "wa") digunakan untuk menunjukkan topik utama dari kalimat. Topik adalah sesuatu yang sudah diketahui oleh pembicara dan pendengar, atau sesuatu yang ingin diangkat sebagai pokok bahasan utama.',
+    title: 'Sorotan Lampu Panggung (Topik Utama)',
+    summary: 'Menandai topik utama pembicaraan.',
+    description: '💡 ANALOGI: Sorotan Lampu Panggung (Spotlight). Bayangkan panggung gelap, lalu lampu menyorot ke satu orang. Orang itu adalah topik utama pembicaraan. Apa pun penjelasan di belakang partikel は adalah cerita atau "gosip" tentang orang tersebut.',
     usages: [
       {
         title: 'Menyatakan Identitas / Status',
         exampleJp: '私は学生です。',
         exampleRomaji: 'Watashi wa gakusei desu.',
         exampleId: 'Saya adalah siswa.',
-        note: 'Menjadikan "saya" (私) sebagai topik utama dan memberikan informasi bahwa topik tersebut adalah siswa.'
+        note: 'Menyorot "saya" (私) di panggung, lalu memberi gosip bahwa saya adalah siswa (学生).'
       },
       {
-        title: 'Menyatakan Topik yang Kontras (Perbandingan)',
-        exampleJp: 'お酒は飲みますが, ビールは飲みません。',
+        title: 'Menyatakan Hal yang Kontras (Perbandingan)',
+        exampleJp: 'お酒は飲みますが、ビールは飲みません。',
         exampleRomaji: 'Osake wa nomimasu ga, biiru wa nomimasen.',
-        exampleId: 'Kalau sake saya minum, tetapi kalau bir saya tidak minum.',
-        note: 'Partikel "wa" di sini menekankan perbandingan yang kontras antara sake dan bir.'
+        exampleId: 'Sake saya minum, tapi kalau bir saya tidak minum.',
+        note: 'Menyoroti kontras: sake disorot lampu (diminum), bir disorot lampu (tidak diminum).'
       }
     ]
   },
@@ -43,30 +43,30 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'ga',
     particle: 'が',
     romaji: 'ga',
-    title: 'Penanda Subjek (Subject Marker)',
-    summary: 'Menandai subjek aktif pelaku tindakan atau keberadaan.',
-    description: 'Partikel が (ga) digunakan untuk menandai subjek dalam kalimat. Berbeda dengan は yang fokus pada informasi di belakangnya, が menekankan pada subjek itu sendiri sebagai pelaku dari kata kerja atau kata sifat, atau untuk menyampaikan informasi yang baru pertama kali didengar.',
+    title: 'Tunjuk Jari / Lampu Kilat (Subjek Fokus)',
+    summary: 'Menunjuk pelaku spesifik atau keberadaan benda.',
+    description: '💡 ANALOGI: Tunjuk Jari (Finger Pointing). Berbeda dengan spotlight は yang santai menjelaskan topik, partikel が seperti telunjuk yang mengarah langsung ke pelaku secara spesifik ("SAYALAH orangnya, bukan orang lain!"). Juga dipakai untuk benda yang tiba-tiba tertangkap mata (keberadaan/keadaan alam).',
     usages: [
       {
-        title: 'Keberadaan Benda / Makhluk Hidup',
+        title: 'Menyatakan Keberadaan Benda / Makhluk Hidup',
         exampleJp: 'あそこに猫がいます。',
         exampleRomaji: 'Asoko ni neko ga imasu.',
         exampleId: 'Di sana ada kucing.',
-        note: 'Menandai "kucing" (猫) sebagai subjek yang ada (います).'
+        note: 'Menunjuk "kucing" (猫) sebagai subjek yang eksis/ada di sana.'
       },
       {
-        title: 'Menekankan Pelaku Spesifik (Fokus Subjek)',
-        exampleJp: '私がやります。',
+        title: 'Menunjuk Pelaku Spesifik (Fokus Subjek)',
+        exampleJp: '私が ya ります。',
         exampleRomaji: 'Watashi ga yarimasu.',
         exampleId: 'Sayalah yang akan melakukannya.',
-        note: 'Menekankan bahwa "saya" (bukan orang lain) yang akan melakukan tindakan tersebut.'
+        note: 'Menunjuk hidung sendiri: "Saya (bukan orang lain) yang akan mengerjakan!"'
       },
       {
-        title: 'Menyatakan Keadaan Alam / Sensoris',
+        title: 'Menyatakan Keadaan Alam / Sensoris Tubuh',
         exampleJp: '雨が降っています。',
         exampleRomaji: 'Ame ga futte imasu.',
         exampleId: 'Hujan sedang turun.',
-        note: 'Menyatakan fenomena alam yang sedang terjadi secara objektif.'
+        note: 'Menyatakan fenomena alam yang tertangkap mata secara langsung.'
       }
     ]
   },
@@ -74,23 +74,23 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'o',
     particle: 'を',
     romaji: 'o',
-    title: 'Penanda Objek Langsung (Direct Object Marker)',
-    summary: 'Menandai objek langsung yang menerima tindakan kata kerja.',
-    description: 'Partikel を (ditulis "wo" tetapi dibaca "o") digunakan untuk menandai objek langsung dari suatu tindakan (kata kerja transitif). Objek langsung adalah benda atau orang yang dikenai pekerjaan secara langsung.',
+    title: 'Sasaran Tembak / Target Panah (Objek)',
+    summary: 'Menandai benda yang terkena tindakan.',
+    description: '💡 ANALOGI: Sasaran Tembak (Bullseye). Bayangkan kata kerja (makan, minum, baca) adalah anak panah yang dilesatkan. Benda di depan partikel を adalah papan target bundar yang tertusuk anak panah tersebut.',
     usages: [
       {
-        title: 'Menandai Objek Tindakan',
+        title: 'Benda yang Dikenai Tindakan',
         exampleJp: 'リンゴを食べます。',
         exampleRomaji: 'Ringo o tabemasu.',
         exampleId: 'Makan apel.',
-        note: 'Apel (リンゴ) adalah objek langsung yang dimakan.'
+        note: 'Apel (リンゴ) adalah papan target yang terkena tindakan makan (食べます).'
       },
       {
-        title: 'Titik Keberangkatan / Keluar dari Suatu Tempat',
+        title: 'Titik Keluar / Meninggalkan Tempat',
         exampleJp: '毎朝７時に家を出ます。',
         exampleRomaji: 'Maiasa shichi-ji ni ie o demasu.',
-        exampleId: 'Setiap pagi meninggalkan rumah jam 7.',
-        note: 'Menggunakan を untuk menunjukkan titik keluar dari suatu tempat (家 - rumah).'
+        exampleId: 'Meninggalkan rumah jam 7 setiap pagi.',
+        note: 'Rumah (家) menjadi target tempat yang kita lewati untuk keluar.'
       }
     ]
   },
@@ -98,30 +98,30 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'ni',
     particle: 'に',
     romaji: 'ni',
-    title: 'Penanda Waktu, Tempat, dan Arah',
-    summary: 'Menunjukkan waktu spesifik, tempat keberadaan, penerima, atau tujuan.',
-    description: 'Partikel に (ni) adalah salah satu partikel dengan fungsi terbanyak. Paling umum digunakan untuk menunjukkan waktu yang spesifik, letak keberadaan suatu benda, arah tujuan pergerakan, atau penerima suatu tindakan.',
+    title: 'Jarum Kompas / Paku Payung (Koordinat/Tujuan)',
+    summary: 'Menunjukkan titik waktu, lokasi diam, atau penerima.',
+    description: '💡 ANALOGI: Paku Payung (Pinpoint). Partikel に berfungsi seperti menancapkan paku payung merah di peta lokasi atau di lembar kalender. Menunjukkan titik koordinat yang super spesifik (jam/hari, letak benda diam, atau orang target transfer).',
     usages: [
       {
-        title: 'Menunjukkan Waktu Spesifik (Jam/Hari/Tanggal)',
+        title: 'Waktu yang Spesifik (Ada Angka/Nama Hari)',
         exampleJp: '朝６時に起きます。',
         exampleRomaji: 'Asa roku-ji ni okimasu.',
-        exampleId: 'Bangun tidur pada jam 6 pagi.',
-        note: 'Jam 6 (６時) adalah waktu spesifik sehingga diberi partikel ni.'
+        exampleId: 'Bangun jam 6 pagi.',
+        note: 'Tancap paku payung tepat di angka jam 6 (６時).'
       },
       {
-        title: 'Keberadaan Benda Mati / Hidup (Lokasi Keberadaan)',
+        title: 'Tempat Keberadaan (Benda Diam/Menetap)',
         exampleJp: '本は机の上にあります。',
         exampleRomaji: 'Hon wa tsukue no ue ni arimasu.',
         exampleId: 'Buku ada di atas meja.',
-        note: 'Menunjukkan letak keberadaan buku di atas meja (机の上).'
+        note: 'Paku payung ditancapkan di lokasi atas meja (机の上) sebagai tempat diamnya buku.'
       },
       {
-        title: 'Penerima Aksi / Sasaran Tindakan',
+        title: 'Penerima Hadiah / Sasaran Aksi',
         exampleJp: '友達に手紙を書きます。',
         exampleRomaji: 'Tomodachi ni tegami o kakimasu.',
         exampleId: 'Menulis surat kepada teman.',
-        note: 'Teman (友達) adalah penerima surat atau sasaran dari tindakan menulis.'
+        note: 'Teman (友達) adalah target paku payung tujuan surat dikirim.'
       }
     ]
   },
@@ -129,30 +129,30 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'de',
     particle: 'で',
     romaji: 'de',
-    title: 'Tempat Aksi, Alat, dan Metode',
-    summary: 'Menunjukkan tempat terjadinya aksi, alat yang digunakan, atau sebab.',
-    description: 'Partikel で (de) digunakan untuk menunjukkan tempat berlangsungnya suatu kegiatan aktif (bukan sekadar keberadaan), alat atau kendaraan yang digunakan untuk melakukan sesuatu, serta bahan pembuatan atau penyebab terjadinya suatu hal.',
+    title: 'Latar Panggung Aksi & Alat Bantu',
+    summary: 'Tempat beraktivitas, atau alat/kendaraan yang digunakan.',
+    description: '💡 ANALOGI: Latar Panggung (Background) & Alat Bantu (Tool). Partikel で menunjukkan latar panggung tempat kamu melakukan kegiatan aktif (berbeda dengan に yang diam). Fungsi keduanya adalah alat/sarana/kendaraan pembantu tindakanmu.',
     usages: [
       {
-        title: 'Tempat Berlangsungnya Aktivitas Aktif',
+        title: 'Tempat Melakukan Kegiatan Aktif',
         exampleJp: '図書館で勉強します。',
         exampleRomaji: 'Toshokan de benkyou shimasu.',
         exampleId: 'Belajar di perpustakaan.',
-        note: 'Belajar adalah aktivitas aktif, maka perpustakaan (図書館) ditandai dengan で (bukan に).'
+        note: 'Perpustakaan adalah tempat terjadinya kegiatan aktif belajar.'
       },
       {
-        title: 'Alat / Metode / Sarana Transportasi',
+        title: 'Alat / Sarana Transportasi / Metode',
         exampleJp: 'タクシーで駅へ行きます。',
         exampleRomaji: 'Takushii de eki he ikimasu.',
-        exampleId: 'Pergi ke stasiun menggunakan taksi.',
-        note: 'Taksi (タクシー) adalah sarana transportasi/metode yang digunakan.'
+        exampleId: 'Pergi ke stasiun naik taksi.',
+        note: 'Taksi adalah alat/kendaraan pembantu untuk pergi.'
       },
       {
-        title: 'Bahasa / Medium Komunikasi',
+        title: 'Bahasa / Bahan Pembuatan',
         exampleJp: '日本語で話してください。',
         exampleRomaji: 'Nihongo de hanashite kudasai.',
-        exampleId: 'Tolong berbicara menggunakan bahasa Jepang.',
-        note: 'Bahasa Jepang (日本語) adalah alat/medium komunikasi yang diminta.'
+        exampleId: 'Tolong bicara memakai bahasa Jepang.',
+        note: 'Bahasa Jepang adalah medium/alat bantu yang dipakai untuk bicara.'
       }
     ]
   },
@@ -160,16 +160,16 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'he',
     particle: 'へ',
     romaji: 'e',
-    title: 'Penanda Arah Tujuan (Direction Marker)',
-    summary: 'Menunjukkan arah atau tujuan pergerakan.',
-    description: 'Partikel へ (ditulis "he" tetapi dibaca "e") digunakan untuk menunjukkan arah atau tujuan pergerakan fisik. Partikel ini sangat mirip dengan に untuk pergerakan, namun へ lebih menekankan pada "arah perjalanannya", sementara に lebih menekankan pada "titik tujuannya".',
+    title: 'Panah Arah Kompas (Arah Tujuan)',
+    summary: 'Menunjukkan arah perjalanan.',
+    description: '💡 ANALOGI: Panah Arah Kompas. Partikel へ (dibaca "e") adalah jarum kompas yang mengarah ke suatu tujuan perjalanan. Berbeda dengan に yang fokus pada titik pendaratan akhir, へ lebih fokus pada proses "arah perjalanannya".',
     usages: [
       {
-        title: 'Arah Tujuan Perjalanan',
+        title: 'Arah Pergerakan / Perjalanan',
         exampleJp: '日本へ行きたいです。',
         exampleRomaji: 'Nihon he ikitai desu.',
         exampleId: 'Saya ingin pergi ke Jepang.',
-        note: 'Menunjukkan arah pergerakan menuju Jepang (日本).'
+        note: 'Arahkan kompas perjalanan menuju negara Jepang (日本).'
       }
     ]
   },
@@ -177,23 +177,23 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'to',
     particle: 'と',
     romaji: 'to',
-    title: 'Penanda Penggabung (dan) & Kebersamaan (bersama)',
-    summary: 'Menghubungkan kata benda secara lengkap, atau berarti "dengan/bersama".',
-    description: 'Partikel と (to) memiliki dua fungsi utama: menghubungkan dua atau lebih kata benda secara lengkap (artinya "dan"), atau untuk menunjukkan orang/hewan yang diajak melakukan suatu aktivitas bersama (artinya "bersama/dengan").',
+    title: 'Rantai Pengikat (Dan / Bersama)',
+    summary: 'Menghubungkan benda secara lengkap, atau berarti "bersama".',
+    description: '💡 ANALOGI: Rantai Besi (Chain Link). Partikel と merantai dua benda secara lengkap (A dan B), atau merantai dirimu dengan orang lain untuk beraktivitas bersama (melakukan bersama/dengan).',
     usages: [
       {
         title: 'Menghubungkan Kata Benda secara Lengkap (Dan)',
         exampleJp: 'パンと牛乳を買いました。',
         exampleRomaji: 'Pan to gyuunyuu o kaimashita.',
-        exampleId: 'Saya membeli roti dan susu.',
-        note: 'Roti dan susu disebutkan secara lengkap sebagai barang yang dibeli.'
+        exampleId: 'Membeli roti dan susu.',
+        note: 'Merantai roti dan susu sebagai barang belanjaan.'
       },
       {
-        title: 'Melakukan Aktivitas Bersama Orang Lain',
+        title: 'Melakukan Kegiatan Bersama Orang Lain',
         exampleJp: '友達と映画を見ました。',
-        exampleRomaji: 'Tomodachi to eiga o mimashitah.',
-        exampleId: 'Saya menonton film bersama teman.',
-        note: 'Menonton film dilakukan bersama/dengan teman (友達).'
+        exampleRomaji: 'Tomodachi to eiga o mimashita.',
+        exampleId: 'Menonton film bersama teman.',
+        note: 'Aktivitas menonton dirantai bersama dengan teman (友達).'
       }
     ]
   },
@@ -201,16 +201,16 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'mo',
     particle: 'も',
     romaji: 'mo',
-    title: 'Penanda Kesamaan (Juga / Pun)',
-    summary: 'Menunjukkan kesamaan atau berarti "juga".',
-    description: 'Partikel も (mo) digunakan untuk menggantikan partikel は, が, atau を ketika subjek atau objek memiliki kesamaan informasi dengan kalimat sebelumnya. Partikel ini berarti "juga" atau "pun".',
+    title: 'Stiker Copy-Paste (Juga / Pun)',
+    summary: 'Menyatakan kesamaan informasi (juga).',
+    description: '💡 ANALOGI: Stiker Copy-Paste. Digunakan ketika informasi suatu subjek/benda persis sama dengan yang sebelumnya dibahas. Kamu tinggal meng-copy stiker informasi itu dan menempelkannya ke subjek baru.',
     usages: [
       {
-        title: 'Menyatakan Kesamaan (Juga)',
+        title: 'Menyatakan Kesamaan Status',
         exampleJp: '田中さんも留学生です。',
         exampleRomaji: 'Tanaka-san mo ryuugakusei desu.',
         exampleId: 'Tanaka-san juga mahasiswa asing.',
-        note: 'Menunjukkan bahwa status Tanaka-san sama dengan orang lain yang sebelumnya dibicarakan.'
+        note: 'Menempelkan stiker "mahasiswa asing" ke Tanaka-san karena statusnya sama dengan subjek sebelumnya.'
       }
     ]
   },
@@ -218,23 +218,23 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'kara',
     particle: 'から',
     romaji: 'kara',
-    title: 'Penanda Titik Awal (Dari / Mulai)',
-    summary: 'Menunjukkan waktu awal, lokasi asal, atau sebab/alasan.',
-    description: 'Partikel から (kara) berarti "dari" atau "mulai". Paling sering digunakan untuk menunjukkan titik awal waktu atau tempat dari suatu aktivitas. Sering berpasangan dengan まで (made).',
+    title: 'Garis Start (Dari / Mulai)',
+    summary: 'Menunjukkan batas waktu awal atau lokasi asal.',
+    description: '💡 ANALOGI: Garis Start. Partikel から menandai garis start dari mana waktu mulai berjalan atau dari titik mana pergerakan fisik dimulai.',
     usages: [
       {
-        title: 'Titik Awal Waktu / Tempat',
+        title: 'Batas Awal Waktu / Jam Mulai',
         exampleJp: '会議は９時から始まります。',
         exampleRomaji: 'Kaigi wa kyuu-ji kara hajimarimasu.',
         exampleId: 'Rapat dimulai dari jam 9.',
-        note: 'Menunjukkan waktu dimulainya rapat yaitu jam 9.'
+        note: 'Garis start rapat dimulai tepat pada jam 9.'
       },
       {
-        title: 'Asal Negara / Daerah',
+        title: 'Asal Negara / Tempat Keberangkatan',
         exampleJp: 'インドネシアから来ました。',
         exampleRomaji: 'Indoneshia kara kimashita.',
-        exampleId: 'Saya datang dari Indonesia.',
-        note: 'Menyatakan asal negara pembicara.'
+        exampleId: 'Datang dari Indonesia.',
+        note: 'Garis start perjalanan saya dimulai dari Indonesia.'
       }
     ]
   },
@@ -242,23 +242,23 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'made',
     particle: 'まで',
     romaji: 'made',
-    title: 'Penanda Titik Akhir (Sampai / Hingga)',
-    summary: 'Menunjukkan batas waktu akhir atau batas tempat tujuan.',
-    description: 'Partikel まで (made) berarti "sampai" atau "hingga". Digunakan untuk menandai batas akhir waktu atau jarak dari suatu pergerakan/proses.',
+    title: 'Bendera Finish (Sampai / Hingga)',
+    summary: 'Menunjukkan batas waktu akhir atau lokasi tujuan akhir.',
+    description: '💡 ANALOGI: Bendera Finish. Pasangan sejati dari から. Partikel まで menandai titik finish akhir waktu atau lokasi pemberhentian terakhir dari suatu proses.',
     usages: [
       {
-        title: 'Batas Waktu Akhir',
+        title: 'Batas Akhir Waktu / Jam Selesai',
         exampleJp: '午後５時まで働きます。',
         exampleRomaji: 'Gogo go-ji made hatarakimasu.',
         exampleId: 'Bekerja sampai jam 5 sore.',
-        note: 'Jam 5 sore adalah batas akhir waktu bekerja.'
+        note: 'Bendera finish bekerja ditancapkan di jam 5 sore.'
       },
       {
-        title: 'Batas Lokasi Akhir',
+        title: 'Batas Lokasi Pemberhentian Akhir',
         exampleJp: '家から学校まで歩きます。',
         exampleRomaji: 'Ie kara gakkou made arukimasu.',
         exampleId: 'Berjalan kaki dari rumah sampai sekolah.',
-        note: 'Sekolah (学校) adalah batas akhir lokasi perjalanan kaki.'
+        note: 'Sekolah adalah bendera finish akhir langkah kaki.'
       }
     ]
   },
@@ -266,23 +266,23 @@ export const PARTICLE_GUIDE_DATA: ParticleGuideItem[] = [
     id: 'no',
     particle: 'の',
     romaji: 'no',
-    title: 'Penanda Kepunyaan & Penghubung Kata Benda',
-    summary: 'Menunjukkan kepemilikan atau memodifikasi kata benda.',
-    description: 'Partikel の (no) digunakan untuk menyatakan kepunyaan (kepemilikan) atau menghubungkan dua buah kata benda di mana kata benda pertama menerangkan kata benda kedua (misal: asal perusahaan, bahan, jenis, dsb).',
+    title: 'Lem Kertas (Kepemilikan & Penggabung Kategori)',
+    summary: 'Menunjukkan kepunyaan atau menyatukan dua kata benda.',
+    description: '💡 ANALOGI: Lem Kertas (Glue). Partikel の berfungsi merekatkan dua kata benda agar menjadi satu kesatuan. Bisa merekatkan pemilik dengan barangnya (punya), atau merekatkan kategori penjelasan dengan benda utamanya.',
     usages: [
       {
-        title: 'Menyatakan Kepunyaan (Kepemilikan)',
+        title: 'Menyatakan Kepemilikan (Kepunyaan)',
         exampleJp: 'これは私の傘です。',
         exampleRomaji: 'Kore wa watashi no kasa desu.',
-        exampleId: 'Ini adalah payung milik saya.',
-        note: 'Menghubungkan "saya" (私) dengan "payung" (傘) untuk menyatakan bahwa payung itu milik saya.'
+        exampleId: 'Ini payung saya.',
+        note: 'Merekatkan "saya" (私) dengan "payung" (傘) menggunakan lem の untuk menandai kepemilikan.'
       },
       {
-        title: 'Menjelaskan Hubungan Posisi / Asal',
+        title: 'Menerangkan Sifat / Kategori Benda',
         exampleJp: '日本語の先生。',
         exampleRomaji: 'Nihongo no sensei.',
         exampleId: 'Guru bahasa Jepang.',
-        note: 'Menghubungkan kata benda "Bahasa Jepang" dengan "Guru" untuk menjelaskan bidang yang diajarkan sang guru.'
+        note: 'Merekatkan kategori "bahasa Jepang" (日本語) dengan "guru" (先生).'
       }
     ]
   }

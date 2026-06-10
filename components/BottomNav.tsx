@@ -7,6 +7,8 @@ import { loadSRS, getSRSSummary, type SRSStore } from '@/lib/srs'
 import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
 import { KANA } from '@/lib/kana'
 import { SPECIALIZED_DATA } from '@/lib/specialized'
+import { getWordJLPTLevel } from '@/lib/jlpt'
+import { playTap } from '@/lib/sounds'
 
 const SPECIAL_CHAPTER_SEQUENCES: Record<string, string[]> = {
   angka: ['Dasar', 'Ratusan', 'Ribuan', 'Penghitung', 'Orang', 'Batang'],
@@ -41,6 +43,7 @@ export default function BottomNav() {
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [vocab, setVocab] = useState<VocabItem[]>([])
   const [selectedSpecialType, setSelectedSpecialType] = useState<'angka' | 'hari' | 'uang' | null>(null)
+  const [showKanjiLevels, setShowKanjiLevels] = useState(false)
 
   // Load local data on mount / open
   useEffect(() => {
@@ -49,6 +52,7 @@ export default function BottomNav() {
       setVocab(loadLocalVocab())
     } else {
       setSelectedSpecialType(null)
+      setShowKanjiLevels(false)
     }
   }, [showPracticeModal])
 
@@ -99,6 +103,15 @@ export default function BottomNav() {
 
   const srs = vocab.length > 0 ? getSRSSummary(vocab.map(v => v.id), srsStore) : null
   const kanjiVocab = vocab.filter(v => v.kanji && v.kanji !== v.hiragana)
+
+  const kanjiLevels = useMemo(() => {
+    const counts = { N5: 0, N4: 0, N3: 0, N2: 0, N1: 0 }
+    kanjiVocab.forEach(v => {
+      const lvl = getWordJLPTLevel(v.kanji, v.chapter)
+      counts[lvl]++
+    })
+    return counts
+  }, [kanjiVocab])
 
   const chapters = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -333,17 +346,28 @@ export default function BottomNav() {
                   {/* Grid: Kanji & Kana */}
                   <div className="grid grid-cols-2 gap-2.5">
                     {kanjiVocab.length > 0 && (
-                      <Link href="/quiz?mode=kanji" onClick={handleLinkClick} className="block no-underline active:scale-[0.98] transition-transform">
-                        <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                      <button 
+                        onClick={() => {
+                          playTap()
+                          setShowKanjiLevels(!showKanjiLevels)
+                          setSelectedSpecialType(null)
+                        }}
+                        className="block no-underline text-left active:scale-[0.98] transition-transform w-full"
+                      >
+                        <div className={`rounded-2xl p-3 flex items-center gap-2.5 border transition-all h-full bg-[var(--color-white)] ${
+                          showKanjiLevels 
+                            ? 'border-[var(--color-accent)] ring-1 ring-[var(--color-accent)]' 
+                            : 'border-[var(--color-border)] hover:bg-[var(--color-bg)]'
+                        }`}>
                           <div className="jp-serif text-2xl font-extrabold text-[var(--color-accent)] leading-none flex items-center justify-center w-8 h-8 bg-[var(--color-accent-light)] rounded-xl shrink-0">漢</div>
                           <div className="flex-1 min-w-0">
                             <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Membaca Kanji</p>
                             <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
-                              Berlatih {kanjiVocab.length} kata Kanji
+                              {showKanjiLevels ? 'Pilih tingkat JLPT ↑' : `Berlatih ${kanjiVocab.length} kata Kanji`}
                             </p>
                           </div>
                         </div>
-                      </Link>
+                      </button>
                     )}
 
                     <Link 
@@ -362,6 +386,57 @@ export default function BottomNav() {
                       </div>
                     </Link>
                   </div>
+
+                  {/* Submenu JLPT Kanji levels */}
+                  {showKanjiLevels && (
+                    <div className="mt-2.5 p-3.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] space-y-2 animate-slide-up">
+                      <p className="font-extrabold text-[9px] uppercase tracking-wider text-[var(--color-text-3)] mb-1">
+                        Pilih Tingkat JLPT Kanji:
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        {(['N5', 'N4', 'N3', 'N2', 'N1'] as const).map((lvl) => {
+                          const count = kanjiLevels[lvl]
+                          if (count > 0) {
+                            return (
+                              <Link 
+                                key={lvl}
+                                href={`/quiz?mode=kanji&level=${lvl}`}
+                                onClick={handleLinkClick}
+                                className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-xs font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform"
+                              >
+                                <span>🇯🇵 JLPT {lvl}</span>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-[var(--color-accent-light)] text-[var(--color-accent)]">
+                                  {count} kata
+                                </span>
+                              </Link>
+                            )
+                          } else {
+                            return (
+                              <div 
+                                key={lvl}
+                                className="flex items-center justify-between p-2.5 rounded-xl bg-gray-100/50 dark:bg-gray-800/10 border border-[var(--color-border)] opacity-60 text-xs font-bold text-[var(--color-text-3)] cursor-not-allowed select-none"
+                              >
+                                <span>🇯🇵 JLPT {lvl}</span>
+                                <span className="text-[9px] font-bold text-[var(--color-text-3)]">
+                                  0 kata
+                                </span>
+                              </div>
+                            )
+                          }
+                        })}
+
+                        {/* Campur Semua Kanji */}
+                        <Link 
+                          href="/quiz?mode=kanji" 
+                          onClick={handleLinkClick} 
+                          className="col-span-2 flex items-center justify-center p-2.5 rounded-xl no-underline text-xs font-black text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] active:scale-[0.98] transition-all mt-1"
+                        >
+                          ⚡ Campur Semua Kanji ({kanjiVocab.length})
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -405,7 +480,11 @@ export default function BottomNav() {
               </div>
               <div className="grid grid-cols-3 gap-2.5 mb-2">
                 <button 
-                  onClick={() => setSelectedSpecialType(selectedSpecialType === 'angka' ? null : 'angka')} 
+                  onClick={() => {
+                    playTap()
+                    setSelectedSpecialType(selectedSpecialType === 'angka' ? null : 'angka')
+                    setShowKanjiLevels(false)
+                  }}
                   className="block no-underline active:scale-95 transition-transform w-full"
                 >
                   <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
@@ -418,7 +497,11 @@ export default function BottomNav() {
                   </div>
                 </button>
                 <button 
-                  onClick={() => setSelectedSpecialType(selectedSpecialType === 'hari' ? null : 'hari')} 
+                  onClick={() => {
+                    playTap()
+                    setSelectedSpecialType(selectedSpecialType === 'hari' ? null : 'hari')
+                    setShowKanjiLevels(false)
+                  }}
                   className="block no-underline active:scale-95 transition-transform w-full"
                 >
                   <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
@@ -431,7 +514,11 @@ export default function BottomNav() {
                   </div>
                 </button>
                 <button 
-                  onClick={() => setSelectedSpecialType(selectedSpecialType === 'uang' ? null : 'uang')} 
+                  onClick={() => {
+                    playTap()
+                    setSelectedSpecialType(selectedSpecialType === 'uang' ? null : 'uang')
+                    setShowKanjiLevels(false)
+                  }}
                   className="block no-underline active:scale-95 transition-transform w-full"
                 >
                   <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
