@@ -52,6 +52,51 @@ export default function BottomNav() {
     }
   }, [showPracticeModal])
 
+  // Listen to popstate to handle back button closing the modal
+  useEffect(() => {
+    if (showPracticeModal) {
+      if (window.history.state?.modal !== 'practice') {
+        window.history.pushState({ modal: 'practice' }, '')
+      }
+
+      const handlePopState = (e: PopStateEvent) => {
+        if (e.state?.modal !== 'practice') {
+          setShowPracticeModal(false)
+        }
+      }
+
+      window.addEventListener('popstate', handlePopState)
+      return () => {
+        window.removeEventListener('popstate', handlePopState)
+      }
+    }
+  }, [showPracticeModal])
+
+  // On mount, check if state has modal open (e.g. going back to page)
+  useEffect(() => {
+    if (window.history.state?.modal === 'practice') {
+      setShowPracticeModal(true)
+    }
+  }, [])
+
+  // Handler for closing the modal manually (clicks on backdrop or X)
+  const closeModal = () => {
+    if (window.history.state?.modal === 'practice') {
+      window.history.back()
+    } else {
+      setShowPracticeModal(false)
+    }
+  }
+
+  // Handler for link clicks to ensure we replace state (clear modal from history)
+  // so going back from next page returns to a closed modal
+  const handleLinkClick = () => {
+    if (window.history.state?.modal === 'practice') {
+      window.history.replaceState(null, '')
+    }
+    setShowPracticeModal(false)
+  }
+
   const srs = vocab.length > 0 ? getSRSSummary(vocab.map(v => v.id), srsStore) : null
   const kanjiVocab = vocab.filter(v => v.kanji && v.kanji !== v.hiragana)
 
@@ -226,10 +271,10 @@ export default function BottomNav() {
         <div className="fixed inset-0 z-[120] flex items-end justify-center px-4 pb-4 select-none">
           <div 
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" 
-            onClick={() => setShowPracticeModal(false)} 
+            onClick={closeModal} 
           />
           <div 
-            className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up"
+            className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up no-scrollbar"
             style={{
               maxHeight: '85dvh',
               overflowY: 'auto'
@@ -238,13 +283,13 @@ export default function BottomNav() {
             {/* Handle bar at the top */}
             <div className="w-12 h-1.5 rounded-full bg-[var(--color-border)] mx-auto mb-5" />
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Pilih Latihan</h3>
                 <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Pilih jenis latihan yang ingin kamu ikuti</p>
               </div>
               <button 
-                onClick={() => setShowPracticeModal(false)}
+                onClick={closeModal}
                 className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-[var(--color-bg)] active:scale-95 transition-all text-xs"
                 style={{ color: 'var(--color-text-2)' }}
               >
@@ -253,7 +298,7 @@ export default function BottomNav() {
             </div>
 
             {noVocab ? (
-              <div className="rounded-2xl p-5 mb-4 text-center border border-[var(--color-accent)] bg-[var(--color-white)]">
+              <div className="rounded-2xl p-5 mb-5 text-center border border-[var(--color-accent)] bg-[var(--color-white)]">
                 <div className="text-3xl mb-2">📋</div>
                 <p className="font-extrabold text-sm text-[var(--color-text-1)]">Belum Ada Kosakata</p>
                 <p className="text-xs font-semibold text-[var(--color-text-2)] mt-1 mb-3">
@@ -261,115 +306,97 @@ export default function BottomNav() {
                 </p>
                 <Link 
                   href="/vocab" 
-                  onClick={() => setShowPracticeModal(false)} 
+                  onClick={handleLinkClick} 
                   className="inline-block rounded-xl px-4 py-2 text-xs font-extrabold text-white no-underline bg-[var(--color-accent)] active:scale-95 transition-transform"
                 >
                   Kelola Kosakata ⚙️
                 </Link>
               </div>
             ) : (
-              <div className="space-y-3 mb-3">
-                {/* Option 1: SRS Vocab Quiz */}
-                <Link href="/quiz" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform">
-                  <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                    <div className="text-3xl">🧠</div>
-                    <div className="flex-1">
-                      <p className="font-extrabold text-sm text-[var(--color-text-1)]">Kosakata Harian (SRS)</p>
-                      <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                        {srs && srs.dueCount > 0 ? `${srs.dueCount} kata siap direview` : 'Berlatih kosakata baru/due hari ini'}
-                      </p>
-                    </div>
-                    <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-                  </div>
-                </Link>
-
-                {/* Option 2: Kanji Quiz */}
-                {kanjiVocab.length > 0 && (
-                  <Link href="/quiz?mode=kanji" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform">
-                    <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                      <div className="jp-serif text-3xl font-extrabold text-[var(--color-accent)] leading-none flex items-center justify-center w-8">漢</div>
-                      <div className="flex-1">
-                        <p className="font-extrabold text-sm text-[var(--color-text-1)]">Fokus Membaca Kanji</p>
-                        <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                          Berlatih {kanjiVocab.length} kata yang menggunakan Kanji
+              <div className="mb-5">
+                <p className="font-extrabold text-[10px] uppercase tracking-wider text-[var(--color-text-3)] mb-2.5">Latihan Utama</p>
+                <div className="space-y-2.5">
+                  {/* Featured: SRS Vocab Quiz */}
+                  <Link href="/quiz" onClick={handleLinkClick} className="block no-underline active:scale-[0.98] transition-transform">
+                    <div className="rounded-2xl p-3.5 flex items-center gap-3.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
+                      <div className="text-3xl filter drop-shadow-sm">🧠</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-extrabold text-sm text-[var(--color-text-1)]">Kosakata Harian (SRS)</p>
+                        <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5 truncate">
+                          {srs && srs.dueCount > 0 ? `${srs.dueCount} kata siap direview` : 'Berlatih kosakata baru/due hari ini'}
                         </p>
                       </div>
                       <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
                     </div>
                   </Link>
-                )}
+
+                  {/* Grid: Kanji & Kana */}
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {kanjiVocab.length > 0 && (
+                      <Link href="/quiz?mode=kanji" onClick={handleLinkClick} className="block no-underline active:scale-[0.98] transition-transform">
+                        <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                          <div className="jp-serif text-2xl font-extrabold text-[var(--color-accent)] leading-none flex items-center justify-center w-8 h-8 bg-[var(--color-accent-light)] rounded-xl shrink-0">漢</div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Membaca Kanji</p>
+                            <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
+                              Berlatih {kanjiVocab.length} kata Kanji
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    )}
+
+                    <Link 
+                      href="/kana" 
+                      onClick={handleLinkClick} 
+                      className={`block no-underline active:scale-[0.98] transition-transform ${kanjiVocab.length === 0 ? 'col-span-2' : ''}`}
+                    >
+                      <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                        <div className="jp-serif text-2xl font-extrabold text-indigo-500 leading-none flex items-center justify-center w-8 h-8 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl shrink-0">あ</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Hiragana & Katakana</p>
+                          <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
+                            104 karakter dasar Jepang
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Option 3 (Always Available): Kana Quiz */}
-            <Link href="/kana" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
-              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8">あ</div>
-                <div className="flex-1">
-                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Hiragana & Katakana</p>
-                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                    Berlatih {KANA.length} karakter dasar Jepang
-                  </p>
-                </div>
-                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-              </div>
-            </Link>
+            {/* Section: Grammar & Other Practices */}
+            <div className="mb-5">
+              <p className="font-extrabold text-[10px] uppercase tracking-wider text-[var(--color-text-3)] mb-2.5">Tata Bahasa & Kalimat</p>
+              <div className="grid grid-cols-2 gap-2.5">
+                {/* Latihan Partikel */}
+                <Link href="/particles" onClick={handleLinkClick} className="block no-underline active:scale-[0.98] transition-transform">
+                  <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                    <div className="jp-serif text-2xl font-extrabold text-amber-500 leading-none flex items-center justify-center w-8 h-8 bg-amber-50 dark:bg-amber-950/30 rounded-xl shrink-0">助</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Kuis Partikel</p>
+                      <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
+                        Kuis partikel (は, が, を...)
+                      </p>
+                    </div>
+                  </div>
+                </Link>
 
-            {/* Option 4 (Always Available): Latihan Partikel */}
-            <Link href="/particles" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
-              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8 text-amber-500">助</div>
-                <div className="flex-1">
-                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Latihan Partikel (は, が, を...)</p>
-                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                    Kuasai fungsi dan penggunaan partikel dasar Jepang
-                  </p>
-                </div>
-                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
+                {/* Penyusunan Kalimat */}
+                <Link href="/sentences" onClick={handleLinkClick} className="block no-underline active:scale-[0.98] transition-transform">
+                  <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                    <div className="jp-serif text-2xl font-extrabold text-green-500 leading-none flex items-center justify-center w-8 h-8 bg-green-50 dark:bg-green-950/30 rounded-xl shrink-0">文</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Susun Kalimat</p>
+                      <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
+                        Susun kata jadi kalimat
+                      </p>
+                    </div>
+                  </div>
+                </Link>
               </div>
-            </Link>
-
-            {/* Option 4b (Always Available): Panduan Partikel */}
-            <Link href="/particles/guide" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
-              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                <div className="text-3xl leading-none flex items-center justify-center w-8 text-amber-500">📖</div>
-                <div className="flex-1">
-                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Panduan Tata Bahasa Partikel</p>
-                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                    Pelajari teori dan contoh kalimat dari partikel Jepang
-                  </p>
-                </div>
-                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-              </div>
-            </Link>
-
-            {/* Option 5 (Always Available): Penyusunan Kalimat */}
-            <Link href="/sentences" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-3">
-              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                <div className="jp-serif text-3xl leading-none flex items-center justify-center w-8 text-green-500">文</div>
-                <div className="flex-1">
-                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Penyusunan Kalimat</p>
-                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                    Susun kepingan kata menjadi kalimat Jepang yang benar
-                  </p>
-                </div>
-                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-              </div>
-            </Link>
-
-            {/* Option 6 (Always Available): Kuis Google Form */}
-            <Link href="/quiz/custom" onClick={() => setShowPracticeModal(false)} className="block no-underline active:scale-[0.98] transition-transform mb-4">
-              <div className="rounded-2xl p-4 flex items-center gap-4 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all">
-                <div className="text-3xl leading-none flex items-center justify-center w-8 text-purple-500">📋</div>
-                <div className="flex-1">
-                  <p className="font-extrabold text-sm text-[var(--color-text-1)]">Kuis Google Form</p>
-                  <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                    Impor dan kerjakan latihan soal kustom sendiri
-                  </p>
-                </div>
-                <span className="text-[var(--color-text-3)] font-bold text-lg">›</span>
-              </div>
-            </Link>
+            </div>
 
             {/* Latihan Khusus (Angka, Hari, Uang) */}
             <div className="border-t border-[var(--color-border)] pt-4 mt-2">
@@ -379,7 +406,7 @@ export default function BottomNav() {
               <div className="grid grid-cols-3 gap-2.5 mb-2">
                 <button 
                   onClick={() => setSelectedSpecialType(selectedSpecialType === 'angka' ? null : 'angka')} 
-                  className="block no-underline active:scale-95 transition-transform"
+                  className="block no-underline active:scale-95 transition-transform w-full"
                 >
                   <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
                     selectedSpecialType === 'angka' 
@@ -392,7 +419,7 @@ export default function BottomNav() {
                 </button>
                 <button 
                   onClick={() => setSelectedSpecialType(selectedSpecialType === 'hari' ? null : 'hari')} 
-                  className="block no-underline active:scale-95 transition-transform"
+                  className="block no-underline active:scale-95 transition-transform w-full"
                 >
                   <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
                     selectedSpecialType === 'hari' 
@@ -405,7 +432,7 @@ export default function BottomNav() {
                 </button>
                 <button 
                   onClick={() => setSelectedSpecialType(selectedSpecialType === 'uang' ? null : 'uang')} 
-                  className="block no-underline active:scale-95 transition-transform"
+                  className="block no-underline active:scale-95 transition-transform w-full"
                 >
                   <div className={`rounded-2xl p-3 flex flex-col items-center justify-center text-center border transition-all h-24 w-full ${
                     selectedSpecialType === 'uang' 
@@ -436,7 +463,7 @@ export default function BottomNav() {
                           <Link 
                             key={chName}
                             href={`/quiz?mode=special&type=${selectedSpecialType}&chapter=${chName}`}
-                            onClick={() => setShowPracticeModal(false)}
+                            onClick={handleLinkClick}
                             className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-white)] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline text-[11px] font-extrabold text-[var(--color-text-1)] active:scale-[0.98] transition-transform"
                           >
                             <div className="flex items-center gap-2">
@@ -480,7 +507,7 @@ export default function BottomNav() {
                         return (
                           <Link 
                             href={`/quiz?mode=special&type=${selectedSpecialType}`} 
-                            onClick={() => setShowPracticeModal(false)} 
+                            onClick={handleLinkClick} 
                             className="flex items-center justify-center p-2.5 rounded-xl no-underline text-[11px] font-black text-white bg-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] active:scale-[0.98] transition-all mt-1"
                           >
                             ⚡ Campur Semua Materi
@@ -517,7 +544,7 @@ export default function BottomNav() {
                       <Link 
                         key={ch.name} 
                         href={`/quiz?chapter=${encodeURIComponent(ch.name)}`} 
-                        onClick={() => setShowPracticeModal(false)}
+                        onClick={handleLinkClick}
                         className="block no-underline shrink-0 active:scale-95 transition-transform"
                       >
                         <div className="rounded-2xl p-3.5 w-28 flex flex-col items-center justify-center text-center border border-[var(--color-border)] bg-[var(--color-white)]">

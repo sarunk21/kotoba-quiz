@@ -117,3 +117,12 @@ html, body {
 .d2 { animation-delay: 0.1s;  opacity: 0; }
 .d3 { animation-delay: 0.15s; opacity: 0; }
 .d4 { animation-delay: 0.2s;  opacity: 0; }
+
+/* ── Hide scrollbar utility ── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
