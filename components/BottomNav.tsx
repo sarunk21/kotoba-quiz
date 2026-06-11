@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { loadSRS, getSRSSummary, type SRSStore } from '@/lib/srs'
@@ -13,6 +13,10 @@ export default function BottomNav() {
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [vocab, setVocab] = useState<VocabItem[]>([])
 
+  const cardRef = useRef<HTMLDivElement>(null)
+  const dragStartY = useRef(0)
+  const isDraggingRef = useRef(false)
+
   // Load local data on mount / open
   useEffect(() => {
     if (showPracticeModal) {
@@ -20,6 +24,76 @@ export default function BottomNav() {
       setVocab(loadLocalVocab())
     }
   }, [showPracticeModal])
+
+  // Lock background body scroll when modal is open
+  useEffect(() => {
+    if (showPracticeModal) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [showPracticeModal])
+
+  // Drag to dismiss event handlers
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return // Only primary button
+    const target = e.currentTarget as HTMLElement
+    target.setPointerCapture(e.pointerId)
+    dragStartY.current = e.clientY
+    isDraggingRef.current = true
+    
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'none'
+      cardRef.current.style.animation = 'none'
+    }
+  }
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return
+    const deltaY = e.clientY - dragStartY.current
+    if (deltaY > 0 && cardRef.current) {
+      cardRef.current.style.transform = `translateY(${deltaY}px)`
+    }
+  }
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return
+    isDraggingRef.current = false
+    
+    const target = e.currentTarget as HTMLElement
+    try {
+      target.releasePointerCapture(e.pointerId)
+    } catch (err) {
+      // Ignore if pointer capture was already released
+    }
+
+    const deltaY = e.clientY - dragStartY.current
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+      
+      const threshold = 120 // 120px to trigger dismiss
+      if (deltaY > threshold) {
+        cardRef.current.style.transform = 'translateY(100%)'
+        setTimeout(() => {
+          closeModal()
+          if (cardRef.current) {
+            cardRef.current.style.transform = ''
+            cardRef.current.style.transition = ''
+          }
+        }, 250)
+      } else {
+        cardRef.current.style.transform = 'translateY(0)'
+        setTimeout(() => {
+          if (cardRef.current) {
+            cardRef.current.style.transition = ''
+          }
+        }, 250)
+      }
+    }
+  }
 
   // Listen to popstate to handle back button closing the modal
   useEffect(() => {
@@ -205,27 +279,37 @@ export default function BottomNav() {
             onClick={closeModal} 
           />
           <div 
+            ref={cardRef}
             className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] pt-6 px-6 pb-24 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up no-scrollbar"
             style={{
               maxHeight: '85dvh',
               overflowY: 'auto'
             }}
           >
-            {/* Handle bar at the top */}
-            <div className="w-12 h-1.5 rounded-full bg-[var(--color-border)] mx-auto mb-5" />
+            {/* Drag handle area */}
+            <div 
+              className="cursor-grab active:cursor-grabbing select-none touch-none"
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+            >
+              {/* Handle bar at the top */}
+              <div className="w-12 h-1.5 rounded-full bg-[var(--color-border)] mx-auto mb-5" />
 
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Pilih Latihan</h3>
-                <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Pilih jenis latihan yang ingin kamu ikuti</p>
+              <div className="flex items-center justify-between mb-5" onPointerDown={(e) => e.stopPropagation()}>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Pilih Latihan</h3>
+                  <p className="text-xs font-semibold text-[var(--color-text-2)] mt-0.5">Pilih jenis latihan yang ingin kamu ikuti</p>
+                </div>
+                <button 
+                  onClick={closeModal}
+                  className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-[var(--color-bg)] active:scale-95 transition-all text-xs"
+                  style={{ color: 'var(--color-text-2)' }}
+                >
+                  ✕
+                </button>
               </div>
-              <button 
-                onClick={closeModal}
-                className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-[var(--color-bg)] active:scale-95 transition-all text-xs"
-                style={{ color: 'var(--color-text-2)' }}
-              >
-                ✕
-              </button>
             </div>
 
             {noVocab ? (
