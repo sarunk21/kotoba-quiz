@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { SENTENCE_QUESTIONS, type SentenceQuestion } from '@/lib/sentences-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap, speakJapanese } from '@/lib/sounds'
 import { addFuriganaToSentence } from '@/lib/vocab'
+import { updateAfterSession } from '@/lib/stats'
 
 export default function SentencesQuizPage() {
   const router = useRouter()
@@ -82,6 +83,7 @@ export default function SentencesQuizPage() {
       const nextLives = lives - 1
       setLives(nextLives)
       if (nextLives <= 0) {
+        updateAfterSession(score, currentIndex + 1)
         setTimeout(() => setIsGameOver(true), 1200)
       }
     }
@@ -89,6 +91,7 @@ export default function SentencesQuizPage() {
 
   const handleNext = () => {
     if (currentIndex + 1 >= questions.length) {
+      updateAfterSession(score, questions.length)
       playFinish()
       setIsFinished(true)
     } else {

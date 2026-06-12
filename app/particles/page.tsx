@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
 import { addFuriganaToSentence } from '@/lib/vocab'
+import { updateAfterSession } from '@/lib/stats'
 
 function generateQuestions(particle: string): ParticleQuestion[] {
   if (particle === 'all') {
@@ -123,6 +124,7 @@ function ParticlesQuizContent() {
       const nextLives = lives - 1
       setLives(nextLives)
       if (nextLives <= 0) {
+        updateAfterSession(score, currentIndex + 1)
         setTimeout(() => setIsGameOver(true), 1200)
       }
     }
@@ -130,6 +132,7 @@ function ParticlesQuizContent() {
 
   const handleNext = () => {
     if (currentIndex + 1 >= questions.length) {
+      updateAfterSession(score, questions.length)
       playFinish()
       setIsFinished(true)
     } else {

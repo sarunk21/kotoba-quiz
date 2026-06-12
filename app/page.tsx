@@ -49,14 +49,17 @@ function isNewerVersion(current: string, remote: string): boolean {
 
 function StudyHeatmap({ history }: { history: Record<string, number> }) {
   const today = new Date()
-  const daysToShow = 12 * 7
+  const daysToShow = 12 * 7 // 84 days
   
-  const startDay = new Date(today)
-  startDay.setDate(today.getDate() - daysToShow + 1)
-  const distToSunday = startDay.getDay()
-  startDay.setDate(startDay.getDate() - distToSunday)
+  // Find the Saturday of the current week
+  const endDay = new Date(today)
+  endDay.setDate(today.getDate() + (6 - today.getDay()))
+  
+  // Start day is 83 days before that Saturday, which guarantees it falls on a Sunday
+  const startDay = new Date(endDay)
+  startDay.setDate(endDay.getDate() - daysToShow + 1)
 
-  const totalGridDays = 12 * 7
+  const totalGridDays = daysToShow
   const dates: Date[] = []
   for (let i = 0; i < totalGridDays; i++) {
     const d = new Date(startDay)
