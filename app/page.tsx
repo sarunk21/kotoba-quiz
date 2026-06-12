@@ -598,29 +598,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Stats row */}
-            {stats && (
-              <div className="grid grid-cols-2 gap-2.5 mb-4 anim-up d1">
-                {[
-                  { 
-                    icon: isStreakActive ? '🔥' : '🕯️', 
-                    label: 'Streak', 
-                    value: String(stats.currentStreak), 
-                    color: isStreakActive ? 'var(--color-red)' : 'var(--color-text-3)', 
-                    bg: isStreakActive ? 'var(--color-red-light)' : 'var(--color-subtle)',
-                    opacity: isStreakActive ? 1 : 0.7
-                  },
-                  { icon: '🎯', label: 'Akurasi', value: `${accuracy}%`, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
-                ].map(s => (
-                  <div key={s.label} className="rounded-2xl py-4 text-center transition-all" 
-                    style={{ background: s.bg, opacity: (s as any).opacity ?? 1 }}>
-                    <p className="text-xl mb-1">{s.icon}</p>
-                    <p className="text-base font-extrabold" style={{ color: s.color }}>{s.value}</p>
-                    <p className="text-xs font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
 
             {/* Weekly Streak Tracker */}
             {stats && (
