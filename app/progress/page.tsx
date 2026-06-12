@@ -8,6 +8,7 @@ import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
 import { speakJapanese } from '@/lib/sounds'
 import BottomNav from '@/components/BottomNav'
 import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
+import { conjugateVerb } from '@/lib/conjugator'
 
 
 const CAT: Record<string, { color: string; bg: string }> = {
@@ -46,8 +47,28 @@ export default function ProgressPage() {
   const [openDropdown, setOpenDropdown] = useState<'status' | 'chapter' | 'category' | 'group' | null>(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
+  const [selectedVocab, setSelectedVocab] = useState<VocabItem | null>(null)
+  const [showFurigana, setShowFurigana] = useState(true)
 
   const filterBarRef = useRef<HTMLDivElement>(null)
+
+  // Initialize furigana preference
+  useEffect(() => {
+    const saved = localStorage.getItem('kotoba_show_furigana')
+    setShowFurigana(saved !== 'false')
+  }, [])
+
+  // Lock scroll when details modal is open
+  useEffect(() => {
+    if (selectedVocab) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [selectedVocab])
 
   // Close dropdowns when clicking outside the filter container
   useEffect(() => {
@@ -425,11 +446,18 @@ export default function ProgressPage() {
                               {v.hiragana && v.kanji !== v.hiragana && (
                                 <p className="text-xs jp" style={{ color: 'var(--color-text-3)' }}>{v.hiragana}</p>
                               )}
-                              <button onClick={() => speakJapanese(v.hiragana || v.kanji)}
-                                className="w-6 h-6 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-90 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] ml-1 shrink-0"
-                                title="Pelafalan">
-                                <VolumeIcon size={12} />
-                              </button>
+                              <div className="flex items-center gap-1 shrink-0 ml-1">
+                                <button onClick={() => speakJapanese(v.hiragana || v.kanji)}
+                                  className="w-6 h-6 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-90 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0"
+                                  title="Pelafalan">
+                                  <VolumeIcon size={12} />
+                                </button>
+                                <button onClick={() => setSelectedVocab(v)}
+                                  className="w-6 h-6 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-90 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0"
+                                  title="Detail & Konjugasi">
+                                  <span className="text-[10px] leading-none">ℹ️</span>
+                                </button>
+                              </div>
                             </div>
                             <p className="text-sm font-semibold" style={{ color: 'var(--color-text-2)' }}>{v.arti}</p>
                             {v.chapter && groupBy !== 'chapter' && (
@@ -491,6 +519,195 @@ export default function ProgressPage() {
           )}
         </div>
       </div>
+      
+      {/* ── Word Detail & Conjugation Modal ── */}
+      {selectedVocab && (() => {
+        const conjugations = conjugateVerb(selectedVocab)
+        const wp = getWordProgress(srsStore, selectedVocab.id)
+        const lv = wp.level
+        const pct = Math.round((lv / 6) * 100)
+        const barColor = lv >= MASTERED_LEVEL ? 'var(--color-green)' : lv >= 3 ? 'var(--color-accent)' : lv >= 1 ? 'var(--color-amber)' : 'var(--color-text-3)'
+        const cat = getCategoryStyle(selectedVocab.category)
+        
+        const SRS_LEVEL_NAMES = [
+          'Baru (Belum dipelajari)',
+          'Apprentice I',
+          'Apprentice II',
+          'Guru I',
+          'Guru II',
+          'Master',
+          'Hafal / Selesai'
+        ]
+
+        return (
+          <div className="fixed inset-0 z-[140] flex items-center justify-center px-4 select-none">
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
+              onClick={() => setSelectedVocab(null)} 
+            />
+            {/* Card Content */}
+            <div 
+              className="bg-white dark:bg-[#1a1d24] rounded-[32px] w-full max-w-sm md:max-w-md p-6 relative shadow-2xl z-10 border border-[var(--color-border)] max-h-[85dvh] overflow-y-auto no-scrollbar flex flex-col"
+              style={{ animation: 'bottomNavSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wider" style={{ background: cat.bg, color: cat.color }}>
+                  {selectedVocab.category}
+                </span>
+                
+                <div className="flex items-center gap-3">
+                  {/* Furigana Toggle */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-black text-[var(--color-text-3)] uppercase tracking-wider">Furigana</span>
+                    <button 
+                      onClick={() => {
+                        const val = !showFurigana
+                        setShowFurigana(val)
+                        localStorage.setItem('kotoba_show_furigana', String(val))
+                      }}
+                      className="w-9 h-5 rounded-full transition-colors relative flex items-center px-0.5 shrink-0"
+                      style={{
+                        background: showFurigana ? 'var(--color-accent)' : 'var(--color-border)',
+                      }}
+                    >
+                      <div 
+                        className="w-4 h-4 rounded-full bg-white transition-transform duration-200 shadow-sm"
+                        style={{
+                          transform: showFurigana ? 'translateX(16px)' : 'translateX(0)',
+                        }}
+                      />
+                    </button>
+                  </div>
+
+                  <button 
+                    onClick={() => setSelectedVocab(null)}
+                    className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-[var(--color-bg)] active:scale-95 transition-all text-xs"
+                    style={{ color: 'var(--color-text-2)', border: '1px solid var(--color-border)' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* Word Display Section */}
+              <div className="text-center py-4 border-b border-[var(--color-border)]">
+                <div className="inline-flex items-center gap-2 mb-2">
+                  {showFurigana && selectedVocab.kanji !== selectedVocab.hiragana ? (
+                    <ruby className="text-4xl font-extrabold jp text-[var(--color-text-1)] select-text leading-tight">
+                      {selectedVocab.kanji}
+                      <rt className="text-xs text-[var(--color-text-3)] select-none tracking-normal font-bold" style={{ fontSize: '0.38em' }}>
+                        {selectedVocab.hiragana}
+                      </rt>
+                    </ruby>
+                  ) : (
+                    <h2 className="text-4xl font-extrabold jp text-[var(--color-text-1)] select-text leading-tight">
+                      {selectedVocab.kanji || selectedVocab.hiragana}
+                    </h2>
+                  )}
+                  <button 
+                    onClick={() => speakJapanese(selectedVocab.hiragana || selectedVocab.kanji)}
+                    className="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-90 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0"
+                    title="Pelafalan"
+                  >
+                    <VolumeIcon size={14} />
+                  </button>
+                </div>
+                {!showFurigana && selectedVocab.kanji !== selectedVocab.hiragana && (
+                  <p className="text-xs font-bold text-[var(--color-text-3)] jp mb-1">({selectedVocab.hiragana})</p>
+                )}
+                <p className="text-base font-extrabold text-[var(--color-text-2)] mt-1.5">{selectedVocab.arti}</p>
+              </div>
+
+              {/* Details & SRS Info */}
+              <div className="py-4 space-y-3 border-b border-[var(--color-border)]">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold text-[var(--color-text-3)]">BAB MATERI</span>
+                  <span className="font-extrabold text-[var(--color-text-1)]">{selectedVocab.chapter || 'Tanpa Bab'}</span>
+                </div>
+                
+                <div>
+                  <div className="flex justify-between items-center text-xs mb-1.5">
+                    <span className="font-bold text-[var(--color-text-3)]">SRS PROGRESS</span>
+                    <span className="font-extrabold" style={{ color: barColor }}>{SRS_LEVEL_NAMES[lv]} (Lv{lv}/6)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 rounded-full overflow-hidden" style={{ height: 8, background: 'var(--color-subtle)' }}>
+                      <div className="h-full rounded-full transition-all duration-500" style={{ width: pct + '%', background: barColor }} />
+                    </div>
+                  </div>
+                </div>
+
+                {lv > 0 && wp.nextReview && (
+                  <div className="flex justify-between items-center text-xs pt-1">
+                    <span className="font-bold text-[var(--color-text-3)]">JADWAL REVIEW</span>
+                    <span className="font-extrabold text-[var(--color-text-2)]">
+                      {wp.nextReview === getLocalDateString() ? 'Hari Ini (Due)' : wp.nextReview}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Conjugations (only for verbs) */}
+              {conjugations ? (
+                <div className="pt-4 flex-1">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Konjugasi Kata Kerja</h4>
+                    <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-[var(--color-accent-light)] text-[var(--color-accent)] uppercase">
+                      {conjugations.group}
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {[
+                      { label: 'Kamus (Dictionary)', form: conjugations.dictionary },
+                      { label: 'Sopan (~masu)', form: conjugations.polite },
+                      { label: 'Gerund (~te)', form: conjugations.te },
+                      { label: 'Lampau (~ta)', form: conjugations.ta },
+                      { label: 'Negatif (~nai)', form: conjugations.nai },
+                    ].map((item, idx) => {
+                      const hasKanji = item.form.kanji !== item.form.hiragana && item.form.kanji !== ''
+                      return (
+                        <div key={idx} className="flex items-center justify-between p-2.5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)]">
+                          <div className="min-w-0">
+                            <p className="text-[9px] font-black text-[var(--color-text-3)] uppercase tracking-wider">{item.label}</p>
+                            <div className="mt-0.5">
+                              {showFurigana && hasKanji ? (
+                                <ruby className="jp font-bold text-sm text-[var(--color-text-1)] select-text">
+                                  {item.form.kanji}
+                                  <rt className="text-[9px] text-[var(--color-text-3)] select-none font-bold" style={{ fontSize: '0.45em' }}>{item.form.hiragana}</rt>
+                                </ruby>
+                              ) : (
+                                <p className="jp font-bold text-sm text-[var(--color-text-1)] select-text">
+                                  {item.form.kanji || item.form.hiragana}
+                                  {hasKanji && !showFurigana && (
+                                    <span className="text-xs font-semibold ml-1.5 text-[var(--color-text-3)]">({item.form.hiragana})</span>
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => speakJapanese(item.form.hiragana)}
+                            className="w-7 h-7 rounded-xl flex items-center justify-center hover:bg-[var(--color-subtle)] active:scale-90 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] bg-white dark:bg-[#1a1d24] shrink-0"
+                            title="Putar Suara"
+                          >
+                            <VolumeIcon size={12} />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : selectedVocab && selectedVocab.category === 'Kata Kerja' ? (
+                <div className="pt-4 text-center">
+                  <p className="text-xs text-[var(--color-text-3)] font-semibold">Gagal memuat detail konjugasi.</p>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )
+      })()}
       
       {/* Sticky Bottom Nav */}
       <BottomNav />

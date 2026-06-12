@@ -12,6 +12,7 @@ export default function BottomNav() {
   const [showPracticeModal, setShowPracticeModal] = useState(false)
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [vocab, setVocab] = useState<VocabItem[]>([])
+  const [failedCount, setFailedCount] = useState(0)
 
   const cardRef = useRef<HTMLDivElement>(null)
   const dragStartY = useRef(0)
@@ -22,6 +23,17 @@ export default function BottomNav() {
     if (showPracticeModal) {
       setSrsStore(loadSRS())
       setVocab(loadLocalVocab())
+      
+      const fw = localStorage.getItem('kotoba_failed_words')
+      if (fw) {
+        try {
+          setFailedCount(JSON.parse(fw).length)
+        } catch (e) {
+          console.error(e)
+        }
+      } else {
+        setFailedCount(0)
+      }
     }
   }, [showPracticeModal])
 
@@ -374,6 +386,18 @@ export default function BottomNav() {
                           </div>
                         </div>
                       </Link>
+
+                      <Link href="/quiz?mode=listening" onClick={handleLinkClick} className="col-span-2 block no-underline active:scale-[0.98] transition-transform">
+                        <div className="rounded-2xl p-3.5 flex items-center gap-3 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                          <div className="text-2xl flex items-center justify-center w-8 h-8 bg-purple-50 dark:bg-purple-950/30 rounded-xl shrink-0">🔊</div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Kuis Pendengaran</p>
+                            <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
+                              Tebak arti kata dari suara pelafalan (Listening)
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -403,6 +427,19 @@ export default function BottomNav() {
                           <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Susun Kalimat</p>
                           <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
                             Susun kata jadi kalimat
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+
+                    {/* Latihan Per Level JLPT */}
+                    <Link href="/quiz/jlpt" onClick={handleLinkClick} className="col-span-2 block no-underline active:scale-[0.98] transition-transform">
+                      <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                        <div className="text-2xl flex items-center justify-center w-8 h-8 bg-blue-50 dark:bg-blue-950/30 rounded-xl shrink-0">🎯</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Latihan Per Level JLPT</p>
+                          <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
+                            Fokus kuis kosakata level N5 sampai N1
                           </p>
                         </div>
                       </div>
@@ -441,6 +478,29 @@ export default function BottomNav() {
                         </div>
                       </Link>
                     )}
+
+                    {/* Tinjau Salah (Weakness Review) */}
+                    <Link
+                      href={failedCount > 0 ? "/quiz?mode=failed" : "#"}
+                      onClick={(e) => {
+                        if (failedCount === 0) {
+                          e.preventDefault()
+                          return
+                        }
+                        handleLinkClick()
+                      }}
+                      className={`col-span-2 block no-underline active:scale-[0.98] transition-transform ${failedCount === 0 ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    >
+                      <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
+                        <div className="text-2xl flex items-center justify-center w-8 h-8 bg-red-50 dark:bg-red-950/30 rounded-xl shrink-0">❌</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Tinjau Salah (Weakness Review)</p>
+                          <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
+                            {failedCount > 0 ? `${failedCount} kata salah siap diperbaiki` : 'Belum ada kosakata yang salah'}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
                 </div>
               </div>

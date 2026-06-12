@@ -9,17 +9,35 @@ export interface CloudData {
   stats: GameStats
   vocab?: VocabItem[]
   vocabUpdatedAt?: string
+  studyHistory?: Record<string, number>
+  failedWords?: string[]
   updatedAt: string
 }
 
 /** Kumpulin semua data lokal */
 function collectLocalData(): CloudData {
   const stats = loadStats()
+  let studyHistory: Record<string, number> = {}
+  let failedWords: string[] = []
+  
+  if (typeof window !== 'undefined') {
+    try {
+      const sh = localStorage.getItem('kotoba_study_history')
+      if (sh) studyHistory = JSON.parse(sh)
+      const fw = localStorage.getItem('kotoba_failed_words')
+      if (fw) failedWords = JSON.parse(fw)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   return {
     srs: loadSRS(),
     stats: stats,
     vocab: loadLocalVocab(),
     vocabUpdatedAt: localStorage.getItem('kotoba_vocab_updated_at') || '',
+    studyHistory,
+    failedWords,
     updatedAt: stats.updatedAt || '',
   }
 }
@@ -72,11 +90,25 @@ function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
   const mergedVocab = cloudVocabIsNewer ? (cloud.vocab ?? local.vocab) : (local.vocab ?? cloud.vocab)
   const mergedVocabUpdatedAt = cloudVocabIsNewer ? (cloud.vocabUpdatedAt || '') : (local.vocabUpdatedAt || '')
 
+  // 4. Merge Study History
+  const mergedHistory: Record<string, number> = { ...(local.studyHistory || {}) }
+  const cloudHistory = cloud.studyHistory || {}
+  for (const [date, count] of Object.entries(cloudHistory)) {
+    mergedHistory[date] = Math.max(mergedHistory[date] || 0, count)
+  }
+
+  // 5. Merge Failed Words
+  const localFailed = local.failedWords || []
+  const cloudFailed = cloud.failedWords || []
+  const mergedFailed = Array.from(new Set([...localFailed, ...cloudFailed]))
+
   return {
     srs: mergedSRS,
     stats: mergedStats,
     vocab: mergedVocab || undefined,
     vocabUpdatedAt: mergedVocabUpdatedAt,
+    studyHistory: mergedHistory,
+    failedWords: mergedFailed,
     updatedAt: cloudIsNewer ? (cloud.updatedAt || '') : (local.updatedAt || ''),
   }
 }
@@ -107,6 +139,12 @@ export async function syncToCloud(): Promise<boolean> {
     }
     if (finalData.vocabUpdatedAt) {
       localStorage.setItem('kotoba_vocab_updated_at', finalData.vocabUpdatedAt)
+    }
+    if (finalData.studyHistory) {
+      localStorage.setItem('kotoba_study_history', JSON.stringify(finalData.studyHistory))
+    }
+    if (finalData.failedWords) {
+      localStorage.setItem('kotoba_failed_words', JSON.stringify(finalData.failedWords))
     }
     
     // 4. Update timestamp before push to ensure it's marked as the latest
@@ -177,6 +215,12 @@ export async function pullFromCloud(): Promise<{ srs: SRSStore; stats: GameStats
     }
     if (finalData.vocabUpdatedAt) {
       localStorage.setItem('kotoba_vocab_updated_at', finalData.vocabUpdatedAt)
+    }
+    if (finalData.studyHistory) {
+      localStorage.setItem('kotoba_study_history', JSON.stringify(finalData.studyHistory))
+    }
+    if (finalData.failedWords) {
+      localStorage.setItem('kotoba_failed_words', JSON.stringify(finalData.failedWords))
     }
     return {
       srs: finalData.srs,

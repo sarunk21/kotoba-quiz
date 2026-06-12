@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loadLocalVocab, getDisplayText, type VocabItem, getGlobalVocab, setGlobalVocab } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
+import { recordFailedWord, removeFailedWord, getFailedWords } from '@/lib/failed'
 import {
   loadSRS, saveSRS, onCorrect, onWrong,
   buildQueue, getWordProgress, SRS_INTERVALS, MASTERED_LEVEL,
@@ -96,6 +97,7 @@ function QuizContent() {
   const level = searchParams.get('level')
   const isKanjiMode = mode === 'kanji'
   const isSpecialMode = mode === 'special'
+  const isListeningMode = mode === 'listening'
 
   const [vocab, setVocab] = useState<VocabItem[]>([])
   const [questionPool, setQuestionPool] = useState<VocabItem[]>([])
@@ -159,6 +161,10 @@ function QuizContent() {
         if (isKanjiMode) {
           pool = pool.filter(item => item.kanji && item.kanji !== item.hiragana)
         }
+        if (mode === 'failed') {
+          const failedIds = new Set(getFailedWords())
+          pool = pool.filter(item => failedIds.has(item.id))
+        }
         let filtered = pool
         if (chapter) {
           filtered = pool.filter(item => item.chapter === chapter)
@@ -170,7 +176,7 @@ function QuizContent() {
         if (filtered.length > 0) {
           setVocab(pool)
           setQuestionPool(filtered)
-          startQuiz(filtered, store, pool)
+          startQuiz(filtered, store, v)
           initialized.current = true
         } else {
           setFinalStats({ correct: 0, total: 0, srsStore: store }); setPhase('result')
@@ -193,8 +199,16 @@ function QuizContent() {
 
   const handleAnswer = useCallback((choice: string) => {
     if (!state || phase !== 'question') return
-    const q = state.queue[state.current]
+        const q = state.queue[state.current]
     const correct = choice === q.arti
+    
+    // Record correct/failed words
+    if (correct) {
+      removeFailedWord(q.id)
+    } else {
+      recordFailedWord(q.id)
+    }
+
     setSelected(choice); setIsCorrect(correct); setPhase('feedback')
     const prevLevel = getWordProgress(srsRef.current, q.id).level
     srsRef.current = correct ? onCorrect(srsRef.current, q.id) : onWrong(srsRef.current, q.id)
@@ -370,7 +384,7 @@ function QuizContent() {
 
           
           <div className="min-h-[20px] mb-2 flex justify-center">
-            {sub && !showFurigana && (isKanjiMode ? (
+            {!(isListeningMode && phase === 'question') && sub && !showFurigana && (isKanjiMode ? (
               showHint ? (
                 <p className="relative jp text-xs anim-pop" style={{ color: 'var(--color-text-3)', letterSpacing: '0.1em' }}>{sub}</p>
               ) : (
@@ -384,21 +398,37 @@ function QuizContent() {
             ))}
           </div>
 
-          <p className="relative jp" style={{
-            fontSize: main.length > 6 ? '2.2rem' : main.length > 3 ? '2.8rem' : '3.5rem',
-            fontWeight: 700, color: 'var(--color-text-1)', lineHeight: 1.2,
-          }}>
-            {sub && showFurigana ? (
-              <ruby className="ruby-text">
-                {main}
-                <rt className="font-semibold text-[var(--color-text-3)] dark:text-gray-400 select-none tracking-normal opacity-85" style={{ fontSize: '0.38em' }}>
-                  {sub}
-                </rt>
-              </ruby>
-            ) : (
-              main
-            )}
-          </p>
+          {isListeningMode && phase === 'question' ? (
+            <div className="flex flex-col items-center justify-center py-6 relative">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  speakJapanese(q.hiragana || q.kanji)
+                }}
+                className="w-20 h-20 rounded-full flex items-center justify-center bg-[var(--color-accent-light)] border border-[var(--color-accent)] active:scale-95 transition-transform"
+                title="Putar Suara"
+              >
+                <span className="text-3xl text-[var(--color-accent)] animate-pulse">🔊</span>
+              </button>
+              <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-4">Ketuk tombol untuk mendengar ulang suara</p>
+            </div>
+          ) : (
+            <p className="relative jp" style={{
+              fontSize: main.length > 6 ? '2.2rem' : main.length > 3 ? '2.8rem' : '3.5rem',
+              fontWeight: 700, color: 'var(--color-text-1)', lineHeight: 1.2,
+            }}>
+              {sub && showFurigana ? (
+                <ruby className="ruby-text">
+                  {main}
+                  <rt className="font-semibold text-[var(--color-text-3)] dark:text-gray-400 select-none tracking-normal opacity-85" style={{ fontSize: '0.38em' }}>
+                    {sub}
+                  </rt>
+                </ruby>
+              ) : (
+                main
+              )}
+            </p>
+          )}
           {/* Level dot */}
           <div className="relative mt-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
             style={{ background: 'var(--color-bg)' }}>

@@ -64,10 +64,26 @@ export function saveStats(stats: GameStats) {
   localStorage.setItem('kotoba_stats', JSON.stringify(stats))
 }
 
+export function recordStudyHistory(questionsCount: number) {
+  if (typeof window === 'undefined') return
+  try {
+    const today = getLocalDateString()
+    const saved = localStorage.getItem('kotoba_study_history')
+    const history: Record<string, number> = saved ? JSON.parse(saved) : {}
+    history[today] = (history[today] || 0) + questionsCount
+    localStorage.setItem('kotoba_study_history', JSON.stringify(history))
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 export function updateAfterSession(correct: number, total: number): GameStats {
   const stats = loadStats()
   const today = getLocalDateString() // YYYY-MM-DD
   
+  // Record history count
+  recordStudyHistory(total)
+
   let newDayStreak = stats.currentStreak
   if (stats.lastPlayedDate !== today) {
     // Kita udah tau dari loadStats() kalau masuk sini berarti lastPlayedDate adalah yesterdayStr
