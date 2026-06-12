@@ -400,7 +400,7 @@ export default function Home() {
         </div>
       )}
 
-      <div ref={scrollRef} className="max-w-sm mx-auto px-4 pt-12 pb-28 overflow-y-auto"
+      <div ref={scrollRef} className="max-w-sm md:max-w-2xl mx-auto px-4 pt-12 pb-28 overflow-y-auto"
         style={{ minHeight: '100dvh', transform: pullY > 0 ? `translateY(${pullY}px)` : 'none', transition: isPulling ? 'none' : 'transform 0.3s ease' }}
         onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
 

@@ -60,7 +60,7 @@ function SpecialSelectContent() {
 
   return (
     <div className="min-h-dvh flex flex-col justify-between" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
+      <div className="max-w-sm md:max-w-2xl mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
         {/* Header */}
         <header className="flex items-center gap-4 mb-6 anim-up">
           <button 
@@ -108,7 +108,7 @@ function SpecialSelectContent() {
             Fokus Bab ({activeTab === 'angka' ? 'Angka & Penghitung' : activeTab === 'hari' ? 'Hari & Waktu' : 'Uang & Harga'}):
           </p>
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {(SPECIAL_CHAPTER_SEQUENCES[activeTab] || []).map((chName) => {
               const isUnlocked = isSpecialChapterUnlocked(activeTab, chName)
               const pct = getSpecialChapterPct(activeTab, chName)

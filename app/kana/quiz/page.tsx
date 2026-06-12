@@ -129,7 +129,7 @@ function QuizContent() {
     const pct = finalStats.total > 0 ? Math.round((finalStats.correct / finalStats.total) * 100) : 0
     const great = pct >= 80
     return (
-      <div className="flex flex-col min-h-dvh max-w-sm mx-auto px-4 py-14" style={{ background: 'var(--color-bg)' }}>
+      <div className="flex flex-col min-h-dvh max-w-sm md:max-w-2xl mx-auto px-4 py-14" style={{ background: 'var(--color-bg)' }}>
         <div className="anim-pop flex-1 flex flex-col">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">{great ? '🎉' : pct >= 50 ? '💪' : '📚'}</div>
@@ -180,7 +180,7 @@ function QuizContent() {
     : (kanaType === 'hiragana' ? q.hiragana : q.katakana)
 
   return (
-    <div className="flex flex-col min-h-dvh max-w-sm mx-auto" style={{ background: 'var(--color-bg)' }}>
+    <div className="flex flex-col min-h-dvh max-w-sm md:max-w-2xl mx-auto" style={{ background: 'var(--color-bg)' }}>
 
       {/* Header */}
       <div className="px-4 pt-12 pb-4">

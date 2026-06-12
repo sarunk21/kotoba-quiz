@@ -171,7 +171,7 @@ export default function BottomNav() {
     <>
       <div className="fixed bottom-0 left-0 right-0 z-[130] flex justify-center px-4 pb-4 select-none">
         <div 
-          className="w-full max-w-sm rounded-[28px] flex items-center justify-between py-2 px-3 border border-[var(--color-border)] bg-white/90 dark:bg-[#1a1d24]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)] transition-all duration-300 relative"
+          className="w-full max-w-sm md:max-w-2xl rounded-[28px] flex items-center justify-between py-2 px-3 border border-[var(--color-border)] bg-white/90 dark:bg-[#1a1d24]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)] transition-all duration-300 relative"
         >
           {/* Left Tabs */}
           <div className="flex-1 flex justify-around">
@@ -280,7 +280,7 @@ export default function BottomNav() {
           />
           <div 
             ref={cardRef}
-            className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] pt-6 px-6 pb-24 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up no-scrollbar"
+            className="bg-white dark:bg-[#1a1d24] rounded-t-[32px] rounded-b-[24px] pt-6 px-6 pb-24 w-full max-w-sm md:max-w-2xl relative shadow-2xl z-10 border border-[var(--color-border)] animate-slide-up no-scrollbar"
             style={{
               maxHeight: '85dvh',
               overflowY: 'auto'

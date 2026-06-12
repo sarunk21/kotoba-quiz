@@ -263,7 +263,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto px-4 pt-12 pb-28">
+      <div className="max-w-sm md:max-w-2xl mx-auto px-4 pt-12 pb-28">
         
         {/* Header */}
         <div className="flex items-center gap-3 mb-8 anim-up">

@@ -112,7 +112,7 @@ export default function KanaPage() {
 
   return (
     <div className="min-h-dvh" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto px-4 pt-12 pb-28">
+      <div className="max-w-sm md:max-w-2xl mx-auto px-4 pt-12 pb-28">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 anim-up">
@@ -209,7 +209,7 @@ export default function KanaPage() {
                 Pilih semua
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
               {GROUPS.map(g => {
                 const gs = groupStats(g.key, activeType)
                 const pct = Math.round((gs.mastered / gs.total) * 100)

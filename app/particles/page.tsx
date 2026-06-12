@@ -178,7 +178,7 @@ function ParticlesQuizContent() {
 
     return (
       <div className="min-h-dvh flex flex-col justify-between" style={{ background: 'var(--color-bg)' }}>
-        <div className="max-w-sm mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
+        <div className="max-w-sm md:max-w-2xl mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
           {/* Top Header */}
           <header className="flex items-center gap-4 mb-8 anim-up">
             <button 
@@ -266,7 +266,7 @@ function ParticlesQuizContent() {
 
   return (
     <div className="min-h-dvh flex flex-col justify-between" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
+      <div className="max-w-sm md:max-w-2xl mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
         {/* Top Header */}
         <header className="flex items-center justify-between gap-4 mb-8 anim-up">
           <button 

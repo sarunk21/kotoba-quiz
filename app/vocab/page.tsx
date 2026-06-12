@@ -501,7 +501,7 @@ export default function VocabPage() {
 
   return (
     <>
-      <main className="min-height-100dvh pb-28 pt-6 px-4 max-w-sm mx-auto flex flex-col gap-5 anim-up">
+      <main className="min-height-100dvh pb-28 pt-6 px-4 max-w-sm md:max-w-2xl mx-auto flex flex-col gap-5 anim-up">
         {/* Header */}
         <header className="flex flex-col gap-2 relative">
           <div className="flex items-center justify-between">
