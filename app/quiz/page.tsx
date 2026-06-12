@@ -347,39 +347,41 @@ function QuizContent() {
           }} />
           
           {/* Card Header Actions */}
-          <div className="flex justify-end items-center gap-1.5 mb-2 relative z-10">
-            {/* Furigana Toggle */}
-            {sub && (
-              <button 
-                onClick={() => {
-                  const newVal = !showFurigana
-                  setShowFurigana(newVal)
-                  localStorage.setItem('kotoba_show_furigana', String(newVal))
-                  playTap()
-                }}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-[11px] active:scale-95 transition-all border ${
-                  showFurigana 
-                    ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
-                    : 'bg-[var(--color-bg)] text-[var(--color-text-3)] border-[var(--color-border)]'
-                }`}
-                title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
-              >
-                あ
+          {!(isListeningMode && phase === 'question') && (
+            <div className="flex justify-end items-center gap-1.5 mb-2 relative z-10">
+              {/* Furigana Toggle */}
+              {sub && (
+                <button 
+                  onClick={() => {
+                    const newVal = !showFurigana
+                    setShowFurigana(newVal)
+                    localStorage.setItem('kotoba_show_furigana', String(newVal))
+                    playTap()
+                  }}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-[11px] active:scale-95 transition-all border ${
+                    showFurigana 
+                      ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
+                      : 'bg-[var(--color-bg)] text-[var(--color-text-3)] border-[var(--color-border)]'
+                  }`}
+                  title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
+                >
+                  あ
+                </button>
+              )}
+              {/* Turtle (Slow-mo) */}
+              <button onClick={() => speakJapanese(q.hiragana || q.kanji, true)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-xs border border-[var(--color-border)]"
+                title="Pelafalan Lambat (Slow-mo)">
+                🐢
               </button>
-            )}
-            {/* Turtle (Slow-mo) */}
-            <button onClick={() => speakJapanese(q.hiragana || q.kanji, true)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-xs border border-[var(--color-border)]"
-              title="Pelafalan Lambat (Slow-mo)">
-              🐢
-            </button>
-            {/* Normal */}
-            <button onClick={() => speakJapanese(q.hiragana || q.kanji, false)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)]"
-              title="Pelafalan Normal">
-              <VolumeIcon size={14} />
-            </button>
-          </div>
+              {/* Normal */}
+              <button onClick={() => speakJapanese(q.hiragana || q.kanji, false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-[var(--color-text-2)] border border-[var(--color-border)]"
+                title="Pelafalan Normal">
+                <VolumeIcon size={14} />
+              </button>
+            </div>
+          )}
 
 
           
