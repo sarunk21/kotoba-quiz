@@ -597,9 +597,8 @@ export default function Home() {
 
             {/* Stats row */}
             {stats && (
-              <div className="grid grid-cols-3 gap-2.5 mb-4 anim-up d1">
+              <div className="grid grid-cols-2 gap-2.5 mb-4 anim-up d1">
                 {[
-                  { icon: '📅', label: 'Sessions', value: String(stats.totalSessions), color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
                   { 
                     icon: isStreakActive ? '🔥' : '🕯️', 
                     label: 'Streak', 
