@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { KANA, kanaId, type KanaType } from '@/lib/kana'
+import { KANA, kanaId, type KanaType, getConfusableKanaIds } from '@/lib/kana'
 import { loadSRS, MASTERED_LEVEL, getWordProgress, type SRSStore } from '@/lib/srs'
 import { getLocalDateString } from '@/lib/dateUtils'
 import { pullFromCloud } from '@/lib/cloud'
@@ -31,7 +31,7 @@ export default function KanaPage() {
   const [srsStore, setSrsStore] = useState<SRSStore>({})
   const [activeType, setActiveType] = useState<KanaType>('hiragana')
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set())
-  const [mode, setMode] = useState<'all' | 'custom' | 'refresh'>('all')
+  const [mode, setMode] = useState<'all' | 'custom' | 'refresh' | 'confusable'>('all')
 
   useEffect(() => {
     setSrsStore(loadSRS())
@@ -96,6 +96,8 @@ export default function KanaPage() {
     if (mode === 'refresh') {
       ids = getRefreshIds(activeType)
       if (!ids.length) return
+    } else if (mode === 'confusable') {
+      ids = getConfusableKanaIds(activeType)
     } else if (mode === 'custom' && selectedGroups.size > 0) {
       ids = KANA.filter(c => selectedGroups.has(c.group)).map(c => c.id)
     } else {
@@ -170,9 +172,10 @@ export default function KanaPage() {
             </p>
             <div className="flex flex-col gap-2">
               {[
-                { key: 'all',     icon: '📚', label: 'Semua karakter', desc: `${KANA.length} karakter` },
-                { key: 'custom',  icon: '🎯', label: 'Pilih grup sendiri', desc: 'Fokus ke baris tertentu' },
-                { key: 'refresh', icon: '🔄', label: 'Penyegaran', desc: refreshCount > 0 ? `${refreshCount} karakter siap direview` : 'Belum ada yang perlu direview' },
+                { key: 'all',        icon: '📚', label: 'Semua karakter', desc: `${KANA.length} karakter` },
+                { key: 'confusable', icon: '🤔', label: 'Karakter Mirip (Confusable)', desc: 'Latih huruf yang bentuknya mirip (さ/ち, シ/ツ, etc.)' },
+                { key: 'custom',     icon: '🎯', label: 'Pilih grup sendiri', desc: 'Fokus ke baris tertentu' },
+                { key: 'refresh',    icon: '🔄', label: 'Penyegaran', desc: refreshCount > 0 ? `${refreshCount} karakter siap direview` : 'Belum ada yang perlu direview' },
               ].map(m => (
                 <button key={m.key} onClick={() => setMode(m.key as typeof mode)}
                   disabled={m.key === 'refresh' && refreshCount === 0}

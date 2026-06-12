@@ -134,3 +134,55 @@ export const KANA: KanaCard[] = [
 export function kanaId(id: string, type: KanaType) {
   return `kana_${type}_${id}`
 }
+
+// ── Confusable (Similar) Kana Groups ──
+export const CONFUSABLE_KANA_GROUPS = {
+  hiragana: [
+    ['あ', 'お'],
+    ['い', 'り'],
+    ['は', 'ほ', 'ま'],
+    ['さ', 'ち', 'き'],
+    ['れ', 'ね', 'わ'],
+    ['ぬ', 'め'],
+    ['ろ', 'る'],
+    ['め', 'ぬ', 'の']
+  ],
+  katakana: [
+    ['シ', 'ツ'],
+    ['ソ', 'ン'],
+    ['フ', 'ヲ', 'ワ'],
+    ['ク', 'タ', 'ケ'],
+    ['コ', 'ユ'],
+    ['ア', 'マ'],
+    ['ヌ', 'ス', 'フ'],
+    ['チ', 'テ'],
+    ['シ', 'ツ', 'ソ', 'ン']
+  ]
+}
+
+/** Get list of Kana Card IDs that belong to the confusable sets */
+export function getConfusableKanaIds(type: KanaType): string[] {
+  const chars = new Set(CONFUSABLE_KANA_GROUPS[type].flat())
+  return KANA
+    .filter(c => chars.has(type === 'hiragana' ? c.hiragana : c.katakana))
+    .map(c => c.id)
+}
+
+/** Get list of Kana Card IDs representing similar-looking characters for a given card */
+export function getConfusableDistractors(correct: KanaCard, type: KanaType): string[] {
+  const char = type === 'hiragana' ? correct.hiragana : correct.katakana
+  const groups = CONFUSABLE_KANA_GROUPS[type]
+  const distractors = new Set<string>()
+
+  for (const group of groups) {
+    if (group.includes(char)) {
+      group.forEach(c => {
+        if (c !== char) distractors.add(c)
+      })
+    }
+  }
+
+  return KANA
+    .filter(k => distractors.has(type === 'hiragana' ? k.hiragana : k.katakana))
+    .map(k => k.id)
+}

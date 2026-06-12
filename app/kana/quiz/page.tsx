@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { KANA, kanaId, type KanaType, type KanaCard } from '@/lib/kana'
+import { KANA, kanaId, type KanaType, type KanaCard, getConfusableDistractors } from '@/lib/kana'
 import {
   loadSRS, saveSRS, onCorrect, onWrong,
   getWordProgress, SRS_INTERVALS, MASTERED_LEVEL,
@@ -32,7 +32,24 @@ function getChoices(correct: KanaCard, pool: KanaCard[], type: KanaType, mode: Q
   const getVal = (c: KanaCard) => mode === 'kana→romaji'
     ? c.romaji
     : (type === 'hiragana' ? c.hiragana : c.katakana)
-  const wrongs = shuffle(pool.filter(c => c.id !== correct.id)).slice(0, 3).map(getVal)
+    
+  // Get similar distractors from confusable sets
+  const confusableIds = getConfusableDistractors(correct, type)
+  const confusablePool = pool.filter(c => confusableIds.includes(c.id) && c.id !== correct.id)
+  
+  // Shuffle similar distractors and take up to 3
+  const similarWrongs = shuffle(confusablePool).slice(0, 3)
+  
+  // Pad with random characters if we have fewer than 3 similar ones
+  const needed = 3 - similarWrongs.length
+  let paddingWrongs: KanaCard[] = []
+  if (needed > 0) {
+    const excludedIds = new Set([correct.id, ...similarWrongs.map(w => w.id)])
+    const remainingPool = pool.filter(c => !excludedIds.has(c.id))
+    paddingWrongs = shuffle(remainingPool).slice(0, needed)
+  }
+  
+  const wrongs = [...similarWrongs, ...paddingWrongs].map(getVal)
   return shuffle([getVal(correct), ...wrongs])
 }
 
