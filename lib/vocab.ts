@@ -112,13 +112,16 @@ export function getDisplayText(item: VocabItem): { main: string; sub: string } {
 
 export function loadLocalVocab(): VocabItem[] {
   if (typeof window === 'undefined') return []
+  const raw = localStorage.getItem('kotoba_vocab')
+  if (!raw) {
+    cachedVocab = null
+    return []
+  }
+  if (cachedVocab) return cachedVocab
   try {
-    const raw = localStorage.getItem('kotoba_vocab')
-    if (raw) {
-      const items = JSON.parse(raw) as VocabItem[]
-      setGlobalVocab(items)
-      return items
-    }
+    const items = JSON.parse(raw) as VocabItem[]
+    setGlobalVocab(items)
+    return items
   } catch (e) {
     console.error('[Vocab] Error loading from localStorage:', e)
   }
@@ -126,14 +129,15 @@ export function loadLocalVocab(): VocabItem[] {
 }
 
 export function saveLocalVocab(items: VocabItem[]) {
+  setGlobalVocab(items)
   if (typeof window === 'undefined') return
   try {
     localStorage.setItem('kotoba_vocab', JSON.stringify(items))
-    setGlobalVocab(items)
   } catch (e) {
     console.error('[Vocab] Error saving to localStorage:', e)
   }
 }
+
 
 // ── Dynamic Furigana Helper ──
 export const FURIGANA_DICT: Record<string, string> = {

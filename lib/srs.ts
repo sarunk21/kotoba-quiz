@@ -29,16 +29,26 @@ function addDays(days: number): string {
   return addLocalDateDays(days)
 }
 
+let cachedSRSStore: SRSStore | null = null
+
 export function loadSRS(): SRSStore {
   if (typeof window === 'undefined') return {}
+  const raw = localStorage.getItem('kotoba_srs')
+  if (!raw) {
+    cachedSRSStore = null
+    return {}
+  }
+  if (cachedSRSStore) return cachedSRSStore
   try {
-    return JSON.parse(localStorage.getItem('kotoba_srs') || '{}')
+    cachedSRSStore = JSON.parse(raw) as SRSStore
+    return cachedSRSStore
   } catch {
     return {}
   }
 }
 
 export function saveSRS(store: SRSStore) {
+  cachedSRSStore = store
   if (typeof window === 'undefined') return
   localStorage.setItem('kotoba_srs', JSON.stringify(store))
 }
