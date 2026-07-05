@@ -8,6 +8,7 @@ import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
 import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
 import { parseCSVToVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
+import { fetchStories } from '@/lib/stories'
 import BottomNav from '@/components/BottomNav'
 import { 
   checkNotificationPermission, 
@@ -72,6 +73,16 @@ export default function SettingsPage() {
         setSyncStatusMsg('Sheet Sudah Sinkron ✓')
         setTimeout(() => setSyncStatusMsg(''), 3000)
         return
+      }
+
+      // ponytail: fetch stories
+      try {
+        const storiesList = await fetchStories(sheetsUrl)
+        if (storiesList.length > 0) {
+          localStorage.setItem('kotoba_stories', JSON.stringify(storiesList))
+        }
+      } catch (se) {
+        console.error('[Stories Sync Error]', se)
       }
 
       const updatedList = [...newItems, ...updatedLocalVocab]

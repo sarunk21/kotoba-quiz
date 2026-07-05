@@ -45,3 +45,11 @@ next-env.d.ts
 
 # scratch files
 /scratch
+
+# PRD & Documentation files
+/PRD.md
+
+# Developer Tools
+/tools/gen-content/.env
+/tools/gen-content/input/
+/tools/gen-content/output/

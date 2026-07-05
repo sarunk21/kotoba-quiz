@@ -11,6 +11,7 @@ import {
   type VocabItem, 
   type Category 
 } from '@/lib/vocab'
+import { fetchStories } from '@/lib/stories'
 import { syncToCloud } from '@/lib/cloud'
 import BottomNav from '@/components/BottomNav'
 
@@ -121,6 +122,16 @@ export default function VocabPage() {
       // Update timestamp on successful fetch
       localStorage.setItem('kotoba_sheets_sync_timestamp', now.toString())
 
+      // ponytail: fetch stories in background
+      try {
+        const storiesList = await fetchStories(url)
+        if (storiesList.length > 0) {
+          localStorage.setItem('kotoba_stories', JSON.stringify(storiesList))
+        }
+      } catch (se) {
+        console.error('[Stories Sync Error]', se)
+      }
+
       if (newItems.length > 0 || hasChanges) {
         const updatedList = [...newItems, ...updatedLocalVocab]
         setVocabList(updatedList)
@@ -161,6 +172,16 @@ export default function VocabPage() {
       // Update timestamp on successful fetch
       localStorage.setItem('kotoba_sheets_sync_timestamp', Date.now().toString())
       
+      // ponytail: fetch stories
+      try {
+        const storiesList = await fetchStories(savedUrl)
+        if (storiesList.length > 0) {
+          localStorage.setItem('kotoba_stories', JSON.stringify(storiesList))
+        }
+      } catch (se) {
+        console.error('[Stories Sync Error]', se)
+      }
+
       const existingIds = new Set(vocabList.map(v => v.id))
       const newItems = parsed.filter(item => !existingIds.has(item.id))
       
@@ -443,6 +464,16 @@ export default function VocabPage() {
         }
         return localItem
       })
+
+      // ponytail: fetch stories
+      try {
+        const storiesList = await fetchStories(sheetsUrlInput)
+        if (storiesList.length > 0) {
+          localStorage.setItem('kotoba_stories', JSON.stringify(storiesList))
+        }
+      } catch (se) {
+        console.error('[Stories Sync Error]', se)
+      }
 
       if (newItems.length === 0 && !hasChanges) {
         alert('Semua kosakata dari link Sheets sudah ada di database dan sudah sinkron!')

@@ -7,6 +7,7 @@ import { loadStats, type GameStats } from '@/lib/stats'
 import { loadSRS, type SRSStore, getSRSSummary, getKanaSummary } from '@/lib/srs'
 import { getLocalDateString, parseLocalDateString } from '@/lib/dateUtils'
 import { parseCSVToVocab, type VocabItem, setGlobalVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
+import { fetchStories } from '@/lib/stories'
 import { pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification, rescheduleDailyReminderIfNeeded } from '@/lib/notifications'
@@ -194,6 +195,16 @@ export default function Home() {
 
       // Update timestamp on successful fetch
       localStorage.setItem('kotoba_sheets_sync_timestamp', now.toString())
+
+      // ponytail: sync stories tab in background
+      try {
+        const storiesList = await fetchStories(url)
+        if (storiesList.length > 0) {
+          localStorage.setItem('kotoba_stories', JSON.stringify(storiesList))
+        }
+      } catch (se) {
+        console.error('[Stories Sync Error]', se)
+      }
 
       if (newItems.length > 0 || hasChanges) {
         const updatedList = [...newItems, ...updatedLocalVocab]

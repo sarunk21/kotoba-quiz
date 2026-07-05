@@ -6,15 +6,26 @@ import { useRouter } from 'next/navigation'
 import { loadSRS, type SRSStore } from '@/lib/srs'
 import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
 import { playTap } from '@/lib/sounds'
+import { type ChapterStory } from '@/lib/stories'
 
 function ChaptersSelectContent() {
   const router = useRouter()
   const [vocab, setVocab] = useState<VocabItem[]>([])
   const [srsStore, setSrsStore] = useState<SRSStore>({})
+  const [stories, setStories] = useState<ChapterStory[]>([])
 
   useEffect(() => {
     setVocab(loadLocalVocab())
     setSrsStore(loadSRS())
+    // ponytail: load chapter stories from localStorage
+    try {
+      const stored = localStorage.getItem('kotoba_stories')
+      if (stored) {
+        setStories(JSON.parse(stored) as ChapterStory[])
+      }
+    } catch (e) {
+      console.error('[Stories Load Error]', e)
+    }
   }, [])
 
   const chapters = useMemo(() => {
@@ -89,12 +100,11 @@ function ChaptersSelectContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {chapters.map((ch) => {
                 const pct = ch.pct
+                const hasStory = stories.some(s => s.chapter === ch.name)
                 return (
-                  <Link
+                  <div
                     key={ch.name}
-                    href={`/quiz?chapter=${encodeURIComponent(ch.name)}`}
-                    onClick={playTap}
-                    className="flex flex-col p-4 rounded-[24px] bg-white dark:bg-[#1a1d24] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline active:scale-[0.98] transition-all shadow-sm"
+                    className="flex flex-col p-4 rounded-[24px] bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-sm transition-all"
                   >
                     <div className="flex items-center justify-between w-full mb-3">
                       <div className="flex items-center gap-3">
@@ -115,7 +125,7 @@ function ChaptersSelectContent() {
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="w-full h-1.5 rounded-full overflow-hidden bg-[var(--color-subtle)]">
+                    <div className="w-full h-1.5 rounded-full overflow-hidden bg-[var(--color-subtle)] mb-4">
                       <div 
                         className="h-full rounded-full transition-all duration-500" 
                         style={{ 
@@ -124,7 +134,28 @@ function ChaptersSelectContent() {
                         }} 
                       />
                     </div>
-                  </Link>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-auto">
+                      {hasStory && (
+                        <Link
+                          href={`/story/${encodeURIComponent(ch.name)}`}
+                          onClick={playTap}
+                          className="flex-1 flex items-center justify-center py-2 px-3 rounded-xl border border-[var(--color-accent)] bg-white dark:bg-[#1a1d24] text-[var(--color-accent)] font-extrabold text-[10px] active:scale-95 transition-all text-center no-underline cursor-pointer"
+                        >
+                          📖 Cerita
+                        </Link>
+                      )}
+                      <Link
+                        href={`/quiz?chapter=${encodeURIComponent(ch.name)}`}
+                        onClick={playTap}
+                        className="flex-1 flex items-center justify-center py-2 px-3 rounded-xl font-extrabold text-[10px] text-white active:scale-95 transition-all text-center no-underline cursor-pointer"
+                        style={{ background: 'var(--color-accent)' }}
+                      >
+                        ⚡ Kuis
+                      </Link>
+                    </div>
+                  </div>
                 )
               })}
             </div>

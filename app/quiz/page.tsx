@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { loadLocalVocab, getDisplayText, type VocabItem, getGlobalVocab, setGlobalVocab } from '@/lib/vocab'
+import { loadLocalVocab, getDisplayText, type VocabItem, getGlobalVocab, setGlobalVocab, addFuriganaToSentence } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 import { recordFailedWord, removeFailedWord, getFailedWords } from '@/lib/failed'
 import {
@@ -441,6 +441,55 @@ function QuizContent() {
               {wp.level === 0 ? 'Baru' : wp.level >= MASTERED_LEVEL ? 'Hafal' : `Lv.${wp.level}`}
             </span>
           </div>
+
+          {/* ponytail: show contoh kalimat & arti after answering */}
+          {selected && (
+            <div className="mt-4 pt-4 border-t border-[var(--color-border)] text-left relative z-10 anim-up">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--color-text-3)] mb-1">
+                Arti Kata
+              </p>
+              <p className="text-base font-extrabold text-[var(--color-green-dark)] dark:text-green-400 mb-4">
+                {q.arti}
+              </p>
+
+              {q.contohKalimat && (
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--color-text-3)] mb-1">
+                      Contoh Kalimat
+                    </p>
+                    <p className="jp text-base font-bold text-[var(--color-text-1)] mb-1 leading-normal">
+                      <span dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(q.contohKalimat) }} />
+                    </p>
+                    <p className="text-xs font-semibold text-[var(--color-text-2)]">
+                      {q.contohKalimatArti}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 pt-1">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        speakJapanese(q.hiragana || q.kanji)
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-extrabold bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-all border border-[var(--color-border)] cursor-pointer"
+                    >
+                      🔊 Kata Saja
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        speakJapanese(q.contohKalimat || '')
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-extrabold bg-[var(--color-accent-light)] text-[var(--color-accent)] active:scale-95 transition-all border border-[var(--color-accent)] cursor-pointer"
+                    >
+                      🔊 Kalimat Penuh
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Choices */}

@@ -9,6 +9,8 @@ export interface VocabItem {
   arti: string
   category: Category
   chapter?: string
+  contohKalimat?: string      // ponytail: optional example sentence
+  contohKalimatArti?: string  // ponytail: optional translation of example sentence
 }
 
 /** 
@@ -47,13 +49,18 @@ export function parseCSVToVocab(csvText: string): VocabItem[] {
     let kanji = ''
     let arti = ''
     let chapter = ''
+    let contohKalimat = ''
+    let contohKalimatArti = ''
 
+    // ponytail: gracefully parse additional example sentence columns if present
     if (cols.length >= 5) {
       category = (cols[0]?.trim() as Category) || 'Kata Benda'
       hiragana = cols[1]?.trim() || ''
       kanji    = cols[2]?.trim() || ''
       arti     = cols[3]?.trim() || ''
       chapter  = cols[4]?.trim() || ''
+      contohKalimat = cols[5]?.trim() || ''
+      contohKalimatArti = cols[6]?.trim() || ''
     } else if (cols.length === 4) {
       category = (cols[0]?.trim() as Category) || 'Kata Benda'
       hiragana = cols[1]?.trim() || ''
@@ -85,6 +92,8 @@ export function parseCSVToVocab(csvText: string): VocabItem[] {
         kanji: kanji || hiragana,
         arti,
         chapter: chapter || undefined,
+        contohKalimat: contohKalimat?.trim() || undefined,
+        contohKalimatArti: contohKalimatArti?.trim() || undefined,
       })
     }
   }
