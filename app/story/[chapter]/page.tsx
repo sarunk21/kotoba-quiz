@@ -7,6 +7,7 @@ import { loadLocalVocab, addFuriganaToSentence, type VocabItem } from '@/lib/voc
 import { speakJapanese, playTap } from '@/lib/sounds'
 import { type ChapterStory } from '@/lib/stories'
 import { StoryPlayer } from '@/components/StoryPlayer'
+import { generateStoryForChapter, getGeminiApiKey } from '@/lib/gemini'
 
 interface PageProps {
   params: Promise<{
@@ -23,6 +24,50 @@ export default function StoryPage({ params }: PageProps) {
   const [vocab, setVocab] = useState<VocabItem[]>([])
   const [stories, setStories] = useState<ChapterStory[]>([])
   const [showTranslation, setShowTranslation] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [genStatus, setGenStatus] = useState('')
+
+  function saveStories(updated: ChapterStory[]) {
+    try {
+      localStorage.setItem('kotoba_stories', JSON.stringify(updated))
+      setStories(updated)
+    } catch (e) {
+      console.error('[StoryPage save]', e)
+    }
+  }
+
+  async function handleGenerate() {
+    const key = getGeminiApiKey()
+    if (!key) {
+      setGenStatus('Set Gemini API key di Pengaturan dulu ya!')
+      return
+    }
+    const chapterVocabList = vocab
+      .filter(v => v.chapter === chapter)
+      .map(v => ({ kanji: v.kanji, hiragana: v.hiragana, arti: v.arti }))
+    if (chapterVocabList.length === 0) {
+      setGenStatus('Vocab bab ini kosong — sync Google Sheets dulu.')
+      return
+    }
+    setGenerating(true)
+    setGenStatus('Generating cerita...')
+    try {
+      const result = await generateStoryForChapter(chapter, chapterVocabList)
+      const newStory: ChapterStory = {
+        chapter,
+        title: result.judul,
+        storyJapanese: result.cerita_jepang,
+        storyIndonesian: result.cerita_indo,
+      }
+      const updated = [...stories.filter(s => s.chapter !== chapter), newStory]
+      saveStories(updated)
+      setGenStatus('')
+    } catch (e: any) {
+      setGenStatus(`Gagal: ${e.message}`)
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   useEffect(() => {
     setVocab(loadLocalVocab())
@@ -87,17 +132,35 @@ export default function StoryPage({ params }: PageProps) {
     return (
       <div className="min-h-dvh flex flex-col justify-between" style={{ background: 'var(--color-bg)' }}>
         <div className="max-w-sm md:max-w-2xl mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col items-center justify-center">
-          <span className="text-4xl mb-3">📖</span>
-          <h2 className="text-base font-black text-[var(--color-text-1)] mb-1">Cerita Belum Tersedia</h2>
+          <span className="text-4xl mb-3">{generating ? '⏳' : '📖'}</span>
+          <h2 className="text-base font-black text-[var(--color-text-1)] mb-1">
+            {generating ? 'Generating Cerita...' : 'Cerita Belum Tersedia'}
+          </h2>
           <p className="text-xs font-semibold text-[var(--color-text-2)] text-center mb-6 max-w-xs">
-            Tidak ditemukan cerita naratif untuk bab "{chapter}". Pastikan Anda telah menyinkronkan data Google Sheets terbaru.
+            {generating
+              ? 'Gemini AI sedang bikin cerita buat bab ini...'
+              : `Belum ada cerita untuk bab "${chapter}". Generate sekarang pakai AI, atau sync dari Google Sheets.`
+            }
           </p>
-          <button 
-            onClick={() => { playTap(); router.back() }}
-            className="rounded-xl px-5 py-2.5 text-xs font-black text-white bg-[var(--color-accent)] active:scale-95 transition-transform"
-          >
-            ← Kembali ke Bab
-          </button>
+          {genStatus && (
+            <p className="text-xs font-bold text-[var(--color-amber)] text-center mb-4 animate-pulse">{genStatus}</p>
+          )}
+          {!generating && (
+            <div className="flex flex-col gap-2 w-full max-w-xs">
+              <button
+                onClick={() => { playTap(); handleGenerate() }}
+                className="w-full rounded-xl px-5 py-3 text-xs font-black text-white bg-[var(--color-accent)] active:scale-95 transition-transform cursor-pointer"
+              >
+                ✨ Generate Cerita Pakai AI
+              </button>
+              <button
+                onClick={() => { playTap(); router.back() }}
+                className="w-full rounded-xl px-5 py-2.5 text-xs font-semibold text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform"
+              >
+                ← Kembali
+              </button>
+            </div>
+          )}
         </div>
       </div>
     )
