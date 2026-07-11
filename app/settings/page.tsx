@@ -9,7 +9,7 @@ import { loadSRS } from '@/lib/srs'
 import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
 import { parseCSVToVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
 import { fetchStories } from '@/lib/stories'
-import { getGeminiApiKey, saveGeminiApiKey, generateStoryForChapter } from '@/lib/gemini'
+import { getGroqApiKey, saveGroqApiKey, generateStoryForChapter } from '@/lib/gemini'
 import { type ChapterStory } from '@/lib/stories'
 import BottomNav from '@/components/BottomNav'
 import { 
@@ -154,8 +154,8 @@ export default function SettingsPage() {
     }
     initNotifications()
 
-    // Load Gemini API key
-    setGeminiKey(getGeminiApiKey())
+    // Load Groq API key
+    setGeminiKey(getGroqApiKey())
   }, [])
 
   function toggleSyncMode(mode: 'auto' | 'manual') {
@@ -280,7 +280,7 @@ export default function SettingsPage() {
   }
 
   function handleSaveGeminiKey() {
-    saveGeminiApiKey(geminiKey)
+    saveGroqApiKey(geminiKey)
     setGeminiStatus('API Key tersimpan ✓')
     setTimeout(() => setGeminiStatus(''), 2500)
   }
@@ -292,7 +292,7 @@ export default function SettingsPage() {
       setTimeout(() => setGeminiStatus(''), 3000)
       return
     }
-    saveGeminiApiKey(key)
+    saveGroqApiKey(key)
 
     const vocab = loadLocalVocab()
     const chaptersMap = new Map<string, typeof vocab>()
@@ -511,14 +511,14 @@ export default function SettingsPage() {
           <div className="rounded-3xl p-6 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-3)' }}>Konten AI ✨</p>
             <p className="text-xs font-semibold leading-relaxed mb-4" style={{ color: 'var(--color-text-2)' }}>
-              Generate cerita naratif per bab secara otomatis pakai Gemini AI. Butuh API key Gemini (gratis di aistudio.google.com).
+              Generate cerita naratif per bab pakai Groq AI (gratis, tanpa kartu kredit). Daftar di <span className="text-[var(--color-accent)] font-bold">console.groq.com</span> → API Keys.
             </p>
 
             {/* API Key input */}
             <div className="flex gap-2 mb-3">
               <input
                 type={showGeminiKey ? 'text' : 'password'}
-                placeholder="AIza..."
+                placeholder="gsk_..."
                 value={geminiKey}
                 onChange={e => setGeminiKey(e.target.value)}
                 className="flex-1 rounded-2xl px-4 py-2.5 text-xs font-semibold border border-[var(--color-border)] outline-none bg-[var(--color-bg)] focus:border-[var(--color-accent)] transition-colors"
@@ -556,7 +556,7 @@ export default function SettingsPage() {
             )}
 
             <p className="text-[10px] text-center mt-3 font-semibold" style={{ color: 'var(--color-text-3)' }}>
-              Cerita tersimpan lokal, tidak ada biaya server. API key tidak dikirim ke mana pun selain Google.
+              Cerita tersimpan lokal. API key hanya dikirim ke api.groq.com, tidak ke server lain.
             </p>
           </div>
           <div className="rounded-3xl p-6 anim-up d3" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>

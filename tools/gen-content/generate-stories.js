@@ -1,54 +1,49 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 import Papa from "papaparse";
 import fs from "fs";
 import "dotenv/config";
 
-// ponytail: check if key is set
-if (!process.env.GEMINI_API_KEY) {
-  console.error("Error: GEMINI_API_KEY tidak diset di .env");
+if (!process.env.GROQ_API_KEY) {
+  console.error("Error: GROQ_API_KEY tidak diset di .env");
+  console.error("Dapetin key gratis di: https://console.groq.com → API Keys");
   process.exit(1);
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_INSTRUCTION = `Kamu adalah pembuat cerita pendek bahasa Jepang untuk pelajar bahasa Jepang.
 Aturan:
-- Buat cerita pendek (3-6 kalimat) dalam bahasa Jepang.
-- Cerita harus memakai kata-kata yang diberikan dan relevan untuk bab tersebut.
-- Level bahasa Jepang: sesuaikan dengan N5-N3.
-- Pecah cerita menjadi 3 adegan (scenes).
-- Balas HANYA dalam format JSON object dengan key:
-  "judul": "...",
-  "scenes": [
-    { "cerita_jepang": "...", "cerita_indo": "...", "image_prompt": "..." },
-    ...
-  ]
-- Teks cerita jepang tidak perlu furigana (hanya kanji dan hiragana standar).
-- JANGAN berikan teks tambahan atau format markdown.`;
+- Buat cerita terdiri dari 3-4 scene/kalimat pendek, level JLPT N5, natural dan nyambung sebagai satu alur cerita singkat.
+- WAJIB memakai kata-kata yang diberikan sesering mungkin.
+- Balas HANYA dalam format JSON object, tanpa teks tambahan, tanpa markdown code fence.
+- Format respons:
+  {"judul": "judul cerita dalam bahasa Indonesia", "scenes": [{"order": 1, "cerita_jepang": "kalimat Jepang", "cerita_indo": "terjemahan Indonesia", "image_prompt": "singkat deskripsi visual scene dalam bahasa Inggris untuk generate ilustrasi anime"}]}
+- image_prompt harus spesifik: siapa yang ada, apa yang mereka lakukan, setting lokasinya.
+- Teks kalimat jepang tidak perlu furigana (hanya kanji dan hiragana standar).`;
 
 async function generateStoryForChapter(chapter, vocabItems) {
-  const wordsText = vocabItems.map(v => `${v.Kanji || v.Hiragana || v.kanji || v.hiragana} (${v.Arti || v.arti})`).join(", ");
-  const prompt = `Buat cerita untuk bab "${chapter}" menggunakan kosakata berikut:\n${wordsText}`;
+  const wordsText = vocabItems
+    .map(v => `${v.Kanji || v.Hiragana || v.kanji || v.hiragana} (${v.Arti || v.arti})`)
+    .join(", ");
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: prompt,
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      responseMimeType: "application/json",
-    },
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      { role: "system", content: SYSTEM_INSTRUCTION },
+      { role: "user", content: `Buat cerita pendek 3-4 scene untuk bab "${chapter}" menggunakan kosakata berikut:\n${wordsText}` },
+    ],
+    response_format: { type: "json_object" },
   });
 
-  return JSON.parse(response.text);
+  return JSON.parse(response.choices[0].message.content);
 }
 
 async function main() {
-  // Ensure directories exist
   if (!fs.existsSync("input")) fs.mkdirSync("input");
   if (!fs.existsSync("output")) fs.mkdirSync("output");
 
   if (!fs.existsSync("input/vocab.csv")) {
-    console.error("Error: input/vocab.csv tidak ditemukan. Harap ekspor tab kosakata dari Google Sheets Anda ke file tersebut.");
+    console.error("Error: input/vocab.csv tidak ditemukan. Harap ekspor tab kosakata dari Google Sheets.");
     process.exit(1);
   }
 
@@ -66,44 +61,52 @@ async function main() {
   const chapters = Object.keys(chaptersMap).filter(ch => ch.trim() !== "");
   console.log(`Total bab ditemukan: ${chapters.length}`);
 
-  const results = [];
-  const sceneResults = [];
+  const legacyRows = [];
+  const sceneRows = [];
 
   for (let i = 0; i < chapters.length; i++) {
     const ch = chapters[i];
     console.log(`Generating story for Chapter "${ch}" (${i + 1}/${chapters.length})...`);
     try {
       const story = await generateStoryForChapter(ch, chaptersMap[ch]);
-      
-      // Keep backward compat summary output
-      results.push({
+      const scenes = story.scenes || [];
+
+      // Legacy per-chapter row (backward compat → tab "Stories")
+      legacyRows.push({
         Bab: ch,
         Judul: story.judul || `Cerita ${ch}`,
-        CeritaJepang: story.scenes.map(s => s.cerita_jepang).join(" "),
-        CeritaIndonesia: story.scenes.map(s => s.cerita_indo).join(" "),
+        CeritaJepang: scenes.map(s => s.cerita_jepang).join(""),
+        CeritaIndonesia: scenes.map(s => s.cerita_indo).join(" "),
       });
 
-      // New detailed output
-      story.scenes.forEach((scene, index) => {
-        sceneResults.push({
+      // Per-scene rows (→ tab "StoriesV2")
+      scenes.forEach((scene, idx) => {
+        sceneRows.push({
           Bab: ch,
-          Scene: index + 1,
-          Judul: story.judul,
-          CeritaJepang: scene.cerita_jepang,
-          CeritaIndonesia: scene.cerita_indo,
-          ImagePrompt: scene.image_prompt
+          JudulCerita: story.judul || `Cerita ${ch}`,
+          UrutanScene: scene.order || idx + 1,
+          KalimatJepang: scene.cerita_jepang || "",
+          KalimatIndonesia: scene.cerita_indo || "",
+          ImagePrompt: scene.image_prompt || "",
+          ImageUrl: `stories/bab${ch}/scene${scene.order || idx + 1}.png`,
         });
       });
+
+      console.log(`  → ${scenes.length} scenes`);
     } catch (e) {
-      console.error(`Gagal membuat cerita untuk bab "${ch}":`, e.message || e);
+      console.error(`Gagal bab "${ch}":`, e.message || e);
     }
-    // jeda kecil biar aman dari rate limit
-    await new Promise(r => setTimeout(r, 2000));
+    // 1 detik antar bab — Groq free tier cukup besar
+    await new Promise(r => setTimeout(r, 1000));
   }
 
-  fs.writeFileSync("output/stories.csv", Papa.unparse(results));
-  fs.writeFileSync("output/stories-scenes.csv", Papa.unparse(sceneResults));
-  console.log("Selesai. Hasil cerita disimpan di output/stories.csv dan output/stories-scenes.csv");
+  fs.writeFileSync("output/stories.csv", Papa.unparse(legacyRows));
+  console.log(`\nstories.csv → ${legacyRows.length} bab. Paste ke tab "Stories".`);
+
+  fs.writeFileSync("output/stories-scenes.csv", Papa.unparse(sceneRows));
+  console.log(`stories-scenes.csv → ${sceneRows.length} scene. Paste ke tab "StoriesV2".`);
+
+  console.log("\nLangkah selanjutnya: node generate-images.js");
 }
 
 main().catch(console.error);

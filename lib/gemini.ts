@@ -1,71 +1,71 @@
 /**
- * Thin browser-safe wrapper for Gemini API (REST, no SDK needed).
- * API key stored in localStorage key: kotoba_gemini_key
+ * Browser-safe AI wrapper using Groq API (OpenAI-compatible REST).
+ * Free tier: https://console.groq.com — no credit card needed.
+ * API key stored in localStorage key: kotoba_groq_key
  */
 
-const GEMINI_MODEL = 'gemini-2.0-flash'
-const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
-export function getGeminiApiKey(): string {
+export function getGroqApiKey(): string {
   if (typeof window === 'undefined') return ''
-  return localStorage.getItem('kotoba_gemini_key') || ''
+  // Support old key name for backward compat
+  return localStorage.getItem('kotoba_groq_key') ||
+         localStorage.getItem('kotoba_gemini_key') || ''
 }
 
-export function saveGeminiApiKey(key: string) {
+export function saveGroqApiKey(key: string) {
   if (typeof window === 'undefined') return
-  localStorage.setItem('kotoba_gemini_key', key.trim())
+  localStorage.setItem('kotoba_groq_key', key.trim())
+  // Clear old key if migrating
+  localStorage.removeItem('kotoba_gemini_key')
 }
 
-interface GeminiRequest {
-  systemInstruction: string
-  userPrompt: string
+// ── Keep old names as aliases so existing callers don't break ──
+export const getGeminiApiKey = getGroqApiKey
+export const saveGeminiApiKey = saveGroqApiKey
+
+interface ChatMessage {
+  role: 'system' | 'user'
+  content: string
 }
 
-async function callGemini(req: GeminiRequest, retries = 3): Promise<string> {
-  const apiKey = getGeminiApiKey()
-  if (!apiKey) throw new Error('Gemini API key belum diset. Isi di Pengaturan.')
+async function callGroq(messages: ChatMessage[], retries = 3): Promise<string> {
+  const apiKey = getGroqApiKey()
+  if (!apiKey) throw new Error('Groq API key belum diset. Isi di Pengaturan.')
 
-  const url = `${GEMINI_API_BASE}/${GEMINI_MODEL}:generateContent?key=${apiKey}`
-
-  const body = {
-    system_instruction: {
-      parts: [{ text: req.systemInstruction }],
-    },
-    contents: [
-      {
-        parts: [{ text: req.userPrompt }],
-      },
-    ],
-    generationConfig: {
-      responseMimeType: 'application/json',
-    },
-  }
-
-  const res = await fetch(url, {
+  const res = await fetch(GROQ_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages,
+      response_format: { type: 'json_object' },
+    }),
   })
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     const msg: string = (err as any)?.error?.message || `HTTP ${res.status}`
 
-    // Rate limit — parse retry delay from error message and wait
-    if ((res.status === 429 || msg.toLowerCase().includes('quota')) && retries > 0) {
-      const retryMatch = msg.match(/retry in ([\d.]+)s/i)
-      const waitMs = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) * 1000 + 2000 : 35000
-      console.warn(`[Gemini] Rate limited. Retrying in ${waitMs / 1000}s... (${retries} retries left)`)
+    // Rate limit — Groq returns 429 with retry_after header
+    if (res.status === 429 && retries > 0) {
+      const retryAfter = parseInt(res.headers.get('retry-after') || '10', 10)
+      const waitMs = (retryAfter + 2) * 1000
+      console.warn(`[Groq] Rate limited. Retrying in ${retryAfter + 2}s... (${retries} retries left)`)
       await new Promise(r => setTimeout(r, waitMs))
-      return callGemini(req, retries - 1)
+      return callGroq(messages, retries - 1)
     }
 
-    throw new Error(`Gemini API error: ${msg}`)
+    throw new Error(`Groq API error: ${msg}`)
   }
 
   const data = await res.json()
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
-  if (!text) throw new Error('Gemini returned empty response')
+  const text = data?.choices?.[0]?.message?.content
+  if (!text) throw new Error('Groq returned empty response')
   return text
 }
 
@@ -76,8 +76,7 @@ Aturan:
 - Buat cerita terdiri dari 3-4 kalimat pendek, level JLPT N5, natural dan nyambung sebagai satu alur cerita singkat.
 - WAJIB memakai kata-kata yang diberikan sesering mungkin.
 - Balas HANYA dalam format JSON object, tanpa teks tambahan.
-- Format respons:
-  {"judul": "...", "cerita_jepang": "...", "cerita_indo": "..."}
+- Format respons: {"judul": "...", "cerita_jepang": "...", "cerita_indo": "..."}
 - Teks kalimat jepang tidak perlu furigana (hanya kanji dan hiragana standar).`
 
 export interface GeneratedStory {
@@ -94,11 +93,12 @@ export async function generateStoryForChapter(
     .map(v => `${v.kanji || v.hiragana} (${v.arti})`)
     .join(', ')
 
-  const userPrompt = `Buat cerita pendek untuk bab "${chapter}" menggunakan kosakata berikut:\n${wordsText}`
+  const raw = await callGroq([
+    { role: 'system', content: STORY_SYSTEM_INSTRUCTION },
+    { role: 'user', content: `Buat cerita pendek untuk bab "${chapter}" menggunakan kosakata berikut:\n${wordsText}` },
+  ])
 
-  const raw = await callGemini({ systemInstruction: STORY_SYSTEM_INSTRUCTION, userPrompt })
   const parsed = JSON.parse(raw)
-
   return {
     judul: parsed.judul || `Cerita ${chapter}`,
     cerita_jepang: parsed.cerita_jepang || '',
@@ -112,13 +112,16 @@ const SENTENCE_SYSTEM_INSTRUCTION = `Kamu adalah generator kalimat contoh untuk 
 Aturan:
 - Level bahasa: sesuai JLPT N5-N3, kalimat pendek dan natural.
 - Setiap kalimat WAJIB memakai kata yang diberikan.
-- Balas HANYA dalam format JSON array, tanpa teks tambahan.
-- Format tiap item: {"id": "...", "kalimat_jepang": "...", "arti_indo": "..."}`
+- Balas HANYA dalam format JSON object dengan key "items" berisi array, tanpa teks tambahan.
+- Format: {"items": [{"id": "...", "kalimat_jepang": "...", "arti_indo": "..."}]}`
 
 export async function generateSentenceBatch(
   batch: { id: string; kanji: string; arti: string }[]
 ): Promise<{ id: string; kalimat_jepang: string; arti_indo: string }[]> {
-  const userPrompt = `Buatkan 1 kalimat contoh untuk setiap kata berikut:\n${JSON.stringify(batch)}`
-  const raw = await callGemini({ systemInstruction: SENTENCE_SYSTEM_INSTRUCTION, userPrompt })
-  return JSON.parse(raw)
+  const raw = await callGroq([
+    { role: 'system', content: SENTENCE_SYSTEM_INSTRUCTION },
+    { role: 'user', content: `Buatkan 1 kalimat contoh untuk setiap kata berikut:\n${JSON.stringify(batch)}` },
+  ])
+  const parsed = JSON.parse(raw)
+  return parsed.items || parsed
 }

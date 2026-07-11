@@ -1,21 +1,21 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 import Papa from "papaparse";
 import fs from "fs";
 import "dotenv/config";
 
-// ponytail: check if key is set
-if (!process.env.GEMINI_API_KEY) {
-  console.error("Error: GEMINI_API_KEY tidak diset di .env");
+if (!process.env.GROQ_API_KEY) {
+  console.error("Error: GROQ_API_KEY tidak diset di .env");
+  console.error("Dapetin key gratis di: https://console.groq.com → API Keys");
   process.exit(1);
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_INSTRUCTION = `Kamu adalah generator kalimat contoh untuk aplikasi belajar bahasa Jepang.
 Aturan:
 - Level bahasa: sesuai JLPT N5-N3, kalimat pendek dan natural.
 - Setiap kalimat WAJIB memakai kata yang diberikan.
-- Balas HANYA dalam format JSON array, tanpa teks tambahan.
+- Balas HANYA dalam format JSON array, tanpa teks tambahan, tanpa markdown code fence.
 - Format tiap item: {"id": "...", "kalimat_jepang": "...", "arti_indo": "..."}`;
 
 function chunk(arr, size) {
@@ -27,25 +27,27 @@ function chunk(arr, size) {
 async function generateBatch(batch) {
   const payload = batch.map(v => ({ id: v.id, kanji: v.Kanji || v.Hiragana, arti: v.Arti }));
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: `Buatkan 1 kalimat contoh untuk setiap kata berikut:\n${JSON.stringify(payload)}`,
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      responseMimeType: "application/json",
-    },
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      { role: "system", content: SYSTEM_INSTRUCTION },
+      { role: "user", content: `Buatkan 1 kalimat contoh untuk setiap kata berikut:\n${JSON.stringify(payload)}` },
+    ],
+    response_format: { type: "json_object" },
   });
 
-  return JSON.parse(response.text);
+  const raw = response.choices[0].message.content;
+  // Groq json_object mode wraps array in an object — handle both
+  const parsed = JSON.parse(raw);
+  return Array.isArray(parsed) ? parsed : (parsed.items || parsed.data || Object.values(parsed)[0]);
 }
 
 async function main() {
-  // Ensure directories exist
   if (!fs.existsSync("input")) fs.mkdirSync("input");
   if (!fs.existsSync("output")) fs.mkdirSync("output");
 
   if (!fs.existsSync("input/vocab.csv")) {
-    console.error("Error: input/vocab.csv tidak ditemukan. Harap ekspor tab kosakata dari Google Sheets Anda ke file tersebut.");
+    console.error("Error: input/vocab.csv tidak ditemukan. Harap ekspor tab kosakata dari Google Sheets.");
     process.exit(1);
   }
 
@@ -73,8 +75,7 @@ async function main() {
     } catch (err) {
       console.error(`Gagal memproses batch ${i + 1}:`, err.message || err);
     }
-    // jeda kecil biar aman dari rate limit
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1000));
   }
 
   const merged = rows.map(r => {
@@ -86,8 +87,7 @@ async function main() {
     };
   });
 
-  const outCsv = Papa.unparse(merged);
-  fs.writeFileSync("output/vocab-with-sentences.csv", outCsv);
+  fs.writeFileSync("output/vocab-with-sentences.csv", Papa.unparse(merged));
   console.log("Selesai. Hasil disimpan di output/vocab-with-sentences.csv");
 }
 
