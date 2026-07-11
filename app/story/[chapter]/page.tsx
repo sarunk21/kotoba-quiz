@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { loadLocalVocab, addFuriganaToSentence, type VocabItem } from '@/lib/vocab'
 import { speakJapanese, playTap } from '@/lib/sounds'
 import { type ChapterStory } from '@/lib/stories'
+import { StoryPlayer } from '@/components/StoryPlayer'
 
 interface PageProps {
   params: Promise<{
@@ -123,35 +124,40 @@ export default function StoryPage({ params }: PageProps) {
         </header>
 
         <main className="space-y-6">
-          {/* Japanese Story Card */}
-          <div className="rounded-[28px] p-6 md:p-8 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-sm anim-up relative overflow-hidden">
-            <div className="absolute inset-0 bg-radial from-[var(--color-accent-light)]/20 via-transparent to-transparent opacity-60 pointer-events-none" />
-            
-            {/* Story Content */}
-            <div className="relative z-10">
-              <p 
-                className="jp text-base md:text-lg leading-relaxed text-[var(--color-text-1)] text-justify"
-                style={{ letterSpacing: '0.04em' }}
-                dangerouslySetInnerHTML={{ __html: highlightedStoryHtml }}
-              />
+          {/* Visual Novel Mode — rendered when StoriesV2 scenes available */}
+          {story.scenes && story.scenes.length > 0 ? (
+            <div className="anim-up">
+              <StoryPlayer story={story} />
             </div>
+          ) : (
+            /* Static Paragraph Mode — backward compat for Stories tab (no scenes) */
+            <div className="rounded-[28px] p-6 md:p-8 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-sm anim-up relative overflow-hidden">
+              <div className="absolute inset-0 bg-radial from-[var(--color-accent-light)]/20 via-transparent to-transparent opacity-60 pointer-events-none" />
+              
+              <div className="relative z-10">
+                <p 
+                  className="jp text-base md:text-lg leading-relaxed text-[var(--color-text-1)] text-justify"
+                  style={{ letterSpacing: '0.04em' }}
+                  dangerouslySetInnerHTML={{ __html: highlightedStoryHtml }}
+                />
+              </div>
 
-            {/* TTS Action Bar */}
-            <div className="mt-6 pt-4 border-t border-[var(--color-border)] flex items-center gap-2 relative z-10">
-              <button 
-                onClick={() => { playTap(); speakJapanese(story.storyJapanese, true) }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-black bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-all cursor-pointer"
-              >
-                🐢 Lambat
-              </button>
-              <button 
-                onClick={() => { playTap(); speakJapanese(story.storyJapanese, false) }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black bg-[var(--color-accent-light)] text-[var(--color-accent)] border border-[var(--color-accent)]/20 active:scale-95 transition-all cursor-pointer"
-              >
-                <VolumeIcon size={12} /> Dengarkan
-              </button>
+              <div className="mt-6 pt-4 border-t border-[var(--color-border)] flex items-center gap-2 relative z-10">
+                <button 
+                  onClick={() => { playTap(); speakJapanese(story.storyJapanese, true) }}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-black bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-all cursor-pointer"
+                >
+                  🐢 Lambat
+                </button>
+                <button 
+                  onClick={() => { playTap(); speakJapanese(story.storyJapanese, false) }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black bg-[var(--color-accent-light)] text-[var(--color-accent)] border border-[var(--color-accent)]/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  <VolumeIcon size={12} /> Dengarkan
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Accordion Indonesian Translation */}
           <div className="rounded-2xl border border-[var(--color-border)] overflow-hidden bg-white dark:bg-[#1a1d24] shadow-sm anim-up d1">

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "gen-sentences": "node generate-sentences.js",
-    "gen-stories": "node generate-stories.js"
+    "gen-stories": "node generate-stories.js",
+    "gen-images": "node generate-images.js"
   },
   "dependencies": {
     "@google/genai": "^0.1.1",

@@ -16,10 +16,13 @@ Aturan:
 - Buat cerita pendek (3-6 kalimat) dalam bahasa Jepang.
 - Cerita harus memakai kata-kata yang diberikan dan relevan untuk bab tersebut.
 - Level bahasa Jepang: sesuaikan dengan N5-N3.
+- Pecah cerita menjadi 3 adegan (scenes).
 - Balas HANYA dalam format JSON object dengan key:
   "judul": "...",
-  "cerita_jepang": "...",
-  "cerita_indo": "..."
+  "scenes": [
+    { "cerita_jepang": "...", "cerita_indo": "...", "image_prompt": "..." },
+    ...
+  ]
 - Teks cerita jepang tidak perlu furigana (hanya kanji dan hiragana standar).
 - JANGAN berikan teks tambahan atau format markdown.`;
 
@@ -64,17 +67,32 @@ async function main() {
   console.log(`Total bab ditemukan: ${chapters.length}`);
 
   const results = [];
+  const sceneResults = [];
 
   for (let i = 0; i < chapters.length; i++) {
     const ch = chapters[i];
     console.log(`Generating story for Chapter "${ch}" (${i + 1}/${chapters.length})...`);
     try {
       const story = await generateStoryForChapter(ch, chaptersMap[ch]);
+      
+      // Keep backward compat summary output
       results.push({
         Bab: ch,
         Judul: story.judul || `Cerita ${ch}`,
-        CeritaJepang: story.cerita_jepang || "",
-        CeritaIndonesia: story.cerita_indo || "",
+        CeritaJepang: story.scenes.map(s => s.cerita_jepang).join(" "),
+        CeritaIndonesia: story.scenes.map(s => s.cerita_indo).join(" "),
+      });
+
+      // New detailed output
+      story.scenes.forEach((scene, index) => {
+        sceneResults.push({
+          Bab: ch,
+          Scene: index + 1,
+          Judul: story.judul,
+          CeritaJepang: scene.cerita_jepang,
+          CeritaIndonesia: scene.cerita_indo,
+          ImagePrompt: scene.image_prompt
+        });
       });
     } catch (e) {
       console.error(`Gagal membuat cerita untuk bab "${ch}":`, e.message || e);
@@ -83,9 +101,9 @@ async function main() {
     await new Promise(r => setTimeout(r, 2000));
   }
 
-  const outCsv = Papa.unparse(results);
-  fs.writeFileSync("output/stories.csv", outCsv);
-  console.log("Selesai. Hasil cerita disimpan di output/stories.csv");
+  fs.writeFileSync("output/stories.csv", Papa.unparse(results));
+  fs.writeFileSync("output/stories-scenes.csv", Papa.unparse(sceneResults));
+  console.log("Selesai. Hasil cerita disimpan di output/stories.csv dan output/stories-scenes.csv");
 }
 
 main().catch(console.error);
