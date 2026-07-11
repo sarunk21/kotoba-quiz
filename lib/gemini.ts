@@ -30,9 +30,17 @@ interface ChatMessage {
   content: string
 }
 
-async function callGroq(messages: ChatMessage[], retries = 3): Promise<string> {
+async function callGroq(messages: ChatMessage[], retries = 3, forceJson = true): Promise<string> {
   const apiKey = getGroqApiKey()
   if (!apiKey) throw new Error('Groq API key belum diset. Isi di Pengaturan.')
+
+  const body: any = {
+    model: GROQ_MODEL,
+    messages,
+  }
+  if (forceJson) {
+    body.response_format = { type: 'json_object' }
+  }
 
   const res = await fetch(GROQ_API_URL, {
     method: 'POST',
@@ -40,11 +48,7 @@ async function callGroq(messages: ChatMessage[], retries = 3): Promise<string> {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      messages,
-      response_format: { type: 'json_object' },
-    }),
+    body: JSON.stringify(body),
   })
 
   if (!res.ok) {
@@ -76,13 +80,20 @@ Aturan:
 - Buat cerita terdiri dari 3-4 kalimat pendek, level JLPT N5, natural dan nyambung sebagai satu alur cerita singkat.
 - WAJIB memakai kata-kata yang diberikan sesering mungkin.
 - Balas HANYA dalam format JSON object, tanpa teks tambahan.
-- Format respons: {"judul": "...", "cerita_jepang": "...", "cerita_indo": "..."}
-- Teks kalimat jepang tidak perlu furigana (hanya kanji dan hiragana standar).`
+- Format respons:
+  {"judul": "...", "scenes": [{"order": 1, "cerita_jepang": "...", "cerita_indo": "...", "chunks": [{"text": "...", "reading": "...", "romaji": "..."}]}]}
+- Teks kalimat jepang tidak perlu furigana. chunks.text bisa berupa kanji atau hiragana, chunks.reading adalah cara bacanya (hiragana).`
+
+export interface GeneratedStoryScene {
+  order: number
+  cerita_jepang: string
+  cerita_indo: string
+  chunks: { text: string; reading: string; romaji: string }[]
+}
 
 export interface GeneratedStory {
   judul: string
-  cerita_jepang: string
-  cerita_indo: string
+  scenes: GeneratedStoryScene[]
 }
 
 export async function generateStoryForChapter(
@@ -100,10 +111,24 @@ export async function generateStoryForChapter(
 
   const parsed = JSON.parse(raw)
   return {
-    judul: parsed.judul || `Cerita ${chapter}`,
-    cerita_jepang: parsed.cerita_jepang || '',
-    cerita_indo: parsed.cerita_indo || '',
+    judul: parsed.judul || parsed.title || `Cerita ${chapter}`,
+    scenes: parsed.scenes || [],
   }
+}
+
+// ── Grammar Explanation ──
+export async function explainGrammar(japanese: string, indonesian: string): Promise<string> {
+  const raw = await callGroq([
+    {
+      role: 'system',
+      content: 'Kamu guru bahasa Jepang. Jelasin grammar & partikel dalam kalimat yang diberikan, singkat (maks 3-4 kalimat), bahasa Indonesia santai, fokus ke kenapa partikel/bentuk kata itu dipakai. Balas HANYA teks penjelasan, tanpa format JSON.',
+    },
+    {
+      role: 'user',
+      content: `Kalimat: ${japanese}\nArti: ${indonesian}\nJelasin grammar-nya.`,
+    },
+  ], 3, false)
+  return raw
 }
 
 // ── Sentence Example Generation ──

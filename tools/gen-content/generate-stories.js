@@ -17,9 +17,9 @@ Aturan:
 - WAJIB memakai kata-kata yang diberikan sesering mungkin.
 - Balas HANYA dalam format JSON object, tanpa teks tambahan, tanpa markdown code fence.
 - Format respons:
-  {"judul": "judul cerita dalam bahasa Indonesia", "scenes": [{"order": 1, "cerita_jepang": "kalimat Jepang", "cerita_indo": "terjemahan Indonesia", "image_prompt": "singkat deskripsi visual scene dalam bahasa Inggris untuk generate ilustrasi anime"}]}
+  {"judul": "judul cerita dalam bahasa Indonesia", "scenes": [{"order": 1, "cerita_jepang": "kalimat Jepang", "cerita_indo": "terjemahan Indonesia", "image_prompt": "singkat deskripsi visual scene dalam bahasa Inggris untuk generate ilustrasi anime", "chunks": [{"text": "...", "reading": "...", "romaji": "..."}]}]}
 - image_prompt harus spesifik: siapa yang ada, apa yang mereka lakukan, setting lokasinya.
-- Teks kalimat jepang tidak perlu furigana (hanya kanji dan hiragana standar).`;
+- Teks kalimat jepang tidak perlu furigana. chunks.text bisa berupa kanji atau hiragana, chunks.reading adalah cara bacanya (hiragana).`;
 
 async function generateStoryForChapter(chapter, vocabItems) {
   const wordsText = vocabItems
@@ -89,6 +89,7 @@ async function main() {
           KalimatIndonesia: scene.cerita_indo || "",
           ImagePrompt: scene.image_prompt || "",
           ImageUrl: `stories/bab${ch}/scene${scene.order || idx + 1}.png`,
+          Chunks: scene.chunks ? JSON.stringify(scene.chunks) : "",
         });
       });
 

@@ -56,8 +56,16 @@ export default function StoryPage({ params }: PageProps) {
       const newStory: ChapterStory = {
         chapter,
         title: result.judul,
-        storyJapanese: result.cerita_jepang,
-        storyIndonesian: result.cerita_indo,
+        storyJapanese: result.scenes.map((s: any) => s.cerita_jepang).join(''),
+        storyIndonesian: result.scenes.map((s: any) => s.cerita_indo).join(' '),
+        scenes: result.scenes.map((s: any) => ({
+          chapter,
+          sceneOrder: s.order,
+          imageUrl: '',
+          sentenceJapanese: s.cerita_jepang,
+          sentenceIndonesian: s.cerita_indo,
+          chunks: s.chunks,
+        })),
       }
       const updated = [...stories.filter(s => s.chapter !== chapter), newStory]
       saveStories(updated)

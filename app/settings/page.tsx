@@ -10,6 +10,7 @@ import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToClo
 import { parseCSVToVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
 import { fetchStories } from '@/lib/stories'
 import { getGroqApiKey, saveGroqApiKey, generateStoryForChapter } from '@/lib/gemini'
+import { startBackgroundGenerate, isGenerating, subscribeProgress } from '@/lib/backgroundGenerate'
 import { type ChapterStory } from '@/lib/stories'
 import BottomNav from '@/components/BottomNav'
 import { 
@@ -38,7 +39,7 @@ export default function SettingsPage() {
   const [geminiKey, setGeminiKey] = useState<string>('')
   const [showGeminiKey, setShowGeminiKey] = useState(false)
   const [geminiStatus, setGeminiStatus] = useState<string>('')
-  const [generatingStories, setGeneratingStories] = useState(false)
+  const [generatingStories, setGeneratingStories] = useState(isGenerating())
 
   // Sync Sheets manually
   async function handleSyncSheets() {
@@ -156,6 +157,11 @@ export default function SettingsPage() {
 
     // Load Groq API key
     setGeminiKey(getGroqApiKey())
+    setGeneratingStories(isGenerating())
+
+    // Sync generating state from background module
+    const unsub = subscribeProgress(p => setGeneratingStories(p.isRunning))
+    return unsub
   }, [])
 
   function toggleSyncMode(mode: 'auto' | 'manual') {
@@ -288,79 +294,39 @@ export default function SettingsPage() {
   async function handleGenerateAllStories() {
     const key = geminiKey.trim()
     if (!key) {
-      setGeminiStatus('Isi API Key Gemini dulu!')
+      setGeminiStatus('Isi API Key Groq dulu!')
       setTimeout(() => setGeminiStatus(''), 3000)
       return
     }
     saveGroqApiKey(key)
 
     const vocab = loadLocalVocab()
-    const chaptersMap = new Map<string, typeof vocab>()
-    for (const v of vocab) {
-      const ch = v.chapter || 'Tanpa Bab'
-      if (!chaptersMap.has(ch)) chaptersMap.set(ch, [])
-      chaptersMap.get(ch)!.push(v)
-    }
-
-    const chapters = Array.from(chaptersMap.keys())
-    if (chapters.length === 0) {
+    if (vocab.length === 0) {
       setGeminiStatus('Belum ada vocab — sync Google Sheets dulu.')
       setTimeout(() => setGeminiStatus(''), 3000)
       return
     }
 
-    // Load existing stories to merge
+    // Build chapters map
+    const chaptersMap = new Map<string, { kanji: string; hiragana: string; arti: string }[]>()
+    for (const v of vocab) {
+      const ch = v.chapter || 'Tanpa Bab'
+      if (!chaptersMap.has(ch)) chaptersMap.set(ch, [])
+      chaptersMap.get(ch)!.push({ kanji: v.kanji, hiragana: v.hiragana, arti: v.arti })
+    }
+
+    // Skip chapters that already have stories
     let existingStories: ChapterStory[] = []
     try {
       const stored = localStorage.getItem('kotoba_stories')
       if (stored) existingStories = JSON.parse(stored)
     } catch { /* ignore */ }
-    const existingMap = new Map(existingStories.map(s => [s.chapter, s]))
+    const alreadyHas = new Set(existingStories.map(s => s.chapter))
 
-    setGeneratingStories(true)
-    const results: ChapterStory[] = [...existingStories]
-
-    for (let i = 0; i < chapters.length; i++) {
-      const ch = chapters[i]
-      setGeminiStatus(`Generating cerita bab ${i + 1}/${chapters.length}: ${ch}...`)
-      try {
-        const vocabList = chaptersMap.get(ch)!.map(v => ({
-          kanji: v.kanji,
-          hiragana: v.hiragana,
-          arti: v.arti,
-        }))
-        const story = await generateStoryForChapter(ch, vocabList)
-
-        const chapterStory: ChapterStory = {
-          chapter: ch,
-          title: story.judul,
-          storyJapanese: story.cerita_jepang,
-          storyIndonesian: story.cerita_indo,
-        }
-
-        // Replace or insert
-        const existIdx = results.findIndex(s => s.chapter === ch)
-        if (existIdx >= 0) results[existIdx] = chapterStory
-        else results.push(chapterStory)
-
-        // Save progressively so partial results aren't lost
-        localStorage.setItem('kotoba_stories', JSON.stringify(results))
-
-        // 5s delay — free tier limit ~15 RPM, be safe
-        if (i < chapters.length - 1) {
-          setGeminiStatus(`Bab ${i + 1}/${chapters.length} selesai. Jeda sebentar...`)
-          await new Promise(r => setTimeout(r, 5000))
-        }
-      } catch (e: any) {
-        console.error(`[Gemini] Failed chapter "${ch}":`, e.message)
-        setGeminiStatus(`Gagal bab "${ch}": ${e.message}`)
-        await new Promise(r => setTimeout(r, 2000))
-      }
-    }
-
-    setGeneratingStories(false)
-    setGeminiStatus(`Selesai! ${results.length} cerita tersimpan ✓`)
-    setTimeout(() => setGeminiStatus(''), 5000)
+    // Fire and forget — user can navigate away
+    startBackgroundGenerate(chaptersMap, alreadyHas)
+    setGeminiStatus('Generate dimulai! Bisa pindah halaman, cerita tetap diproses.')
+    setTimeout(() => setGeminiStatus(''), 4000)
   }
 
   if (status === 'loading') return null

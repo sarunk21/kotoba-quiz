@@ -1,11 +1,19 @@
 import Papa from 'papaparse'
 
+export interface SentenceChunk {
+  text: string
+  reading: string
+  romaji: string
+}
+
 export interface StoryScene {
   chapter: string
   sceneOrder: number
   imageUrl: string
   sentenceJapanese: string
   sentenceIndonesian: string
+  vocabHighlight?: string[]
+  chunks?: SentenceChunk[]
 }
 
 export interface ChapterStory {
@@ -18,41 +26,38 @@ export interface ChapterStory {
 
 /**
  * Parse CSV from StoriesV2 tab (per-scene, 1 row = 1 scene).
- * Columns: Bab, JudulCerita, UrutanScene, KalimatJepang, KalimatIndonesia, ImageUrl
+ * Columns: Bab, JudulCerita, UrutanScene, KalimatJepang, KalimatIndonesia, ImageUrl, Chunks
  * Groups rows into ChapterStory[] with scenes[] populated.
  */
 export function parseCSVToScenes(csvText: string): ChapterStory[] {
   const parsed = Papa.parse(csvText, {
-    header: false,
+    header: true, // Use header: true to handle named columns more robustly
     skipEmptyLines: true,
   })
 
-  const data = parsed.data as string[][]
-
-  // Skip header
-  let startIdx = 0
-  if (data[0] && (
-    data[0][0]?.toLowerCase().includes('bab') ||
-    data[0][2]?.toLowerCase().includes('urutan')
-  )) {
-    startIdx = 1
-  }
+  const data = parsed.data as any[]
 
   // Accumulate scenes per chapter
   const chapterMap = new Map<string, ChapterStory>()
 
-  for (let i = startIdx; i < data.length; i++) {
-    const cols = data[i]
-    if (!cols || cols.length < 4) continue
-
-    const chapter = cols[0]?.trim() || ''
-    const title = cols[1]?.trim() || ''
-    const sceneOrder = parseInt(cols[2]?.trim() || '0', 10)
-    const sentenceJapanese = cols[3]?.trim() || ''
-    const sentenceIndonesian = cols[4]?.trim() || ''
-    const imageUrl = cols[5]?.trim() || ''
+  for (const row of data) {
+    const chapter = (row.Bab || row.bab)?.trim() || ''
+    const title = (row.JudulCerita || row.judul)?.trim() || ''
+    const sceneOrder = parseInt((row.UrutanScene || row.urutan)?.trim() || '0', 10)
+    const sentenceJapanese = (row.KalimatJepang || row.kalimatJepang)?.trim() || ''
+    const sentenceIndonesian = (row.KalimatIndonesia || row.kalimatIndonesia)?.trim() || ''
+    const imageUrl = (row.ImageUrl || row.imageUrl)?.trim() || ''
 
     if (!chapter || !sentenceJapanese) continue
+
+    // Parse chunks if they exist (usually from Google Sheets as JSON string)
+    let chunksData: SentenceChunk[] | undefined
+    const rawChunks = row.Chunks || row.chunks
+    if (rawChunks) {
+      try {
+        chunksData = JSON.parse(rawChunks)
+      } catch { /* ignore invalid JSON */ }
+    }
 
     if (!chapterMap.has(chapter)) {
       chapterMap.set(chapter, {
@@ -65,7 +70,7 @@ export function parseCSVToScenes(csvText: string): ChapterStory[] {
     }
 
     const story = chapterMap.get(chapter)!
-    story.scenes!.push({ chapter, sceneOrder, imageUrl, sentenceJapanese, sentenceIndonesian })
+    story.scenes!.push({ chapter, sceneOrder, imageUrl, sentenceJapanese, sentenceIndonesian, chunks: chunksData })
 
     // Also build flat fields for backward compat (used by existing static story page)
     story.storyJapanese += sentenceJapanese

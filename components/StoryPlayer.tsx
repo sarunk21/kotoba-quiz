@@ -5,6 +5,8 @@ import type { ChapterStory } from '@/lib/stories'
 import { speakJapanese } from '@/lib/sounds'
 import { playTap } from '@/lib/sounds'
 import { addFuriganaToSentence } from '@/lib/vocab'
+import { ChunkedSubtitle } from './ChunkedSubtitle'
+import { explainGrammar } from '@/lib/gemini'
 
 interface StoryPlayerProps {
   story: ChapterStory
@@ -15,6 +17,8 @@ export function StoryPlayer({ story }: StoryPlayerProps) {
   const [sceneIndex, setSceneIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [showTranslation, setShowTranslation] = useState(false)
+  const [explanation, setExplanation] = useState<string | null>(null)
+  const [loadingExplain, setLoadingExplain] = useState(false)
   const [imgError, setImgError] = useState(false)
   const cancelRef = useRef(false)
 
@@ -28,6 +32,7 @@ export function StoryPlayer({ story }: StoryPlayerProps) {
     setIsPlaying(false)
     setImgError(false)
     setShowTranslation(false)
+    setExplanation(null)
     setSceneIndex(idx)
   }, [])
 
@@ -71,6 +76,24 @@ export function StoryPlayer({ story }: StoryPlayerProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sceneIndex])
+
+  const handleExplain = async () => {
+    playTap()
+    if (explanation) {
+      setExplanation(null)
+      return
+    }
+    setLoadingExplain(true)
+    setExplanation(null)
+    try {
+      const res = await explainGrammar(scene.sentenceJapanese, scene.sentenceIndonesian)
+      setExplanation(res)
+    } catch (err: any) {
+      setExplanation(`Gagal memuat penjelasan: ${err.message || 'Coba lagi'}. Pastikan API Key Groq sudah diisi di Pengaturan.`)
+    } finally {
+      setLoadingExplain(false)
+    }
+  }
 
   const subtitleHtml = addFuriganaToSentence(scene.sentenceJapanese)
 
@@ -119,12 +142,16 @@ export function StoryPlayer({ story }: StoryPlayerProps) {
 
       {/* Subtitle Card */}
       <div className="rounded-[20px] p-4 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-sm">
-        {/* Japanese sentence */}
-        <p
-          className="jp text-lg font-bold text-[var(--color-text-1)] text-center leading-relaxed mb-1"
-          style={{ letterSpacing: '0.04em' }}
-          dangerouslySetInnerHTML={{ __html: subtitleHtml }}
-        />
+        {/* Japanese sentence (chunks or flat fallback) */}
+        {scene.chunks && scene.chunks.length > 0 ? (
+          <ChunkedSubtitle chunks={scene.chunks} />
+        ) : (
+          <p
+            className="jp text-lg font-bold text-[var(--color-text-1)] text-center leading-relaxed mb-1"
+            style={{ letterSpacing: '0.04em' }}
+            dangerouslySetInnerHTML={{ __html: subtitleHtml }}
+          />
+        )}
 
         {/* Indonesian translation — toggle */}
         <div
@@ -187,13 +214,32 @@ export function StoryPlayer({ story }: StoryPlayerProps) {
         </button>
       </div>
 
-      {/* Slow-mo TTS button */}
-      <button
-        onClick={() => { playTap(); speakJapanese(scene.sentenceJapanese, true) }}
-        className="w-full py-2 rounded-xl text-[10px] font-bold text-[var(--color-text-3)] border border-dashed border-[var(--color-border)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all cursor-pointer"
-      >
-        🐢 Pelafalan Lambat
-      </button>
+      {/* Grammar Explanation Box */}
+      {explanation && (
+        <div className="rounded-[20px] p-4 bg-[var(--color-subtle)] border border-[var(--color-border)] shadow-sm anim-up">
+          <h4 className="text-xs font-bold text-[var(--color-accent)] mb-2 uppercase tracking-widest">Penjelasan Grammar</h4>
+          <p className="text-sm font-medium text-[var(--color-text-2)] leading-relaxed whitespace-pre-wrap">
+            {explanation}
+          </p>
+        </div>
+      )}
+
+      {/* Sub controls */}
+      <div className="flex gap-2 w-full">
+        <button
+          onClick={handleExplain}
+          disabled={loadingExplain}
+          className="flex-1 py-2.5 rounded-xl text-[11px] font-bold border border-[var(--color-border)] hover:bg-[var(--color-subtle)] bg-white dark:bg-[#1a1d24] active:scale-95 transition-all cursor-pointer disabled:opacity-50 text-[var(--color-accent)]"
+        >
+          {loadingExplain ? '💭 Mikir...' : explanation ? 'Tutup Penjelasan' : '💡 Explain Grammar'}
+        </button>
+        <button
+          onClick={() => { playTap(); speakJapanese(scene.sentenceJapanese, true) }}
+          className="flex-1 py-2.5 rounded-xl text-[11px] font-bold text-[var(--color-text-3)] border border-dashed border-[var(--color-border)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all cursor-pointer"
+        >
+          🐢 Pelafalan Lambat
+        </button>
+      </div>
     </div>
   )
 }
