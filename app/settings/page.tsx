@@ -346,8 +346,11 @@ export default function SettingsPage() {
         // Save progressively so partial results aren't lost
         localStorage.setItem('kotoba_stories', JSON.stringify(results))
 
-        // Small delay — be nice to free tier rate limits
-        await new Promise(r => setTimeout(r, 1500))
+        // 5s delay — free tier limit ~15 RPM, be safe
+        if (i < chapters.length - 1) {
+          setGeminiStatus(`Bab ${i + 1}/${chapters.length} selesai. Jeda sebentar...`)
+          await new Promise(r => setTimeout(r, 5000))
+        }
       } catch (e: any) {
         console.error(`[Gemini] Failed chapter "${ch}":`, e.message)
         setGeminiStatus(`Gagal bab "${ch}": ${e.message}`)

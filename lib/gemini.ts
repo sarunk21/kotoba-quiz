@@ -21,7 +21,7 @@ interface GeminiRequest {
   userPrompt: string
 }
 
-async function callGemini(req: GeminiRequest): Promise<string> {
+async function callGemini(req: GeminiRequest, retries = 3): Promise<string> {
   const apiKey = getGeminiApiKey()
   if (!apiKey) throw new Error('Gemini API key belum diset. Isi di Pengaturan.')
 
@@ -49,7 +49,17 @@ async function callGemini(req: GeminiRequest): Promise<string> {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    const msg = (err as any)?.error?.message || `HTTP ${res.status}`
+    const msg: string = (err as any)?.error?.message || `HTTP ${res.status}`
+
+    // Rate limit — parse retry delay from error message and wait
+    if ((res.status === 429 || msg.toLowerCase().includes('quota')) && retries > 0) {
+      const retryMatch = msg.match(/retry in ([\d.]+)s/i)
+      const waitMs = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) * 1000 + 2000 : 35000
+      console.warn(`[Gemini] Rate limited. Retrying in ${waitMs / 1000}s... (${retries} retries left)`)
+      await new Promise(r => setTimeout(r, waitMs))
+      return callGemini(req, retries - 1)
+    }
+
     throw new Error(`Gemini API error: ${msg}`)
   }
 
