@@ -70,6 +70,25 @@ function getCategoryStyle(category: string) {
   return { color: 'var(--color-text-2)', bg: 'var(--color-subtle)' }
 }
 
+function parseChapterNum(chapterStr?: string): number {
+  if (!chapterStr) return 1
+  const match = chapterStr.match(/\d+/)
+  return match ? parseInt(match[0], 10) : 1
+}
+
+function getMaxActiveChapterNumber(vocabList: VocabItem[], store: SRSStore): number {
+  let maxChapter = 1
+  for (const item of vocabList) {
+    const prog = store[item.id]
+    if (prog && (prog.level > 0 || prog.correctCount > 0 || prog.wrongCount > 0)) {
+      const chNum = parseChapterNum(item.chapter)
+      if (chNum > maxChapter) {
+        maxChapter = chNum
+      }
+    }
+  }
+  return maxChapter
+}
 
 export default function QuizPage() {
   return (
@@ -165,9 +184,17 @@ function QuizContent() {
           const failedIds = new Set(getFailedWords())
           pool = pool.filter(item => failedIds.has(item.id))
         }
+
         let filtered = pool
         if (chapter) {
           filtered = pool.filter(item => item.chapter === chapter)
+        } else if (!isKanjiMode && !isSpecialMode && mode !== 'failed' && !level) {
+          // Adaptive mode: Filter to vocabulary items from Bab 1 up to user's highest active chapter
+          const maxActiveCh = getMaxActiveChapterNumber(pool, store)
+          const adaptivePool = pool.filter(item => parseChapterNum(item.chapter) <= maxActiveCh)
+          if (adaptivePool.length > 0) {
+            filtered = adaptivePool
+          }
         }
         if (level) {
           filtered = filtered.filter(item => getWordJLPTLevel(item.kanji, item.chapter) === level)
@@ -302,6 +329,15 @@ function QuizContent() {
             ))}
           </div>
           <div className="flex items-center gap-2">
+            {chapter ? (
+              <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wider bg-[var(--color-accent-light)] text-[var(--color-accent)]">
+                {chapter}
+              </span>
+            ) : !isKanjiMode && !isSpecialMode && mode !== 'failed' && !level && (
+              <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wider bg-[var(--color-accent-light)] text-[var(--color-accent)]">
+                🎯 Bab 1 - {getMaxActiveChapterNumber(vocab, srsRef.current)}
+              </span>
+            )}
             {isKanjiMode && (
               <span className="text-[10px] font-extrabold px-2 py-1 rounded-lg uppercase tracking-wider"
                 style={{ background: 'var(--color-accent)', color: '#fff' }}>
