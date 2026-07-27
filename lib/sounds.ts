@@ -148,6 +148,29 @@ export function playLoseHeart() {
   o.start(t); o.stop(t + 0.22)
 }
 
+/** Pre-fetch and cache Japanese audio in the background for zero-latency instant playback */
+export function preloadJapaneseAudio(text: string) {
+  if (typeof window === 'undefined' || !text || !navigator.onLine) return
+  const localProxyUrl = `/api/audio?text=${encodeURIComponent(text)}`
+  
+  ;(async () => {
+    try {
+      if ('caches' in window) {
+        const cache = await caches.open('kotoba-audio-cache')
+        const match = await cache.match(localProxyUrl)
+        if (match) return // already cached
+        
+        const res = await fetch(localProxyUrl)
+        if (res.ok) {
+          await cache.put(localProxyUrl, res)
+        }
+      }
+    } catch (e) {
+      // silent background prefetch error handling
+    }
+  })()
+}
+
 /** Speak Japanese text using Web Speech API with caching */
 export function speakJapanese(text: string, slow = false) {
   if (typeof window === 'undefined') return

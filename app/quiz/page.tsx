@@ -11,7 +11,7 @@ import {
   type SRSStore
 } from '@/lib/srs'
 import { pushToCloud } from '@/lib/cloud'
-import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish, speakJapanese } from '@/lib/sounds'
+import { playCorrect, playWrong, playStreak, playLevelUp, playTap, playLoseHeart, playFinish, speakJapanese, preloadJapaneseAudio } from '@/lib/sounds'
 import { SPECIALIZED_DATA } from '@/lib/specialized'
 import { getWordJLPTLevel } from '@/lib/jlpt'
 import { rescheduleDailyReminderIfNeeded } from '@/lib/notifications'
@@ -215,11 +215,16 @@ function QuizContent() {
     init()
   }, [isKanjiMode, isSpecialMode, type, chapter, level, startQuiz])
 
-  // Auto-play pronunciation when a new question loads
+  // Auto-play pronunciation when a new question loads & pre-fetch next
   useEffect(() => {
     if (phase === 'question' && state?.queue && state.queue[state.current]) {
       const currentVocab = state.queue[state.current]
       speakJapanese(currentVocab.hiragana || currentVocab.kanji)
+
+      if (state.queue[state.current + 1]) {
+        const nextVocab = state.queue[state.current + 1]
+        preloadJapaneseAudio(nextVocab.hiragana || nextVocab.kanji)
+      }
     }
   }, [state?.current, phase])
 
