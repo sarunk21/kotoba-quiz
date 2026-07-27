@@ -525,9 +525,9 @@ export default function VocabPage() {
 
   return (
     <>
-      <main className="min-height-100dvh pb-28 pt-6 px-4 max-w-sm md:max-w-2xl mx-auto flex flex-col gap-5 anim-up">
+      <main className="min-h-dvh pb-28 pt-6 px-4 max-w-sm md:max-w-2xl mx-auto flex flex-col gap-5">
         {/* Header */}
-        <header className="flex flex-col gap-2 relative">
+        <header className="flex flex-col gap-2 relative anim-up">
           <div className="flex items-center justify-between">
             <Link 
               href="/" 
@@ -784,9 +784,10 @@ export default function VocabPage() {
           ➕
         </button>
 
-        {/* Bottom Navigation */}
-        <BottomNav />
       </main>
+
+      {/* Bottom Navigation */}
+      <BottomNav />
 
       {/* ── MODAL: Add / Edit Word ── */}
       {showAddEditModal && (
