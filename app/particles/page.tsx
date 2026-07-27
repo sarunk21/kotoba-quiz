@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
-import { addFuriganaToSentence } from '@/lib/vocab'
+import { addFuriganaToSentence, extractVocabRefFromSentence } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 
 function generateQuestions(particle: string): ParticleQuestion[] {
@@ -432,6 +432,29 @@ function ParticlesQuizContent() {
               <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed select-text">
                 Arti: {currentQuestion.translation}
               </p>
+
+              {/* Core Vocabulary Reference Breakdown */}
+              {(() => {
+                const refs = extractVocabRefFromSentence(currentQuestion.sentence)
+                if (refs.length === 0) return null
+                return (
+                  <div className="mt-4 pt-3 border-t border-[var(--color-border)] text-left">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-2 flex items-center gap-1">
+                      <span>📖</span> Kosakata Minna no Nihongo dalam Kalimat Ini:
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {refs.map((v, i) => (
+                        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[var(--color-subtle)] text-[10px] font-bold text-[var(--color-text-1)] border border-[var(--color-border)]">
+                          <span className="jp font-black text-xs">{v.kanji}</span>
+                          <span className="text-[var(--color-text-3)] text-[9px]">({v.hiragana})</span>
+                          <span className="text-[var(--color-text-2)]">{v.arti}</span>
+                          <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[var(--color-accent-light)] text-[var(--color-accent)] uppercase">{v.chapter}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
 
             {/* Multiple Choice Options */}

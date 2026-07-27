@@ -169,11 +169,11 @@ export default function BottomNav() {
 
   const leftTabs = [
     { name: 'Beranda', path: '/', icon: '🏠' },
-    { name: 'Kamus', path: '/progress', icon: '📖' },
+    { name: 'Kosakata', path: '/vocab', icon: '📖' },
   ]
 
   const rightTabs = [
-    { name: 'Karakter', path: '/kana', icon: 'あ' },
+    { name: 'Latihan', path: '/practice', icon: 'あ' },
     { name: 'Pengaturan', path: '/settings', icon: '⚙️' },
   ]
 
@@ -227,16 +227,17 @@ export default function BottomNav() {
             })}
           </div>
 
-          {/* Center Float Button */}
+          {/* Center Float Button (1-Tap Direct Launch SRS Quiz) */}
           <div className="flex justify-center px-1 shrink-0">
-            <button 
-              onClick={togglePracticeModal}
+            <Link 
+              href="/quiz"
+              onClick={playTap}
               className="flex items-center justify-center select-none no-underline w-14 h-14 rounded-full bg-gradient-to-tr from-[var(--color-accent)] to-[var(--color-accent-dark)] shadow-[0_6px_20px_rgba(91,94,244,0.4)] active:scale-90 transition-all -mt-8 border-4 border-white dark:border-[#1a1d24]"
             >
-              <span className="text-xl text-white transition-all duration-300 block" style={{ transform: showPracticeModal ? 'rotate(90deg)' : 'none' }}>
-                {showPracticeModal ? '✕' : '🎯'}
+              <span className="text-xl text-white transition-all duration-300 block">
+                🎯
               </span>
-            </button>
+            </Link>
           </div>
 
           {/* Right Tabs */}

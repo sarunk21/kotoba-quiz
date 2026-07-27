@@ -67,13 +67,6 @@ export default function VocabPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [isBulkDelete, setIsBulkDelete] = useState(false)
 
-  // Auth Protection
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/')
-    }
-  }, [status, router])
-
   // Load Initial Vocab & Google Sheets URL
   useEffect(() => {
     const list = loadLocalVocab()

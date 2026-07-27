@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { SENTENCE_QUESTIONS, type SentenceQuestion } from '@/lib/sentences-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap, speakJapanese } from '@/lib/sounds'
-import { addFuriganaToSentence } from '@/lib/vocab'
+import { addFuriganaToSentence, extractVocabRefFromSentence } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 
 export default function SentencesQuizPage() {
@@ -244,6 +244,29 @@ export default function SentencesQuizPage() {
                 <p className="text-sm font-extrabold text-[var(--color-text-1)] select-text">
                   Arti: {currentQuestion.indonesian}
                 </p>
+
+                {/* Core Vocabulary Reference Breakdown */}
+                {(() => {
+                  const refs = extractVocabRefFromSentence(currentQuestion.japanese)
+                  if (refs.length === 0) return null
+                  return (
+                    <div className="mt-3 pt-2.5 border-t border-[var(--color-border)] text-left">
+                      <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-1.5 flex items-center gap-1">
+                        <span>📖</span> Referensi Kata (Minna no Nihongo):
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {refs.map((v, i) => (
+                          <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--color-subtle)] text-[9px] font-bold text-[var(--color-text-1)] border border-[var(--color-border)]">
+                            <span className="jp font-black text-[10px]">{v.kanji}</span>
+                            <span className="text-[var(--color-text-3)]">({v.hiragana})</span>
+                            <span className="text-[var(--color-text-2)]">{v.arti}</span>
+                            <span className="text-[8px] font-black px-1 rounded bg-[var(--color-accent-light)] text-[var(--color-accent)]">{v.chapter}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
 
               {/* Selected Blocks Area */}

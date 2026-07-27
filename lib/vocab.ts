@@ -1,4 +1,5 @@
 import Papa from 'papaparse'
+import defaultVocabData from '@/public/data/vocab-default.json'
 
 export type Category = 'Kata Benda' | 'Kata Kerja' | 'Kata Sifat' | 'Ungkapan' | 'Angka' | 'Hari' | 'Uang'
 
@@ -11,13 +12,14 @@ export interface VocabItem {
   chapter?: string
   contohKalimat?: string      // ponytail: optional example sentence
   contohKalimatArti?: string  // ponytail: optional translation of example sentence
+  source?: 'standard' | 'custom'
 }
 
 /** 
  * Parse CSV robustly using PapaParse.
  * Columns expected: kategori, hiragana, kanji, arti, bab
  */
-export function parseCSVToVocab(csvText: string): VocabItem[] {
+export function parseCSVToVocab(csvText: string, defaultSource: 'standard' | 'custom' = 'custom'): VocabItem[] {
   const parsed = Papa.parse(csvText, {
     header: false,
     skipEmptyLines: true,
@@ -94,6 +96,7 @@ export function parseCSVToVocab(csvText: string): VocabItem[] {
         chapter: chapter || undefined,
         contohKalimat: contohKalimat?.trim() || undefined,
         contohKalimatArti: contohKalimatArti?.trim() || undefined,
+        source: defaultSource,
       })
     }
   }
@@ -123,8 +126,10 @@ export function loadLocalVocab(): VocabItem[] {
   if (typeof window === 'undefined') return []
   const raw = localStorage.getItem('kotoba_vocab')
   if (!raw) {
-    cachedVocab = null
-    return []
+    // Auto-seed with default 960 vocabulary dataset for Bab 1-25
+    const initialItems = defaultVocabData as VocabItem[]
+    saveLocalVocab(initialItems)
+    return initialItems
   }
   if (cachedVocab) return cachedVocab
   try {
@@ -291,9 +296,26 @@ FURIGANA_DICT['日曜日'] = 'にちようび'
 FURIGANA_DICT['毎週'] = 'まいしゅう'
 FURIGANA_DICT['妹'] = 'いもうと'
 
+// Pre-sorted keys for furigana dictionary
+let PRE_SORTED_FURIGANA_KEYS: string[] | null = null
+
+function getSortedFuriganaKeys(): string[] {
+  if (!PRE_SORTED_FURIGANA_KEYS) {
+    PRE_SORTED_FURIGANA_KEYS = Object.keys(FURIGANA_DICT).sort((a, b) => b.length - a.length)
+  }
+  return PRE_SORTED_FURIGANA_KEYS
+}
+
+const furiganaCache = new Map<string, string>()
+
 export function addFuriganaToSentence(sentence: string): string {
+  if (!sentence) return ''
+  if (furiganaCache.has(sentence)) {
+    return furiganaCache.get(sentence)!
+  }
+
   let html = sentence
-  const sortedKeys = Object.keys(FURIGANA_DICT).sort((a, b) => b.length - a.length)
+  const sortedKeys = getSortedFuriganaKeys()
   
   // Temporarily replace ___ and spaces around it to protect it from replacement
   html = html.replace('___', '___TEMP___')
@@ -308,5 +330,47 @@ export function addFuriganaToSentence(sentence: string): string {
 
   // Restore ___
   html = html.split('___TEMP___').join('___')
+  
+  // Cache result (limit cache size to 500 items)
+  if (furiganaCache.size > 500) furiganaCache.clear()
+  furiganaCache.set(sentence, html)
+  
   return html
+}
+
+const vocabRefCache = new Map<string, { kanji: string; hiragana: string; arti: string; chapter: string }[]>()
+
+export function extractVocabRefFromSentence(sentence: string, vocabList?: VocabItem[]): { kanji: string; hiragana: string; arti: string; chapter: string }[] {
+  if (!sentence) return []
+  if (vocabRefCache.has(sentence)) {
+    return vocabRefCache.get(sentence)!
+  }
+
+  const list = vocabList || getGlobalVocab() || loadLocalVocab()
+  if (!list || list.length === 0) return []
+
+  const matches: { kanji: string; hiragana: string; arti: string; chapter: string }[] = []
+  const cleanSentence = sentence.replace(/___/g, '')
+
+  for (const item of list) {
+    const kanjiMatch = item.kanji && item.kanji.length >= 2 && cleanSentence.includes(item.kanji)
+    const hiraganaMatch = item.hiragana && item.hiragana.length >= 3 && cleanSentence.includes(item.hiragana)
+
+    if (kanjiMatch || hiraganaMatch) {
+      const matchWord = item.kanji || item.hiragana
+      if (!matches.some(m => m.kanji === matchWord)) {
+        matches.push({
+          kanji: matchWord,
+          hiragana: item.hiragana,
+          arti: item.arti,
+          chapter: item.chapter || 'Bab 1'
+        })
+      }
+    }
+  }
+
+  if (vocabRefCache.size > 500) vocabRefCache.clear()
+  vocabRefCache.set(sentence, matches)
+
+  return matches
 }
