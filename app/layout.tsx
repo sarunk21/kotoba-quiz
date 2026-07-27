@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { SessionProvider } from 'next-auth/react'
 import AppInitializer from '@/components/AppInitializer'
-import { GenerateProgressToast } from '@/components/GenerateProgressToast'
 
 export const metadata: Metadata = {
   title: '言葉カード — Kotoba Quiz',
@@ -50,7 +49,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider>
           <AppInitializer />
           {children}
-          <GenerateProgressToast />
         </SessionProvider>
         <script dangerouslySetInnerHTML={{
           __html: `

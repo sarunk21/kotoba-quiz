@@ -421,26 +421,13 @@ export default function BottomNav() {
                     </Link>
 
                     {/* Penyusunan Kalimat */}
-                    <Link href="/sentences" onClick={handleLinkClick} className="block no-underline active:scale-[0.98] transition-transform">
+                    <Link href="/sentences" onClick={handleLinkClick} className="col-span-2 block no-underline active:scale-[0.98] transition-transform">
                       <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
                         <div className="jp-serif text-2xl font-extrabold text-green-500 leading-none flex items-center justify-center w-8 h-8 bg-green-50 dark:bg-green-950/30 rounded-xl shrink-0">文</div>
                         <div className="flex-1 min-w-0">
                           <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Susun Kalimat</p>
                           <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
                             Susun kata jadi kalimat
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-
-                    {/* Latihan Per Level JLPT */}
-                    <Link href="/quiz/jlpt" onClick={handleLinkClick} className="col-span-2 block no-underline active:scale-[0.98] transition-transform">
-                      <div className="rounded-2xl p-3 flex items-center gap-2.5 border border-[var(--color-border)] hover:bg-[var(--color-bg)] bg-[var(--color-white)] transition-all h-full">
-                        <div className="text-2xl flex items-center justify-center w-8 h-8 bg-blue-50 dark:bg-blue-950/30 rounded-xl shrink-0">🎯</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-extrabold text-xs text-[var(--color-text-1)] truncate">Latihan Per Level JLPT</p>
-                          <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 line-clamp-2 leading-tight">
-                            Fokus kuis kosakata level N5 sampai N1
                           </p>
                         </div>
                       </div>

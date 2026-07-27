@@ -137,19 +137,10 @@ function ChaptersSelectContent() {
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-auto">
-                      {hasStory && (
-                        <Link
-                          href={`/story/${encodeURIComponent(ch.name)}`}
-                          onClick={playTap}
-                          className="flex-1 flex items-center justify-center py-2 px-3 rounded-xl border border-[var(--color-accent)] bg-white dark:bg-[#1a1d24] text-[var(--color-accent)] font-extrabold text-[10px] active:scale-95 transition-all text-center no-underline cursor-pointer"
-                        >
-                          📖 Cerita
-                        </Link>
-                      )}
                       <Link
                         href={`/quiz?chapter=${encodeURIComponent(ch.name)}`}
                         onClick={playTap}
-                        className="flex-1 flex items-center justify-center py-2 px-3 rounded-xl font-extrabold text-[10px] text-white active:scale-95 transition-all text-center no-underline cursor-pointer"
+                        className="w-full flex items-center justify-center py-2.5 px-3 rounded-xl font-extrabold text-[11px] text-white active:scale-95 transition-all text-center no-underline cursor-pointer"
                         style={{ background: 'var(--color-accent)' }}
                       >
                         ⚡ Kuis

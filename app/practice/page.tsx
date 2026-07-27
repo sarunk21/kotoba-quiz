@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { playTap } from '@/lib/sounds'
+import BottomNav from '@/components/BottomNav'
 
 interface PracticeQuestion {
   id: string
@@ -222,28 +223,13 @@ export default function PracticeHubPage() {
             <Link
               href="/sentences"
               onClick={playTap}
-              className="block no-underline active:scale-[0.98] transition-transform"
+              className="col-span-2 block no-underline active:scale-[0.98] transition-transform"
             >
               <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-md transition-all h-full">
                 <div className="jp-serif text-3xl font-extrabold text-green-500 mb-2">文</div>
                 <p className="font-extrabold text-xs text-[var(--color-text-1)]">Susun Kalimat</p>
                 <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
                   Latihan susun blok kata
-                </p>
-              </div>
-            </Link>
-
-            {/* Level JLPT */}
-            <Link
-              href="/quiz/jlpt"
-              onClick={playTap}
-              className="block no-underline active:scale-[0.98] transition-transform"
-            >
-              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-md transition-all h-full">
-                <div className="text-3xl font-extrabold text-blue-500 mb-2">🎯</div>
-                <p className="font-extrabold text-xs text-[var(--color-text-1)]">Level JLPT</p>
-                <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                  Kuis khusus N5 sampai N1
                 </p>
               </div>
             </Link>
@@ -294,6 +280,7 @@ export default function PracticeHubPage() {
           </div>
         </div>
       )}
+      <BottomNav />
     </main>
   )
 }

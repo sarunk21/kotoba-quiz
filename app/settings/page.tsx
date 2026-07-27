@@ -8,10 +8,6 @@ import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
 import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
 import { parseCSVToVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
-import { fetchStories } from '@/lib/stories'
-import { getGroqApiKey, saveGroqApiKey, generateStoryForChapter } from '@/lib/gemini'
-import { startBackgroundGenerate, isGenerating, subscribeProgress } from '@/lib/backgroundGenerate'
-import { type ChapterStory } from '@/lib/stories'
 import BottomNav from '@/components/BottomNav'
 import { 
   checkNotificationPermission, 
@@ -36,10 +32,6 @@ export default function SettingsPage() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [syncMode, setSyncMode] = useState<'auto' | 'manual'>('auto')
   const [syncActionStatus, setSyncActionStatus] = useState<string>('')
-  const [geminiKey, setGeminiKey] = useState<string>('')
-  const [showGeminiKey, setShowGeminiKey] = useState(false)
-  const [geminiStatus, setGeminiStatus] = useState<string>('')
-  const [generatingStories, setGeneratingStories] = useState(isGenerating())
 
   // Sync Sheets manually
   async function handleSyncSheets() {
@@ -82,15 +74,7 @@ export default function SettingsPage() {
         return
       }
 
-      // ponytail: fetch stories
-      try {
-        const storiesList = await fetchStories(sheetsUrl)
-        if (storiesList.length > 0) {
-          localStorage.setItem('kotoba_stories', JSON.stringify(storiesList))
-        }
-      } catch (se) {
-        console.error('[Stories Sync Error]', se)
-      }
+
 
       const updatedList = [...newItems, ...updatedLocalVocab]
       saveLocalVocab(updatedList)
@@ -154,14 +138,6 @@ export default function SettingsPage() {
       setReminderTime(time)
     }
     initNotifications()
-
-    // Load Groq API key
-    setGeminiKey(getGroqApiKey())
-    setGeneratingStories(isGenerating())
-
-    // Sync generating state from background module
-    const unsub = subscribeProgress(p => setGeneratingStories(p.isRunning))
-    return unsub
   }, [])
 
   function toggleSyncMode(mode: 'auto' | 'manual') {
@@ -283,50 +259,6 @@ export default function SettingsPage() {
       setResetting(false)
       setShowResetConfirm(false)
     }
-  }
-
-  function handleSaveGeminiKey() {
-    saveGroqApiKey(geminiKey)
-    setGeminiStatus('API Key tersimpan ✓')
-    setTimeout(() => setGeminiStatus(''), 2500)
-  }
-
-  async function handleGenerateAllStories() {
-    const key = geminiKey.trim()
-    if (!key) {
-      setGeminiStatus('Isi API Key Groq dulu!')
-      setTimeout(() => setGeminiStatus(''), 3000)
-      return
-    }
-    saveGroqApiKey(key)
-
-    const vocab = loadLocalVocab()
-    if (vocab.length === 0) {
-      setGeminiStatus('Belum ada vocab — sync Google Sheets dulu.')
-      setTimeout(() => setGeminiStatus(''), 3000)
-      return
-    }
-
-    // Build chapters map
-    const chaptersMap = new Map<string, { kanji: string; hiragana: string; arti: string }[]>()
-    for (const v of vocab) {
-      const ch = v.chapter || 'Tanpa Bab'
-      if (!chaptersMap.has(ch)) chaptersMap.set(ch, [])
-      chaptersMap.get(ch)!.push({ kanji: v.kanji, hiragana: v.hiragana, arti: v.arti })
-    }
-
-    // Skip chapters that already have stories
-    let existingStories: ChapterStory[] = []
-    try {
-      const stored = localStorage.getItem('kotoba_stories')
-      if (stored) existingStories = JSON.parse(stored)
-    } catch { /* ignore */ }
-    const alreadyHas = new Set(existingStories.map(s => s.chapter))
-
-    // Fire and forget — user can navigate away
-    startBackgroundGenerate(chaptersMap, alreadyHas)
-    setGeminiStatus('Generate dimulai! Bisa pindah halaman, cerita tetap diproses.')
-    setTimeout(() => setGeminiStatus(''), 4000)
   }
 
   if (status === 'loading') return null
@@ -473,58 +405,7 @@ export default function SettingsPage() {
             )}
           </div>
 
-          {/* AI Content Generation Section */}
-          <div className="rounded-3xl p-6 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-            <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-3)' }}>Konten AI ✨</p>
-            <p className="text-xs font-semibold leading-relaxed mb-4" style={{ color: 'var(--color-text-2)' }}>
-              Generate cerita naratif per bab pakai Groq AI (gratis, tanpa kartu kredit). Daftar di <span className="text-[var(--color-accent)] font-bold">console.groq.com</span> → API Keys.
-            </p>
 
-            {/* API Key input */}
-            <div className="flex gap-2 mb-3">
-              <input
-                type={showGeminiKey ? 'text' : 'password'}
-                placeholder="gsk_..."
-                value={geminiKey}
-                onChange={e => setGeminiKey(e.target.value)}
-                className="flex-1 rounded-2xl px-4 py-2.5 text-xs font-semibold border border-[var(--color-border)] outline-none bg-[var(--color-bg)] focus:border-[var(--color-accent)] transition-colors"
-                style={{ color: 'var(--color-text-1)' }}
-              />
-              <button
-                onClick={() => setShowGeminiKey(s => !s)}
-                className="w-10 h-10 rounded-xl flex items-center justify-center border border-[var(--color-border)] bg-[var(--color-bg)] text-sm active:scale-90 transition-all cursor-pointer"
-              >
-                {showGeminiKey ? '🙈' : '👁️'}
-              </button>
-              <button
-                onClick={handleSaveGeminiKey}
-                className="rounded-2xl px-4 py-2.5 text-xs font-extrabold active:scale-95 transition-all cursor-pointer"
-                style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)' }}
-              >
-                Simpan
-              </button>
-            </div>
-
-            {/* Generate button */}
-            <button
-              onClick={handleGenerateAllStories}
-              disabled={generatingStories || !geminiKey.trim()}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold active:scale-95 transition-transform disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-              style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 4px 12px rgba(91,94,244,0.2)' }}
-            >
-              {generatingStories ? '⏳ Generating...' : '✨ Generate Cerita Semua Bab'}
-            </button>
-
-            {geminiStatus && (
-              <p className="text-center text-[10px] font-bold mt-3 animate-pulse" style={{ color: generatingStories ? 'var(--color-accent)' : geminiStatus.includes('✓') ? 'var(--color-green)' : 'var(--color-amber)' }}>
-                {geminiStatus}
-              </p>
-            )}
-
-            <p className="text-[10px] text-center mt-3 font-semibold" style={{ color: 'var(--color-text-3)' }}>
-              Cerita tersimpan lokal. API key hanya dikirim ke api.groq.com, tidak ke server lain.
-            </p>
-          </div>
           <div className="rounded-3xl p-6 anim-up d3" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Notifikasi</p>
             <div className="flex items-center justify-between">
