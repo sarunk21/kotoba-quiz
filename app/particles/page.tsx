@@ -6,6 +6,7 @@ import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
 import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
 import { addFuriganaToSentence, extractVocabRefFromSentence } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
+import BottomNav from '@/components/BottomNav'
 
 function generateQuestions(particle: string): ParticleQuestion[] {
   if (particle === 'all') {
@@ -261,6 +262,7 @@ function ParticlesQuizContent() {
             </div>
           </div>
         </div>
+        <BottomNav />
       </div>
     )
   }
@@ -555,6 +557,7 @@ function ParticlesQuizContent() {
           </div>
         )}
       </div>
+      <BottomNav />
     </div>
   )
 }
