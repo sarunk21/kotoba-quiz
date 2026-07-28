@@ -85,6 +85,23 @@ function QuizContent() {
   const [selected, setSelected] = useState<string | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showRomajiHint, setShowRomajiHint] = useState(false)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
+
+  // Intercept browser / device back button during active quiz
+  useEffect(() => {
+    if (phase !== 'question' && phase !== 'feedback') return
+    window.history.pushState({ inQuiz: true }, '', window.location.href)
+
+    const handlePopState = () => {
+      window.history.pushState({ inQuiz: true }, '', window.location.href)
+      setShowExitConfirm(true)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [phase])
   const [quizMode, setQuizMode] = useState<QuizMode>('kana→romaji')
   const [cardKey, setCardKey] = useState(0)
   const [finalStats, setFinalStats] = useState<{ correct: number; total: number } | null>(null)
@@ -254,7 +271,7 @@ function QuizContent() {
       <div className="px-4 pt-10 pb-4">
         <div className="flex items-center gap-3 mb-4">
           <button 
-            onClick={() => { playTap(); saveSRS(srsRef.current); pushToCloud(); router.replace('/kana') }}
+            onClick={() => { playTap(); setShowExitConfirm(true) }}
             className="w-9 h-9 rounded-2xl flex items-center justify-center font-black text-base shrink-0 active:scale-95 transition-transform bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] shadow-xs cursor-pointer"
           >
             ✕
@@ -470,6 +487,42 @@ function QuizContent() {
               >
                 {state.current + 1 >= state.queue.length ? 'Selesaikan Kuis 🎉' : 'Lanjut →'}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Exit Confirmation Modal ── */}
+        {showExitConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade">
+            <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-3xl p-6 max-w-xs w-full shadow-2xl text-center anim-pop">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center text-2xl mx-auto mb-3">
+                ⚠️
+              </div>
+              <h3 className="text-base font-black text-[var(--color-text-1)] mb-1">
+                Keluar dari Kuis Kana?
+              </h3>
+              <p className="text-xs font-semibold text-[var(--color-text-3)] mb-6">
+                Progres sesi kuis Kana akan disimpan sebelum Anda keluar.
+              </p>
+              <div className="flex flex-col gap-2.5">
+                <button
+                  onClick={() => { playTap(); setShowExitConfirm(false) }}
+                  className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-accent)] text-white active:scale-95 transition-all shadow-sm cursor-pointer"
+                >
+                  Lanjutkan Kuis ➔
+                </button>
+                <button
+                  onClick={() => {
+                    playTap()
+                    saveSRS(srsRef.current)
+                    pushToCloud()
+                    router.replace('/kana')
+                  }}
+                  className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-subtle)] text-rose-600 dark:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                >
+                  Ya, Keluar
+                </button>
+              </div>
             </div>
           </div>
         )}

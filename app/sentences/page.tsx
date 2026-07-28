@@ -26,12 +26,29 @@ export default function SentencesQuizPage() {
   const [isFinished, setIsFinished] = useState(false)
 
   const [showFurigana, setShowFurigana] = useState(false)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
 
   // Initialize showFurigana state on mount
   useEffect(() => {
     const saved = localStorage.getItem('kotoba_show_furigana')
     setShowFurigana(saved !== 'false') // default to true
   }, [])
+
+  // Intercept browser / device back button during active quiz
+  useEffect(() => {
+    if (isFinished || isGameOver) return
+    window.history.pushState({ inQuiz: true }, '', window.location.href)
+
+    const handlePopState = () => {
+      window.history.pushState({ inQuiz: true }, '', window.location.href)
+      setShowExitConfirm(true)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [isFinished, isGameOver])
 
   const currentQuestion = useMemo(() => {
     return questions[currentIndex] || null
@@ -127,8 +144,11 @@ export default function SentencesQuizPage() {
         {/* Top Header */}
         <header className="flex items-center justify-between gap-4 mb-8 anim-up">
           <button 
-            onClick={() => router.push('/')}
-            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform"
+            onClick={() => {
+              playTap()
+              setShowExitConfirm(true)
+            }}
+            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform cursor-pointer"
           >
             ←
           </button>
@@ -377,6 +397,40 @@ export default function SentencesQuizPage() {
                   >
                     {currentIndex + 1 >= questions.length ? 'Selesaikan Latihan 🎉' : 'Lanjut →'}
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── Exit Confirmation Modal ── */}
+            {showExitConfirm && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade">
+                <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-3xl p-6 max-w-xs w-full shadow-2xl text-center anim-pop">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center text-2xl mx-auto mb-3">
+                    ⚠️
+                  </div>
+                  <h3 className="text-base font-black text-[var(--color-text-1)] mb-1">
+                    Keluar dari Susun Kalimat?
+                  </h3>
+                  <p className="text-xs font-semibold text-[var(--color-text-3)] mb-6">
+                    Kemajuan sesi kuis ini belum selesai. Apakah Anda yakin ingin keluar?
+                  </p>
+                  <div className="flex flex-col gap-2.5">
+                    <button
+                      onClick={() => { playTap(); setShowExitConfirm(false) }}
+                      className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-accent)] text-white active:scale-95 transition-all shadow-sm cursor-pointer"
+                    >
+                      Lanjutkan Kuis ➔
+                    </button>
+                    <button
+                      onClick={() => {
+                        playTap()
+                        router.push('/')
+                      }}
+                      className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-subtle)] text-rose-600 dark:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                    >
+                      Ya, Keluar
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

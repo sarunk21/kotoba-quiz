@@ -195,24 +195,33 @@ export default function PracticeHubPage() {
               onClick={playTap}
               className="col-span-2 block no-underline active:scale-[0.98] transition-transform"
             >
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-5 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between border border-indigo-400/20">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-2xl shrink-0">
-                    📖
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-extrabold text-sm text-white tracking-tight">Kuis Kosakata Per Bab</h3>
-                      <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-amber-400 text-indigo-950 uppercase tracking-wider">SRS</span>
+              <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-[28px] p-5 text-white shadow-lg hover:shadow-xl transition-all relative overflow-hidden border border-indigo-400/30">
+                {/* Background glow */}
+                <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl shrink-0 shadow-sm border border-white/20">
+                      📖
                     </div>
-                    <p className="text-[11px] font-medium text-indigo-100/90 mt-0.5">
-                      Kuis hafalan flashcard terarah per bab
-                    </p>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-black text-base text-white tracking-tight">Kuis Kosakata Per Bab</h3>
+                        <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-amber-400 text-indigo-950 uppercase tracking-wider shadow-xs">
+                          SRS
+                        </span>
+                      </div>
+                      <p className="text-xs font-medium text-indigo-100/90 mt-1">
+                        Bab 1–25 • Pelajari & Kuis Hafalan Terstruktur
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end">
+                    <span className="w-full sm:w-auto text-center text-xs font-black bg-white text-indigo-600 px-4 py-2.5 rounded-xl shadow-md flex items-center justify-center gap-1.5 hover:bg-indigo-50 transition-colors">
+                      <span>Pilih Bab</span>
+                      <span>➔</span>
+                    </span>
                   </div>
                 </div>
-                <span className="text-xs font-black bg-white text-indigo-600 px-3.5 py-2 rounded-xl shrink-0 shadow-sm flex items-center gap-1">
-                  Mulai ➔
-                </span>
               </div>
             </Link>
 

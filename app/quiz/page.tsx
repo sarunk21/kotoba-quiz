@@ -129,6 +129,7 @@ function QuizContent() {
   const [finalStats, setFinalStats] = useState<{ correct: number; total: number; srsStore: SRSStore } | null>(null)
   const [showHint, setShowHint] = useState(false)
   const [showFurigana, setShowFurigana] = useState(false)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
   const srsRef = useRef<SRSStore>({})
   const initialized = useRef(false)
 
@@ -136,6 +137,22 @@ function QuizContent() {
     const saved = localStorage.getItem('kotoba_show_furigana')
     setShowFurigana(saved !== 'false') // default to true
   }, [])
+
+  // Intercept browser / device back button during active quiz
+  useEffect(() => {
+    if (phase !== 'question' && phase !== 'feedback') return
+    window.history.pushState({ inQuiz: true }, '', window.location.href)
+
+    const handlePopState = () => {
+      window.history.pushState({ inQuiz: true }, '', window.location.href)
+      setShowExitConfirm(true)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [phase])
 
   const startQuiz = useCallback((v: VocabItem[], store: SRSStore, fullPool?: VocabItem[]) => {
     const { dueIds, newIds, refreshIds } = buildQueue(v.map(i => i.id), store, TOTAL_QUESTIONS)
@@ -313,8 +330,8 @@ function QuizContent() {
       <div className="px-4 pt-12 pb-4">
         <div className="flex items-center gap-3 mb-5">
           {/* Close */}
-          <button onClick={() => { saveSRS(srsRef.current); pushToCloud(); router.replace('/') }}
-            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 active:scale-95 transition-transform"
+          <button onClick={() => setShowExitConfirm(true)}
+            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-base shrink-0 active:scale-95 transition-transform cursor-pointer"
             style={{ background: 'var(--color-white)', color: 'var(--color-text-2)', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             ✕
           </button>
@@ -596,6 +613,41 @@ function QuizContent() {
             >
               Lanjut ➔
             </button>
+          </div>
+        </div>
+      )}
+      {/* ── Exit Confirmation Modal ── */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade">
+          <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-3xl p-6 max-w-xs w-full shadow-2xl text-center anim-pop">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center text-2xl mx-auto mb-3">
+              ⚠️
+            </div>
+            <h3 className="text-base font-black text-[var(--color-text-1)] mb-1">
+              Keluar dari Kuis?
+            </h3>
+            <p className="text-xs font-semibold text-[var(--color-text-3)] mb-6">
+              Progres kuis sesi ini akan disimpan sebelum Anda keluar.
+            </p>
+            <div className="flex flex-col gap-2.5">
+              <button
+                onClick={() => { playTap(); setShowExitConfirm(false) }}
+                className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-accent)] text-white active:scale-95 transition-all shadow-sm cursor-pointer"
+              >
+                Lanjutkan Kuis ➔
+              </button>
+              <button
+                onClick={() => {
+                  playTap()
+                  saveSRS(srsRef.current)
+                  pushToCloud()
+                  router.replace('/')
+                }}
+                className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-subtle)] text-rose-600 dark:text-rose-400 active:scale-95 transition-all cursor-pointer"
+              >
+                Ya, Keluar
+              </button>
+            </div>
           </div>
         </div>
       )}
