@@ -483,54 +483,16 @@ function QuizContent() {
             </span>
           </div>
 
-          {/* ponytail: show contoh kalimat & arti after answering */}
-          {selected && (
-            <div className="mt-4 pt-4 border-t border-[var(--color-border)] text-left relative z-10 anim-up">
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--color-text-3)] mb-1">
-                Arti Kata
-              </p>
-              <p className="text-base font-extrabold text-[var(--color-green-dark)] dark:text-green-400 mb-4">
-                {q.arti}
-              </p>
-
-              {q.contohKalimat && (
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--color-text-3)] mb-1">
-                      Contoh Kalimat
-                    </p>
-                    <p className="jp text-base font-bold text-[var(--color-text-1)] mb-1 leading-normal">
-                      <span dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(q.contohKalimat) }} />
-                    </p>
-                    <p className="text-xs font-semibold text-[var(--color-text-2)]">
-                      {q.contohKalimatArti}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2 pt-1">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        speakJapanese(q.hiragana || q.kanji)
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-extrabold bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-all border border-[var(--color-border)] cursor-pointer"
-                    >
-                      🔊 Kata Saja
-                    </button>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        speakJapanese(q.contohKalimat || '')
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-extrabold bg-[var(--color-accent-light)] text-[var(--color-accent)] active:scale-95 transition-all border border-[var(--color-accent)] cursor-pointer"
-                    >
-                      🔊 Kalimat Penuh
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Level dot */}
+          <div className="relative mt-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
+            style={{ background: 'var(--color-bg)' }}>
+            <div className="w-1.5 h-1.5 rounded-full" style={{
+              background: wp.level >= 5 ? 'var(--color-green)' : wp.level >= 3 ? 'var(--color-accent)' : wp.level >= 1 ? 'var(--color-amber)' : 'var(--color-text-3)'
+            }} />
+            <span className="text-xs font-semibold" style={{ color: 'var(--color-text-2)' }}>
+              {wp.level === 0 ? 'Baru' : wp.level >= MASTERED_LEVEL ? 'Hafal' : `Lv.${wp.level}`}
+            </span>
+          </div>
         </div>
 
         {/* Choices */}
@@ -570,38 +532,69 @@ function QuizContent() {
         </div>
       </div>
 
-      {/* ── Feedback panel ── */}
+      {/* ── Fixed Bottom Feedback Sheet ── */}
       {selected && (
-        <div className="anim-up px-4 pt-5 pb-8 mt-5"
+        <div className="fixed bottom-0 left-0 right-0 z-50 anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl border-t"
           style={{
             background: isCorrect ? 'var(--color-green-light)' : 'var(--color-red-light)',
-            borderRadius: '28px 28px 0 0',
-            borderTop: `1.5px solid ${isCorrect ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}`,
+            borderColor: isCorrect ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)',
+            borderRadius: '32px 32px 0 0',
           }}>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="font-extrabold text-base" style={{ color: isCorrect ? 'var(--color-green-dark)' : 'var(--color-red-dark)' }}>
-                {isCorrect
-                  ? state.roundStreak >= 3 ? `🔥 ${state.roundStreak}x Streak!` : '✓ Bener!'
-                  : '✗ Salah!'}
-              </p>
-              <p className="text-sm font-semibold mt-0.5" style={{ color: 'var(--color-text-2)' }}>
-                {isCorrect
-                  ? wp.level >= MASTERED_LEVEL
-                    ? 'Masih hafal! Muncul lagi 90 hari lagi'
-                    : `Naik level → review ${SRS_INTERVALS[Math.min(wp.level + 1, 6)]} hari lagi`
-                  : <span>Jawaban: <span className="jp font-bold" style={{ color: 'var(--color-green-dark)' }}>{q.arti}</span></span>
-                }
-              </p>
+          <div className="max-w-sm md:max-w-2xl mx-auto px-5 py-5 flex flex-col gap-3.5">
+            {/* Status Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-extrabold text-base flex items-center gap-1.5" style={{ color: isCorrect ? 'var(--color-green-dark)' : 'var(--color-red-dark)' }}>
+                  <span>{isCorrect ? '✓' : '✗'}</span>
+                  <span>{isCorrect ? (state.roundStreak >= 3 ? `🔥 ${state.roundStreak}x Streak!` : 'Bener!') : 'Salah!'}</span>
+                </p>
+                <p className="text-xs font-bold mt-0.5" style={{ color: 'var(--color-text-2)' }}>
+                  {isCorrect
+                    ? wp.level >= MASTERED_LEVEL
+                      ? 'Masih hafal! Review 90 hari lagi'
+                      : `Naik level → review ${SRS_INTERVALS[Math.min(wp.level + 1, 6)]} hari lagi`
+                    : <span>Jawaban tepat: <strong className="jp font-bold text-emerald-600 dark:text-emerald-400">{q.arti}</strong></span>
+                  }
+                </p>
+              </div>
             </div>
-            <button onClick={nextQuestion}
-              className="shrink-0 rounded-2xl px-6 py-3 text-sm font-extrabold active:scale-95 transition-transform"
+
+            {/* Contoh Kalimat & Additional info if present */}
+            {q.contohKalimat && (
+              <div className="pt-2 border-t border-black/10 dark:border-white/10 space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Contoh Kalimat:</p>
+                <p className="jp text-sm font-bold text-[var(--color-text-1)] leading-normal">
+                  <span dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(q.contohKalimat) }} />
+                </p>
+                <p className="text-xs font-semibold text-[var(--color-text-2)]">{q.contohKalimatArti}</p>
+                
+                <div className="flex gap-2 pt-1">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); speakJapanese(q.hiragana || q.kanji) }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-extrabold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-all shadow-xs"
+                  >
+                    🔊 Kata Saja
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); speakJapanese(q.contohKalimat || '') }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-extrabold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 active:scale-95 transition-all shadow-xs"
+                  >
+                    🔊 Kalimat Penuh
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Next Button */}
+            <button 
+              onClick={nextQuestion}
+              className="w-full rounded-2xl py-3.5 px-6 text-sm font-extrabold text-white active:scale-95 transition-all text-center shadow-md cursor-pointer mt-1"
               style={{
                 background: isCorrect ? 'var(--color-green)' : 'var(--color-red)',
-                color: '#fff',
-                boxShadow: isCorrect ? '0 4px 12px rgba(34,197,94,0.3)' : '0 4px 12px rgba(239,68,68,0.3)',
-              }}>
-              Lanjut →
+                boxShadow: isCorrect ? '0 4px 14px rgba(34,197,94,0.35)' : '0 4px 14px rgba(239,68,68,0.35)',
+              }}
+            >
+              Lanjut ➔
             </button>
           </div>
         </div>

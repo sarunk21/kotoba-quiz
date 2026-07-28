@@ -319,43 +319,9 @@ export default function SentencesQuizPage() {
               </div>
             </div>
 
-            {/* Explanation / Bottom Panel */}
-            {isChecked && (
-              <div 
-                className={`rounded-[24px] p-4 border mb-6 anim-pop ${
-                  isCorrect 
-                    ? 'bg-green-50/50 dark:bg-green-950/10 border-green-500/30' 
-                    : 'bg-red-50/50 dark:bg-red-950/10 border-red-500/30'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">{isCorrect ? '✓' : '✗'}</span>
-                  <h4 className={`text-xs font-black uppercase ${isCorrect ? 'text-green-500' : 'text-red-500'}`}>
-                    {isCorrect ? 'Jawaban Benar!' : 'Jawaban Salah!'}
-                  </h4>
-                </div>
-                {!isCorrect && (
-                  <div className="mb-2">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Kunci Jawaban:</p>
-                    {showFurigana ? (
-                      <p className="text-xs font-black text-green-600 dark:text-green-500 jp" dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(currentQuestion.japanese) }} />
-                    ) : (
-                      <p className="text-xs font-black text-green-600 dark:text-green-500 jp">{currentQuestion.japanese}</p>
-                    )}
-                  </div>
-                )}
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Penjelasan Tata Bahasa:</p>
-                  <p className="text-[10px] font-bold text-[var(--color-text-2)] leading-relaxed">
-                    {currentQuestion.explanation}
-                  </p>
-                </div>
-              </div>
-            )}
-
             {/* Action Buttons */}
             <div className="mt-auto">
-              {!isChecked ? (
+              {!isChecked && (
                 <button 
                   onClick={handleCheck}
                   disabled={selectedBlocks.length === 0}
@@ -369,15 +335,51 @@ export default function SentencesQuizPage() {
                 >
                   Periksa Susunan Kalimat 🔍
                 </button>
-              ) : (
-                <button 
-                  onClick={handleNext}
-                  className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)]"
-                >
-                  {currentIndex + 1 >= questions.length ? 'Selesaikan Latihan 🎉' : 'Lanjut →'}
-                </button>
               )}
             </div>
+
+            {/* Fixed Bottom Feedback Sheet */}
+            {isChecked && (
+              <div className="fixed bottom-0 left-0 right-0 z-50 anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl border-t bg-white dark:bg-[#1a1d24] border-[var(--color-border)] rounded-t-[32px]">
+                <div className="max-w-sm md:max-w-2xl mx-auto px-5 py-5 flex flex-col gap-3.5">
+                  <div className={`p-4 rounded-2xl border ${
+                    isCorrect 
+                      ? 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-300' 
+                      : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-300'
+                  }`}>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-xl">{isCorrect ? '✓' : '✗'}</span>
+                      <h4 className={`text-xs font-black uppercase ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                        {isCorrect ? 'Jawaban Benar!' : 'Jawaban Kurang Tepat'}
+                      </h4>
+                    </div>
+                    {!isCorrect && (
+                      <div className="mb-2">
+                        <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Kunci Jawaban:</p>
+                        {showFurigana ? (
+                          <p className="text-xs font-black text-green-600 dark:text-green-400 jp" dangerouslySetInnerHTML={{ __html: addFuriganaToSentence(currentQuestion.japanese) }} />
+                        ) : (
+                          <p className="text-xs font-black text-green-600 dark:text-green-400 jp">{currentQuestion.japanese}</p>
+                        )}
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Penjelasan Tata Bahasa:</p>
+                      <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed">
+                        {currentQuestion.explanation}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={handleNext}
+                    className="w-full rounded-2xl py-3.5 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)] cursor-pointer"
+                  >
+                    {currentIndex + 1 >= questions.length ? 'Selesaikan Latihan 🎉' : 'Lanjut →'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
