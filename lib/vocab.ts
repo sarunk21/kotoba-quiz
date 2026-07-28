@@ -129,7 +129,7 @@ export function loadLocalVocab(): VocabItem[] {
   if (typeof window === 'undefined') return []
   const raw = localStorage.getItem('kotoba_vocab')
   if (!raw) {
-    // Auto-seed with default 960 vocabulary dataset for Bab 1-25
+    // Auto-seed with default 958 vocabulary dataset for Bab 1-25
     const initialItems = defaultVocabData as VocabItem[]
     saveLocalVocab(initialItems)
     return initialItems
@@ -137,6 +137,18 @@ export function loadLocalVocab(): VocabItem[] {
   if (cachedVocab) return cachedVocab
   try {
     const items = JSON.parse(raw) as VocabItem[]
+    // Automatic Offline Migration Check:
+    // If local cache contains old corrupted chapter names (e.g. not starting with 'Bab'),
+    // auto-update local cache to the bundled clean offline dataset (Bab 1-25)
+    const hasCorruptedChapters = items.some(
+      item => item.chapter && !item.chapter.startsWith('Bab ') && item.chapter !== 'Tanpa Bab'
+    )
+    if (hasCorruptedChapters) {
+      const cleanItems = defaultVocabData as VocabItem[]
+      saveLocalVocab(cleanItems)
+      return cleanItems
+    }
+
     setGlobalVocab(items)
     return items
   } catch (e) {
