@@ -36,6 +36,23 @@ function CustomQuizPracticeContent() {
   const [score, setScore] = useState(0)
   const [isGameOver, setIsGameOver] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
+
+  // Intercept browser / device back button during active quiz
+  useEffect(() => {
+    if (!quiz || isFinished || isGameOver) return
+    window.history.pushState({ inQuiz: true }, '', window.location.href)
+
+    const handlePopState = () => {
+      window.history.pushState({ inQuiz: true }, '', window.location.href)
+      setShowExitConfirm(true)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [quiz, isFinished, isGameOver])
 
   // Load quiz on mount
   useEffect(() => {
@@ -154,9 +171,9 @@ function CustomQuizPracticeContent() {
           <button 
             onClick={() => {
               playTap()
-              router.push('/quiz/custom')
+              setShowExitConfirm(true)
             }}
-            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform"
+            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform cursor-pointer"
           >
             ←
           </button>
@@ -335,37 +352,13 @@ function CustomQuizPracticeContent() {
               )}
             </div>
 
-            {/* Explanation / Answer Key Reveal */}
-            {isChecked && (
-              <div 
-                className={`rounded-[24px] p-4 border mb-6 anim-pop ${
-                  isCorrect 
-                    ? 'bg-green-50/50 dark:bg-green-950/10 border-green-500/30' 
-                    : 'bg-red-50/50 dark:bg-red-950/10 border-red-500/30'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xl">{isCorrect ? '✓' : '✗'}</span>
-                  <h4 className={`text-xs font-black uppercase ${isCorrect ? 'text-green-500' : 'text-red-500'}`}>
-                    {isCorrect ? 'Jawaban Benar!' : 'Jawaban Salah!'}
-                  </h4>
-                </div>
-                {!isCorrect && (
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)] mb-0.5">Jawaban yang Benar:</p>
-                    <p className="text-xs font-black text-green-600 dark:text-green-500 jp">{correctAnswer}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Action Button */}
             <div className="mt-auto">
-              {!isChecked ? (
+              {!isChecked && (
                 <button 
                   onClick={handleCheck}
                   disabled={currentQuestion.type === 'text' ? !textInput.trim() : !selectedAnswer}
-                  className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform"
+                  className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform cursor-pointer"
                   style={{
                     background: (currentQuestion.type === 'text' ? textInput.trim() : selectedAnswer) 
                       ? 'var(--color-accent)' 
@@ -381,14 +374,74 @@ function CustomQuizPracticeContent() {
                 >
                   Periksa Jawaban 🔍
                 </button>
-              ) : (
-                <button 
-                  onClick={handleNext}
-                  className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)]"
-                >
-                  {currentIndex + 1 >= questions.length ? 'Selesaikan Latihan 🎉' : 'Lanjut →'}
-                </button>
               )}
+            </div>
+
+            {/* Fixed Bottom Feedback Sheet */}
+            {isChecked && (
+              <div className="fixed bottom-0 left-0 right-0 z-50 anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl border-t bg-white dark:bg-[#1a1d24] border-[var(--color-border)] rounded-t-[32px]">
+                <div className="max-w-sm md:max-w-2xl mx-auto px-5 py-5 flex flex-col gap-3.5">
+                  <div className={`p-4 rounded-2xl border ${
+                    isCorrect 
+                      ? 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-300' 
+                      : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-300'
+                  }`}>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-xl">{isCorrect ? '✓' : '✗'}</span>
+                      <h4 className={`text-xs font-black uppercase ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                        {isCorrect ? 'Jawaban Benar!' : 'Jawaban Kurang Tepat'}
+                      </h4>
+                    </div>
+                    {!isCorrect && (
+                      <div>
+                        <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-3)] mb-0.5">Jawaban yang Benar:</p>
+                        <p className="text-xs font-black text-green-600 dark:text-green-400 jp">{correctAnswer}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <button 
+                    onClick={handleNext}
+                    className="w-full rounded-2xl py-3.5 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)] cursor-pointer"
+                  >
+                    {currentIndex + 1 >= questions.length ? 'Selesaikan Latihan 🎉' : 'Lanjut →'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Exit Confirmation Modal ── */}
+        {showExitConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade">
+            <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-3xl p-6 max-w-xs w-full shadow-2xl text-center anim-pop">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center text-2xl mx-auto mb-3">
+                ⚠️
+              </div>
+              <h3 className="text-base font-black text-[var(--color-text-1)] mb-1">
+                Keluar dari Kuis Custom?
+              </h3>
+              <p className="text-xs font-semibold text-[var(--color-text-3)] mb-6">
+                Kemajuan sesi kuis ini belum selesai. Apakah Anda yakin ingin keluar?
+              </p>
+              <div className="flex flex-col gap-2.5">
+                <button
+                  onClick={() => { playTap(); setShowExitConfirm(false) }}
+                  className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-accent)] text-white active:scale-95 transition-all shadow-sm cursor-pointer"
+                >
+                  Lanjutkan Kuis ➔
+                </button>
+                <button
+                  onClick={() => {
+                    playTap()
+                    router.push('/quiz/custom')
+                  }}
+                  className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-subtle)] text-rose-600 dark:text-rose-400 active:scale-95 transition-all cursor-pointer"
+                >
+                  Ya, Keluar
+                </button>
+              </div>
             </div>
           </div>
         )}
