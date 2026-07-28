@@ -553,22 +553,22 @@ export default function VocabPage() {
         </header>
 
         {/* CSV Actions & Stats Banner */}
-        <section className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 shadow-card flex items-center justify-between gap-3">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-3)]">Kelola & Latihan</span>
-            <span className="text-xs font-bold text-[var(--color-text-1)]">Kuis Kosakata Per Bab</span>
+        <section className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-3xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] block">Database Kosakata</span>
+            <p className="text-xs font-extrabold text-[var(--color-text-1)] mt-0.5">Kelola & Kuis Hafalan Per Bab</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
             <Link
               href="/quiz/chapters"
-              className="text-xs font-extrabold px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white no-underline active:scale-95 transition-transform flex items-center gap-1 shadow-sm"
+              className="text-xs font-black px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white no-underline active:scale-95 transition-all flex items-center gap-1.5 shadow-sm shrink-0"
             >
               📖 Kuis Per Bab
             </Link>
             {sheetsUrlInput && (
               <button 
                 onClick={handleSyncFromSavedLink}
-                className="text-xs font-extrabold px-3 py-2 rounded-xl bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-400 active:scale-95 transition-transform flex items-center gap-1"
+                className="text-xs font-extrabold px-3 py-2 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/30 active:scale-95 transition-all flex items-center gap-1 shrink-0"
                 title="Tarik ulang dari Google Sheets"
                 disabled={loadingImportLink}
               >
@@ -577,13 +577,13 @@ export default function VocabPage() {
             )}
             <button 
               onClick={() => { setCsvError(''); setShowCsvModal(true) }}
-              className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-accent-light)] text-[var(--color-accent)] active:scale-95 transition-transform"
+              className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-accent-light)] text-[var(--color-accent)] active:scale-95 transition-all shrink-0"
             >
               📥 Impor
             </button>
             <button 
               onClick={handleExportCSV}
-              className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
+              className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-all shrink-0"
               disabled={vocabList.length === 0}
             >
               📤 Ekspor

@@ -186,30 +186,32 @@ export default function PracticeHubPage() {
         </div>
       ) : (
         /* Practice Menu Grid */
-        <div className="space-y-6">
+        <div className="space-y-7">
           {/* Main Practice Categories */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3.5">
             {/* Kuis Kosakata Per Bab (Featured) */}
             <Link
               href="/quiz/chapters"
               onClick={playTap}
               className="col-span-2 block no-underline active:scale-[0.98] transition-transform"
             >
-              <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between border border-indigo-400/30">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl bg-white/20 p-2.5 rounded-xl backdrop-blur-md">📖</span>
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-5 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between border border-indigo-400/20">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-2xl shrink-0">
+                    📖
+                  </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-black text-sm text-white">Kuis Kosakata Per Bab</h3>
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-indigo-950 uppercase tracking-wider">SRS Flashcard</span>
+                      <h3 className="font-extrabold text-sm text-white tracking-tight">Kuis Kosakata Per Bab</h3>
+                      <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-amber-400 text-indigo-950 uppercase tracking-wider">SRS</span>
                     </div>
-                    <p className="text-[10px] font-medium text-indigo-100 mt-0.5">
-                      Pilih Bab kosakata (Google Sheets / Standard) untuk kuis hafalan SRS per bab
+                    <p className="text-[11px] font-medium text-indigo-100/90 mt-0.5">
+                      Kuis hafalan flashcard terarah per bab
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-black bg-white text-indigo-600 px-3 py-2 rounded-xl shrink-0 shadow-sm flex items-center gap-1">
-                  Pilih Bab ➔
+                <span className="text-xs font-black bg-white text-indigo-600 px-3.5 py-2 rounded-xl shrink-0 shadow-sm flex items-center gap-1">
+                  Mulai ➔
                 </span>
               </div>
             </Link>
@@ -220,12 +222,16 @@ export default function PracticeHubPage() {
               onClick={playTap}
               className="block no-underline active:scale-[0.98] transition-transform"
             >
-              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-md transition-all h-full">
-                <div className="jp-serif text-3xl font-extrabold text-indigo-500 mb-2">あ</div>
-                <p className="font-extrabold text-xs text-[var(--color-text-1)]">Kana SRS Quiz</p>
-                <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                  104 Karakter Hiragana & Katakana
-                </p>
+              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-sm transition-all h-full flex flex-col justify-between">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl font-black mb-3 jp-serif">
+                  あ
+                </div>
+                <div>
+                  <p className="font-extrabold text-xs text-[var(--color-text-1)]">Kana SRS Quiz</p>
+                  <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">
+                    104 Karakter Kana
+                  </p>
+                </div>
               </div>
             </Link>
 
@@ -235,12 +241,16 @@ export default function PracticeHubPage() {
               onClick={playTap}
               className="block no-underline active:scale-[0.98] transition-transform"
             >
-              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-md transition-all h-full">
-                <div className="jp-serif text-3xl font-extrabold text-amber-500 mb-2">助</div>
-                <p className="font-extrabold text-xs text-[var(--color-text-1)]">Kuis Partikel</p>
-                <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                  Partikel は, が, を, に, で...
-                </p>
+              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-sm transition-all h-full flex flex-col justify-between">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-black mb-3 jp-serif">
+                  助
+                </div>
+                <div>
+                  <p className="font-extrabold text-xs text-[var(--color-text-1)]">Kuis Partikel</p>
+                  <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">
+                    は, が, を, に, で...
+                  </p>
+                </div>
               </div>
             </Link>
 
@@ -250,25 +260,29 @@ export default function PracticeHubPage() {
               onClick={playTap}
               className="col-span-2 block no-underline active:scale-[0.98] transition-transform"
             >
-              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-md transition-all h-full">
-                <div className="jp-serif text-3xl font-extrabold text-green-500 mb-2">文</div>
-                <p className="font-extrabold text-xs text-[var(--color-text-1)]">Susun Kalimat</p>
-                <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5">
-                  Latihan susun blok kata
-                </p>
+              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 hover:shadow-sm transition-all h-full flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl font-black shrink-0 jp-serif">
+                  文
+                </div>
+                <div>
+                  <p className="font-extrabold text-xs text-[var(--color-text-1)]">Susun Kalimat</p>
+                  <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">
+                    Latihan menyusun struktur kalimat Jepang
+                  </p>
+                </div>
               </div>
             </Link>
           </div>
 
           {/* Specialized Practice Section: Ungkapan Sehari-hari */}
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3.5">
               <div>
-                <h2 className="text-sm font-extrabold text-[var(--color-text-1)] uppercase tracking-wider">
+                <h2 className="text-xs font-black text-[var(--color-text-1)] uppercase tracking-wider">
                   🎯 Latihan Praktik Sehari-hari
                 </h2>
-                <p className="text-[10px] font-bold text-[var(--color-text-3)]">
-                  Hari, Tanggal, Waktu, Angka, Uang, Tubuh & Salam
+                <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">
+                  Topik penting penggunaan harian
                 </p>
               </div>
               <Link href="/quiz/special" onClick={playTap} className="text-[10px] font-extrabold text-[var(--color-accent)] no-underline hover:underline">
@@ -276,25 +290,27 @@ export default function PracticeHubPage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {[
-                { title: 'Hari & Waktu', desc: 'Senin-Minggu, Jam, Menit', icon: '📅', url: '/quiz/special?type=hari' },
-                { title: 'Angka & Counter', desc: '1-10rb, ~つ, ~人, ~本...', icon: '🔢', url: '/quiz/special?type=angka' },
-                { title: 'Tanggal & Bulan', desc: '1-31日, 1-12月', icon: '📆', url: '/quiz/special?type=hari' },
-                { title: 'Uang & Belanja', desc: 'Nominal Yen & Kasir', icon: '💴', url: '/quiz/special?type=uang' },
-                { title: 'Anggota Tubuh', desc: '頭, 目, 耳, 手, 足...', icon: '🧠', url: '/quiz/special?type=tubuh' },
-                { title: 'Keluarga & Salam', desc: '家族, Salam & Percakapan', icon: '🤝', url: '/quiz/special?type=salam' },
+                { title: 'Hari & Waktu', desc: 'Senin-Minggu & Jam', icon: '📅', url: '/quiz/special?type=hari', bg: 'bg-blue-50 dark:bg-blue-950/30' },
+                { title: 'Angka & Unit', desc: '1-10rb, ~つ, ~人...', icon: '🔢', url: '/quiz/special?type=angka', bg: 'bg-purple-50 dark:bg-purple-950/30' },
+                { title: 'Tanggal & Bulan', desc: '1-31日 & 1-12月', icon: '📆', url: '/quiz/special?type=hari', bg: 'bg-indigo-50 dark:bg-indigo-950/30' },
+                { title: 'Uang & Belanja', desc: 'Nominal Yen & Kasir', icon: '💴', url: '/quiz/special?type=uang', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
+                { title: 'Anggota Tubuh', desc: 'Kepala, Wajah, Badan', icon: '🧠', url: '/quiz/special?type=tubuh', bg: 'bg-rose-50 dark:bg-rose-950/30' },
+                { title: 'Keluarga & Salam', desc: 'Keluarga & Percakapan', icon: '🤝', url: '/quiz/special?type=salam', bg: 'bg-amber-50 dark:bg-amber-950/30' },
               ].map((item, idx) => (
                 <Link
                   key={idx}
                   href={item.url}
                   onClick={playTap}
-                  className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-3 flex flex-col justify-between no-underline hover:border-[var(--color-accent)] transition-all active:scale-[0.98] shadow-xs"
+                  className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-3.5 flex flex-col justify-between no-underline hover:border-[var(--color-accent)] transition-all active:scale-[0.98] shadow-xs"
                 >
-                  <span className="text-2xl mb-2">{item.icon}</span>
+                  <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center text-lg mb-2.5 shrink-0`}>
+                    {item.icon}
+                  </div>
                   <div>
-                    <h4 className="text-xs font-black text-[var(--color-text-1)] truncate">{item.title}</h4>
-                    <p className="text-[9px] font-bold text-[var(--color-text-3)] mt-0.5 line-clamp-1">{item.desc}</p>
+                    <h4 className="text-xs font-extrabold text-[var(--color-text-1)] truncate">{item.title}</h4>
+                    <p className="text-[9px] font-bold text-[var(--color-text-3)] mt-0.5 truncate">{item.desc}</p>
                   </div>
                 </Link>
               ))}

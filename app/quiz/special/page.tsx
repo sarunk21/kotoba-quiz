@@ -117,22 +117,25 @@ function SpecialSelectContent() {
                     key={chName}
                     href={`/quiz?mode=special&type=${activeTab}&chapter=${chName}`}
                     onClick={playTap}
-                    className="flex flex-col p-4 rounded-[24px] bg-white dark:bg-[#1a1d24] hover:bg-[var(--color-bg)] border border-[var(--color-border)] no-underline active:scale-[0.98] transition-all shadow-sm"
+                    className="flex flex-col p-4.5 rounded-3xl bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] no-underline hover:border-[var(--color-accent)] active:scale-[0.98] transition-all shadow-xs"
                   >
-                    <div className="flex items-center justify-between w-full mb-3">
+                    <div className="flex items-center justify-between w-full mb-3.5">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-bg)] shrink-0">
+                        <div className="w-10 h-10 rounded-2xl bg-[var(--color-bg)] flex items-center justify-center text-xl shrink-0">
                           {meta.icon}
-                        </span>
+                        </div>
                         <div>
-                          <h4 className="text-xs font-black text-[var(--color-text-1)]">{meta.label}</h4>
-                          <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5">Bab latihan {meta.label.split(' (')[0]}</p>
+                          <h4 className="text-xs font-black text-[var(--color-text-1)] tracking-tight">{meta.label}</h4>
+                          <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">Modul Kuis SRS</p>
                         </div>
                       </div>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{
-                        background: pct >= 80 ? 'var(--color-green-light)' : pct > 0 ? 'var(--color-accent-light)' : 'var(--color-subtle)',
-                        color: pct >= 80 ? 'var(--color-green)' : pct > 0 ? 'var(--color-accent)' : 'var(--color-text-3)'
-                      }}>
+                      <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
+                        pct >= 80 
+                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' 
+                          : pct > 0 
+                            ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400' 
+                            : 'bg-[var(--color-subtle)] text-[var(--color-text-3)]'
+                      }`}>
                         {pct}%
                       </span>
                     </div>
@@ -158,19 +161,19 @@ function SpecialSelectContent() {
                 return (
                   <div
                     key={chName}
-                    className="flex items-center justify-between p-4 rounded-[24px] bg-gray-100/40 dark:bg-gray-800/10 border border-[var(--color-border)] opacity-60 text-xs font-bold text-[var(--color-text-3)] cursor-not-allowed select-none"
+                    className="flex items-center justify-between p-4.5 rounded-3xl bg-gray-50/60 dark:bg-gray-800/20 border border-[var(--color-border)] opacity-60 text-xs font-bold text-[var(--color-text-3)] cursor-not-allowed select-none"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-subtle)] shrink-0">
+                      <div className="w-10 h-10 rounded-2xl bg-[var(--color-subtle)] flex items-center justify-center text-lg shrink-0">
                         🔒
-                      </span>
+                      </div>
                       <div>
                         <h4 className="text-xs font-black text-[var(--color-text-3)]">{meta.label}</h4>
-                        <p className="text-[9px] font-semibold text-[var(--color-text-3)] mt-0.5">Bab dikunci</p>
+                        <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">Bab dikunci</p>
                       </div>
                     </div>
-                    <span className="text-[9px] font-black text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-2 py-1 rounded-lg">
-                      Selesaikan {prevMeta.label.split(' (')[0]} &ge; 40%
+                    <span className="text-[9px] font-black text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-1 rounded-lg">
+                      Selesaikan {prevMeta.label.split(' (')[0]} &ge; 30%
                     </span>
                   </div>
                 )

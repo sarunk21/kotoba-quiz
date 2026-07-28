@@ -103,24 +103,27 @@ function ChaptersSelectContent() {
                 return (
                   <div
                     key={ch.name}
-                    className="flex flex-col p-4 rounded-[24px] bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-sm transition-all"
+                    className="flex flex-col p-4.5 rounded-3xl bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-xs hover:border-[var(--color-accent)] transition-all"
                   >
-                    <div className="flex items-center justify-between w-full mb-3">
+                    <div className="flex items-center justify-between w-full mb-3.5">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-bg)] shrink-0">
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl shrink-0">
                           📖
-                        </span>
+                        </div>
                         <div>
-                          <h4 className="text-xs font-black text-[var(--color-text-1)] truncate w-36" title={ch.name}>{ch.name}</h4>
-                          <p className="text-[9px] font-bold text-[var(--color-text-2)] mt-0.5">
+                          <h4 className="text-xs font-extrabold text-[var(--color-text-1)] truncate w-36" title={ch.name}>{ch.name}</h4>
+                          <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">
                             {ch.masteredCount}/{ch.count} hafal • {ch.count} kata
                           </p>
                         </div>
                       </div>
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{
-                        background: pct >= 80 ? 'var(--color-green-light)' : pct > 0 ? 'var(--color-accent-light)' : 'var(--color-subtle)',
-                        color: pct >= 80 ? 'var(--color-green)' : pct > 0 ? 'var(--color-accent)' : 'var(--color-text-3)'
-                      }}>
+                      <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
+                        pct >= 80 
+                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' 
+                          : pct > 0 
+                            ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400' 
+                            : 'bg-[var(--color-subtle)] text-[var(--color-text-3)]'
+                      }`}>
                         {pct}%
                       </span>
                     </div>
@@ -141,10 +144,9 @@ function ChaptersSelectContent() {
                       <Link
                         href={`/quiz?chapter=${encodeURIComponent(ch.name)}`}
                         onClick={playTap}
-                        className="w-full flex items-center justify-center py-2.5 px-3 rounded-xl font-extrabold text-[11px] text-white active:scale-95 transition-all text-center no-underline cursor-pointer"
-                        style={{ background: 'var(--color-accent)' }}
+                        className="w-full flex items-center justify-center py-2.5 px-3.5 rounded-xl font-extrabold text-xs text-white bg-[var(--color-accent)] active:scale-95 transition-all text-center no-underline cursor-pointer shadow-xs"
                       >
-                        ⚡ Kuis
+                        ⚡ Mulai Kuis
                       </Link>
                     </div>
                   </div>
