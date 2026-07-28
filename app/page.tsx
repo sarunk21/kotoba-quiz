@@ -28,7 +28,7 @@ const WEEKDAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
 
 const PULL_THRESHOLD = 140 // px tarik ke bawah sebelum trigger
 
-const DEFAULT_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9UYAD3iOYHLFUeMh-uHUi9cbk6ejo7oUcrKEMtNgg2AZL37fSxvNOxjItQtunRb3DyjsKTct8hfvW/pub?gid=1283721307&single=true&output=csv'
+const DEFAULT_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1hLXaSIWZFBkqoGHFcqi3_g7YWoPl-xNvI8K2O2yY70s/export?format=csv'
 
 const CURRENT_VERSION = '0.1.2'
 

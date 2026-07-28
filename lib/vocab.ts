@@ -60,7 +60,10 @@ export function parseCSVToVocab(csvText: string, defaultSource: 'standard' | 'cu
       hiragana = cols[1]?.trim() || ''
       kanji    = cols[2]?.trim() || ''
       arti     = cols[3]?.trim() || ''
-      chapter  = cols[4]?.trim() || ''
+      chapter  = cols[4]?.trim().replace(/^["']|["']$/g, '') || ''
+      if (/^\d+$/.test(chapter)) {
+        chapter = `Bab ${chapter}`
+      }
       contohKalimat = cols[5]?.trim() || ''
       contohKalimatArti = cols[6]?.trim() || ''
     } else if (cols.length === 4) {

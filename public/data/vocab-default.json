@@ -675,13 +675,12 @@
     "source": "standard"
   },
   {
-    "id": "-ddx1wpVW5na2Fw",
+    "id": "-75ltc4VW5na2Fw",
     "category": "Ungkapan",
-    "hiragana": "そうだすか",
+    "hiragana": "そうですか",
     "kanji": "そうですか",
-    "arti": "\"Ouwh",
-    "chapter": "begitu ya\"",
-    "contohKalimat": "Bab 2",
+    "arti": "Ouwh, begitu ya",
+    "chapter": "Bab 2",
     "source": "standard"
   },
   {
@@ -694,23 +693,21 @@
     "source": "standard"
   },
   {
-    "id": "6dxsxoVW5na2Fw",
+    "id": "-nsp0wrVW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "これからおせわになります",
     "kanji": "これからお世話になります",
-    "arti": "\"Mulai sekarang",
-    "chapter": "akan sering merepotkan\"",
-    "contohKalimat": "Bab 2",
+    "arti": "Mulai sekarang, akan sering merepotkan",
+    "chapter": "Bab 2",
     "source": "standard"
   },
   {
-    "id": "hl1o9dVW5na2Fw",
+    "id": "-eypsraVW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "こちらこそよろしくおねがいします",
     "kanji": "こちらこそよろしくお願いします",
-    "arti": "\"Iya",
-    "chapter": "sama-sama\"",
-    "contohKalimat": "Bab 2",
+    "arti": "Iya, sama-sama",
+    "chapter": "Bab 2",
     "source": "standard"
   },
   {
@@ -1641,13 +1638,12 @@
     "source": "standard"
   },
   {
-    "id": "j85vmrVW5na2Fw",
+    "id": "-hddluuVW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "たいへんですね",
     "kanji": "大変ですね",
-    "arti": "\"Wah",
-    "chapter": "berat ya (ungkapan simpati)\"",
-    "contohKalimat": "Bab 4",
+    "arti": "Wah, berat ya (ungkapan simpati)",
+    "chapter": "Bab 4",
     "source": "standard"
   },
   {
@@ -2155,14 +2151,12 @@
     "source": "standard"
   },
   {
-    "id": "jqdqgjVW5na2Fw",
+    "id": "n5ilv9VW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "そうですね",
     "kanji": "そうですね",
-    "arti": "\"Ya",
-    "chapter": "betul / Ya",
-    "contohKalimat": "begitulah\"",
-    "contohKalimatArti": "Bab 5",
+    "arti": "Ya, betul / Ya, begitulah",
+    "chapter": "Bab 5",
     "source": "standard"
   },
   {
@@ -2238,13 +2232,12 @@
     "source": "standard"
   },
   {
-    "id": "nvqyekS2F0YSBL",
+    "id": "4kqnl1S2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "かきます",
     "kanji": "書きます",
-    "arti": "\"Menulis",
-    "chapter": "menggambar\"",
-    "contohKalimat": "Bab 6",
+    "arti": "Menulis, menggambar",
+    "chapter": "Bab 6",
     "source": "standard"
   },
   {
@@ -2266,14 +2259,12 @@
     "source": "standard"
   },
   {
-    "id": "-u0784hS2F0YSBL",
+    "id": "-uzckefS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "します",
     "kanji": "します",
-    "arti": "\"Mengerjakan",
-    "chapter": "melakukan",
-    "contohKalimat": "berbuat\"",
-    "contohKalimatArti": "Bab 6",
+    "arti": "Mengerjakan, melakukan, berbuat",
+    "chapter": "Bab 6",
     "source": "standard"
   },
   {
@@ -2556,13 +2547,12 @@
     "source": "standard"
   },
   {
-    "id": "-n2c7mrS2F0YSBC",
+    "id": "ahjmhaS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "ちょっと",
     "kanji": "ちょっと",
-    "arti": "\"Sebentar",
-    "chapter": "sedikit\"",
-    "contohKalimat": "Bab 6",
+    "arti": "Sebentar, sedikit",
+    "chapter": "Bab 6",
     "source": "standard"
   },
   {
@@ -2584,13 +2574,12 @@
     "source": "standard"
   },
   {
-    "id": "a8og9S2F0YSBC",
+    "id": "geqis1S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "それから",
     "kanji": "それから",
-    "arti": "\"Setelah itu",
-    "chapter": "kemudian\"",
-    "contohKalimat": "Bab 6",
+    "arti": "Setelah itu, kemudian",
+    "chapter": "Bab 6",
     "source": "standard"
   },
   {
@@ -2621,13 +2610,12 @@
     "source": "standard"
   },
   {
-    "id": "-u9g34tS2F0YSBC",
+    "id": "-6hh7m1S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "じゃ、また",
     "kanji": "じゃ、また",
-    "arti": "\"OK",
-    "chapter": "sampai jumpa\"",
-    "contohKalimat": "Bab 6",
+    "arti": "OK, sampai jumpa",
+    "chapter": "Bab 6",
     "source": "standard"
   },
   {
@@ -2667,33 +2655,30 @@
     "source": "standard"
   },
   {
-    "id": "-5ikc08S2F0YSBL",
+    "id": "atn7noS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "もらいます",
     "kanji": "もらいます",
-    "arti": "\"Mendapatkan",
-    "chapter": "menerima\"",
-    "contohKalimat": "Bab 7",
+    "arti": "Mendapatkan, menerima",
+    "chapter": "Bab 7",
     "source": "standard"
   },
   {
-    "id": "grge1dS2F0YSBL",
+    "id": "-e1upa3S2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "かします",
     "kanji": "貸します",
-    "arti": "\"Meminjamkan",
-    "chapter": "menyewakan\"",
-    "contohKalimat": "Bab 7",
+    "arti": "Meminjamkan, menyewakan",
+    "chapter": "Bab 7",
     "source": "standard"
   },
   {
-    "id": "-uniw1sS2F0YSBL",
+    "id": "-4eu3vmS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "かります",
     "kanji": "借ります",
-    "arti": "\"Meminjam",
-    "chapter": "menyewa\"",
-    "contohKalimat": "Bab 7",
+    "arti": "Meminjam, menyewa",
+    "chapter": "Bab 7",
     "source": "standard"
   },
   {
@@ -2769,13 +2754,12 @@
     "source": "standard"
   },
   {
-    "id": "-nkanw1S2F0YSBC",
+    "id": "-6el7szS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "パソコン",
     "kanji": "パソコン",
-    "arti": "\"Komputer PC",
-    "chapter": "laptop\"",
-    "contohKalimat": "Bab 7",
+    "arti": "Komputer PC, laptop",
+    "chapter": "Bab 7",
     "source": "standard"
   },
   {
@@ -2869,13 +2853,12 @@
     "source": "standard"
   },
   {
-    "id": "ny8zwyS2F0YSBC",
+    "id": "-7zo9x1S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "プレゼント",
     "kanji": "プレゼント",
-    "arti": "\"Kado",
-    "chapter": "hadiah\"",
-    "contohKalimat": "Bab 7",
+    "arti": "Kado, hadiah",
+    "chapter": "Bab 7",
     "source": "standard"
   },
   {
@@ -5588,24 +5571,21 @@
     "source": "standard"
   },
   {
-    "id": "u3ah9lS2F0YSBL",
+    "id": "osrm3rS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "つけます",
     "kanji": "付けます",
-    "arti": "\"Menyalakan",
-    "chapter": "memasang",
-    "contohKalimat": "menghidupkan (Klp. 2)\"",
-    "contohKalimatArti": "Bab 14",
+    "arti": "Menyalakan, memasang, menghidupkan (Klp. 2)",
+    "chapter": "Bab 14",
     "source": "standard"
   },
   {
-    "id": "-ifei4qS2F0YSBL",
+    "id": "-700brhS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "けします",
     "kanji": "消します",
-    "arti": "\"Mematikan",
-    "chapter": "memadamkan (Klp. 1)\"",
-    "contohKalimat": "Bab 14",
+    "arti": "Mematikan, memadamkan (Klp. 1)",
+    "chapter": "Bab 14",
     "source": "standard"
   },
   {
@@ -5699,13 +5679,12 @@
     "source": "standard"
   },
   {
-    "id": "-seggdbS2F0YSBL",
+    "id": "-2nebqxS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "とめます",
     "kanji": "止めます",
-    "arti": "\"Menghentikan",
-    "chapter": "memarkir (Klp. 2)\"",
-    "contohKalimat": "Bab 14",
+    "arti": "Menghentikan, memarkir (Klp. 2)",
+    "chapter": "Bab 14",
     "source": "standard"
   },
   {
@@ -5781,13 +5760,12 @@
     "source": "standard"
   },
   {
-    "id": "-4ofxzsS2F0YSBC",
+    "id": "8erex3S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "でんき",
     "kanji": "電気",
-    "arti": "\"Listrik",
-    "chapter": "lampu\"",
-    "contohKalimat": "Bab 14",
+    "arti": "Listrik, lampu",
+    "chapter": "Bab 14",
     "source": "standard"
   },
   {
@@ -5854,13 +5832,12 @@
     "source": "standard"
   },
   {
-    "id": "13srcS2F0YSBC",
+    "id": "hblznnS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "もんだい",
     "kanji": "問題",
-    "arti": "\"Masalah",
-    "chapter": "soal\"",
-    "contohKalimat": "Bab 14",
+    "arti": "Masalah, soal",
+    "chapter": "Bab 14",
     "source": "standard"
   },
   {
@@ -5900,23 +5877,21 @@
     "source": "standard"
   },
   {
-    "id": "-xs7axwVW5na2Fw",
+    "id": "-lb7fmtVW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "ゆっくり",
     "kanji": "ゆっくり",
-    "arti": "\"Pelan-pelan",
-    "chapter": "istirahat dengan baik\"",
-    "contohKalimat": "Bab 14",
+    "arti": "Pelan-pelan, istirahat dengan baik",
+    "chapter": "Bab 14",
     "source": "standard"
   },
   {
-    "id": "-su68aqVW5na2Fw",
+    "id": "-auv401VW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "すぐ",
     "kanji": "すぐ",
-    "arti": "\"Segera",
-    "chapter": "langsung\"",
-    "contohKalimat": "Bab 14",
+    "arti": "Segera, langsung",
+    "chapter": "Bab 14",
     "source": "standard"
   },
   {
@@ -6001,24 +5976,21 @@
     "source": "standard"
   },
   {
-    "id": "-cqb2zlS2F0YSBL",
+    "id": "eoqk1wS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "おきます",
     "kanji": "置きます",
-    "arti": "\"Meletakkan",
-    "chapter": "menaruh (Klp. 1)\"",
-    "contohKalimat": "Bab 15",
+    "arti": "Meletakkan, menaruh (Klp. 1)",
+    "chapter": "Bab 15",
     "source": "standard"
   },
   {
-    "id": "ibxy2oS2F0YSBL",
+    "id": "-2r5az9S2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "つくります",
     "kanji": "作ります",
-    "arti": "\"Membuat",
-    "chapter": "membangun",
-    "contohKalimat": "memproduksi (Klp. 1)\"",
-    "contohKalimatArti": "Bab 15",
+    "arti": "Membuat, membangun, memproduksi (Klp. 1)",
+    "chapter": "Bab 15",
     "source": "standard"
   },
   {
@@ -6031,13 +6003,12 @@
     "source": "standard"
   },
   {
-    "id": "yuhw85S2F0YSBL",
+    "id": "qnq4atS2F0YSBL",
     "category": "Kata Kerja",
     "hiragana": "しります",
     "kanji": "知ります",
-    "arti": "\"Mengetahui",
-    "chapter": "mengenal (Klp. 1)\"",
-    "contohKalimat": "Bab 15",
+    "arti": "Mengetahui, mengenal (Klp. 1)",
+    "chapter": "Bab 15",
     "source": "standard"
   },
   {
@@ -6077,13 +6048,12 @@
     "source": "standard"
   },
   {
-    "id": "x3ei1nS2F0YSBC",
+    "id": "-im7lg9S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "しりょう",
     "kanji": "資料",
-    "arti": "\"Data",
-    "chapter": "bahan\"",
-    "contohKalimat": "Bab 15",
+    "arti": "Data, bahan",
+    "chapter": "Bab 15",
     "source": "standard"
   },
   {
@@ -6204,14 +6174,12 @@
     "source": "standard"
   },
   {
-    "id": "kjakbdS2F0YSBL",
+    "id": "-eu3ctgS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "のりかえます",
     "kanji": "乗り換えます",
-    "arti": "\"Ganti",
-    "chapter": "pindah (kereta",
-    "contohKalimat": "bus",
-    "contohKalimatArti": "atau kendaraan lainnya)\"",
+    "arti": "Ganti, pindah (kereta, bus, atau kendaraan lainnya)",
+    "chapter": "Bab 16",
     "source": "standard"
   },
   {
@@ -6233,25 +6201,21 @@
     "source": "standard"
   },
   {
-    "id": "-1l48mfS2F0YSBL",
+    "id": "ltdm4iS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "だします",
     "kanji": "出します",
-    "arti": "\"Mengeluarkan",
-    "chapter": "menyerahkan",
-    "contohKalimat": "mengirim\"",
-    "contohKalimatArti": "Bab 16",
+    "arti": "Mengeluarkan, menyerahkan, mengirim",
+    "chapter": "Bab 16",
     "source": "standard"
   },
   {
-    "id": "-3f4okmS2F0YSBL",
+    "id": "sg5hegS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "おろします",
     "kanji": "下ろします",
-    "arti": "\"Mengeluarkan",
-    "chapter": "mengambil",
-    "contohKalimat": "menurunkan\"",
-    "contohKalimatArti": "Bab 16",
+    "arti": "Mengeluarkan, mengambil, menurunkan",
+    "chapter": "Bab 16",
     "source": "standard"
   },
   {
@@ -6642,13 +6606,12 @@
     "source": "standard"
   },
   {
-    "id": "hopfbkS2F0YSBL",
+    "id": "ndpngdS2F0YSBL",
     "category": "Kata Kerja (Klp 2)",
     "hiragana": "おぼえます",
     "kanji": "覚えます",
-    "arti": "\"Mengingat",
-    "chapter": "menghafal\"",
-    "contohKalimat": "Bab 17",
+    "arti": "Mengingat, menghafal",
+    "chapter": "Bab 17",
     "source": "standard"
   },
   {
@@ -6688,25 +6651,21 @@
     "source": "standard"
   },
   {
-    "id": "-ci8c4S2F0YSBL",
+    "id": "-ewekplS2F0YSBL",
     "category": "Kata Kerja (Klp 2)",
     "hiragana": "でかけます",
     "kanji": "出かけます",
-    "arti": "\"Pergi",
-    "chapter": "keluar",
-    "contohKalimat": "berangkat\"",
-    "contohKalimatArti": "Bab 17",
+    "arti": "Pergi, keluar, berangkat",
+    "chapter": "Bab 17",
     "source": "standard"
   },
   {
-    "id": "-9jmo6eS2F0YSBL",
+    "id": "-kpjp23S2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "ぬぎます",
     "kanji": "脱ぎます",
-    "arti": "\"Melepas (pakaian",
-    "chapter": "sepatu",
-    "contohKalimat": "dll)\"",
-    "contohKalimatArti": "Bab 17",
+    "arti": "Melepas (pakaian, sepatu, dll)",
+    "chapter": "Bab 17",
     "source": "standard"
   },
   {
@@ -6773,14 +6732,12 @@
     "source": "standard"
   },
   {
-    "id": "-wv3qoyS2F0YSBT",
+    "id": "-psijdoS2F0YSBT",
     "category": "Kata Sifat Na",
     "hiragana": "たいせつ[な]",
     "kanji": "大切[な]",
-    "arti": "\"Penting",
-    "chapter": "bernilai",
-    "contohKalimat": "berharga\"",
-    "contohKalimatArti": "Bab 17",
+    "arti": "Penting, bernilai, berharga",
+    "chapter": "Bab 17",
     "source": "standard"
   },
   {
@@ -6955,14 +6912,12 @@
     "source": "standard"
   },
   {
-    "id": "o6rwylS2F0YSBL",
+    "id": "-roefg9S2F0YSBL",
     "category": "Kata Kerja (Klp 2)",
     "hiragana": "できます",
     "kanji": "できます",
-    "arti": "\"Bisa",
-    "chapter": "dapat",
-    "contohKalimat": "mampu\"",
-    "contohKalimatArti": "Bab 18",
+    "arti": "Bisa, dapat, mampu",
+    "chapter": "Bab 18",
     "source": "standard"
   },
   {
@@ -6984,13 +6939,12 @@
     "source": "standard"
   },
   {
-    "id": "-zi5ai9S2F0YSBL",
+    "id": "satydtS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "うたいます",
     "kanji": "歌います",
-    "arti": "\"Bernyanyi",
-    "chapter": "menyanyi\"",
-    "contohKalimat": "Bab 18",
+    "arti": "Bernyanyi, menyanyi",
+    "chapter": "Bab 18",
     "source": "standard"
   },
   {
@@ -7012,23 +6966,21 @@
     "source": "standard"
   },
   {
-    "id": "9ixji8S2F0YSBL",
+    "id": "ltegbfS2F0YSBL",
     "category": "Kata Kerja (Klp 2)",
     "hiragana": "かえます",
     "kanji": "換えます",
-    "arti": "\"Mengganti",
-    "chapter": "menukar\"",
-    "contohKalimat": "Bab 18",
+    "arti": "Mengganti, menukar",
+    "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "d9l7a5S2F0YSBL",
+    "id": "-82jdqkS2F0YSBL",
     "category": "Kata Kerja (Klp 3)",
     "hiragana": "うんてんします",
     "kanji": "運転します",
-    "arti": "\"Menyetir",
-    "chapter": "mengendarai\"",
-    "contohKalimat": "Bab 18",
+    "arti": "Menyetir, mengendarai",
+    "chapter": "Bab 18",
     "source": "standard"
   },
   {
@@ -7068,57 +7020,56 @@
     "source": "standard"
   },
   {
-    "id": "-g69m5cS2F0YSBC",
+    "id": "k21dj5S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "しゅみ",
     "kanji": "趣味",
-    "arti": "\"Hobi",
-    "chapter": "kegemaran\"",
-    "contohKalimat": "Bab 18",
-    "source": "standard"
-  },
-  {
-    "id": "hpfcj3S2F0YSBC",
-    "category": "Kata Benda",
-    "hiragana": "にっき",
-    "kanji": "日記",
-    "arti": "Buku harian",
+    "arti": "Hobi, kegemaran",
     "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "r3v3w1S2F0YSBC",
+    "id": "jlh4c8S2F0YSBC",
     "category": "Kata Benda",
-    "hiragana": "[お]いのり",
-    "kanji": "[お]祈り",
+    "hiragana": "にっき",
+    "kanji": "日記",
+    "arti": "Catatan Harian",
+    "chapter": "Bab 18",
+    "source": "standard"
+  },
+  {
+    "id": "s0cb8xS2F0YSBC",
+    "category": "Kata Benda",
+    "hiragana": "おいのり",
+    "kanji": "お祈り",
     "arti": "Doa",
     "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "8vyvt9S2F0YSBC",
+    "id": "ie1pgwS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "かちょう",
     "kanji": "課長",
-    "arti": "Kepala bagian",
+    "arti": "Kepala Seksi",
     "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "xgpv7dS2F0YSBC",
+    "id": "1ysyn6S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "ぶちょう",
     "kanji": "部長",
-    "arti": "Kepala departemen",
+    "arti": "Kepala Bagian",
     "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "-7e7e0yS2F0YSBC",
+    "id": "-7vst0iS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "しゃちょう",
     "kanji": "社長",
-    "arti": "Direktur utama",
+    "arti": "Direktur Utama",
     "chapter": "Bab 18",
     "source": "standard"
   },
@@ -7150,80 +7101,62 @@
     "source": "standard"
   },
   {
-    "id": "-530cx6S2F0YSBC",
+    "id": "q1fo1fS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "とくに",
     "kanji": "特に",
-    "arti": "Terutama",
+    "arti": "Terutama, khususnya",
     "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "-898kt3S2F0YSBC",
-    "category": "Kata Benda",
-    "hiragana": "へえ",
-    "kanji": "へえ",
-    "arti": "Wah (ungkapan terkejut)",
-    "chapter": "Bab 18",
-    "source": "standard"
-  },
-  {
-    "id": "-2b1yjdS2F0YSBC",
-    "category": "Kata Benda",
-    "hiragana": "それはおもしろいですね",
-    "kanji": "それは面白いですね",
-    "arti": "Itu menarik ya",
-    "chapter": "Bab 18",
-    "source": "standard"
-  },
-  {
-    "id": "dhn4q2S2F0YSBC",
+    "id": "ozgwaS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "なかなか",
     "kanji": "なかなか",
-    "arti": "Tidak mudah ~ / Cukup ~",
+    "arti": "Jarang / Tidak mudah (diikuti bentuk negatif)",
     "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "-vdar8rS2F0YSBC",
+    "id": "-51xoyvS2F0YSBC",
     "category": "Kata Benda",
+    "hiragana": "ふるさと",
+    "kanji": "故郷",
+    "arti": "Kampung Halaman",
+    "chapter": "Bab 18",
+    "source": "standard"
+  },
+  {
+    "id": "-z5rr8pVW5na2Fw",
+    "category": "Ungkapan",
     "hiragana": "ほんとうですか",
     "kanji": "本当ですか",
-    "arti": "Benarkah?",
+    "arti": "Betul? / Benar?",
     "chapter": "Bab 18",
     "source": "standard"
   },
   {
-    "id": "x1usa9S2F0YSBC",
-    "category": "Kata Benda",
-    "hiragana": "ぜひ",
-    "kanji": "ぜひ",
-    "arti": "Sangat / Pasti",
-    "chapter": "Bab 18",
-    "source": "standard"
-  },
-  {
-    "id": "-btqyuiS2F0YSBL",
+    "id": "-itamvS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "のぼります",
     "kanji": "登ります",
-    "arti": "Mendaki (gunung)",
+    "arti": "Naik (mendaki)",
     "chapter": "Bab 19",
     "source": "standard"
   },
   {
-    "id": "-cudurzS2F0YSBL",
-    "category": "Kata Kerja (Klp 2)",
+    "id": "-g8y016S2F0YSBL",
+    "category": "Kata Kerja (Klp 1)",
     "hiragana": "とまります",
     "kanji": "泊まります",
-    "arti": "Menginap (di hotel)",
+    "arti": "Menginap",
     "chapter": "Bab 19",
     "source": "standard"
   },
   {
-    "id": "-hmcmphS2F0YSBL",
-    "category": "Kata Kerja (Klp 1)",
+    "id": "-q1oenrS2F0YSBL",
+    "category": "Kata Kerja (Klp 3)",
     "hiragana": "そうじします",
     "kanji": "掃除します",
     "arti": "Membersihkan",
@@ -7231,26 +7164,26 @@
     "source": "standard"
   },
   {
-    "id": "r9e5dvS2F0YSBL",
-    "category": "Kata Kerja (Klp 1)",
+    "id": "nm38tqS2F0YSBL",
+    "category": "Kata Kerja (Klp 3)",
     "hiragana": "せんたくします",
     "kanji": "洗濯します",
-    "arti": "Mencuci (pakaian)",
+    "arti": "Mencuci pakaian",
     "chapter": "Bab 19",
     "source": "standard"
   },
   {
-    "id": "mhndbtS2F0YSBL",
+    "id": "-jbnfxjS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
-    "hiragana": "なリます",
+    "hiragana": "なります",
     "kanji": "なります",
     "arti": "Menjadi",
     "chapter": "Bab 19",
     "source": "standard"
   },
   {
-    "id": "v5l79qS2F0YSBT",
-    "category": "Kata Sifat Na",
+    "id": "-j149o4S2F0YSBT",
+    "category": "Kata Sifat I",
     "hiragana": "ねむい",
     "kanji": "眠い",
     "arti": "Mengantuk",
@@ -7348,13 +7281,12 @@
     "source": "standard"
   },
   {
-    "id": "-5u9qu0VW5na2Fw",
+    "id": "s5jes6VW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "だんだん",
     "kanji": "だんだん",
-    "arti": "\"Lama kelamaan",
-    "chapter": "berangsur-angsur\"",
-    "contohKalimat": "Bab 19",
+    "arti": "Lama kelamaan, berangsur-angsur",
+    "chapter": "Bab 19",
     "source": "standard"
   },
   {
@@ -7439,14 +7371,12 @@
     "source": "standard"
   },
   {
-    "id": "-8up871S2F0YSBL",
+    "id": "90mnrxS2F0YSBL",
     "category": "Kata Kerja (Klp 2)",
     "hiragana": "しらべます",
     "kanji": "調べます",
-    "arti": "\"Memeriksa",
-    "chapter": "meneliti",
-    "contohKalimat": "mengecek\"",
-    "contohKalimatArti": "Bab 20",
+    "arti": "Memeriksa, meneliti, mengecek",
+    "chapter": "Bab 20",
     "source": "standard"
   },
   {
@@ -7630,23 +7560,21 @@
     "source": "standard"
   },
   {
-    "id": "-ww9ogfS2F0YSBL",
+    "id": "-p6bt6tS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "おもいます",
     "kanji": "思います",
-    "arti": "\"Mengira",
-    "chapter": "berpikir\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Mengira, berpikir",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
-    "id": "1nd348S2F0YSBL",
+    "id": "fj538uS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "いいます",
     "kanji": "言います",
-    "arti": "\"Mengatakan",
-    "chapter": "berkata\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Mengatakan, berkata",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
@@ -7677,13 +7605,12 @@
     "source": "standard"
   },
   {
-    "id": "-km48nlS2F0YSBL",
+    "id": "-4dwfb8S2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "やくにたちます",
     "kanji": "役に立ちます",
-    "arti": "\"Berguna",
-    "chapter": "bermanfaat\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Berguna, bermanfaat",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
@@ -7723,13 +7650,12 @@
     "source": "standard"
   },
   {
-    "id": "ojvritS2F0YSBT",
+    "id": "-iimnomS2F0YSBT",
     "category": "Kata Sifat Na",
     "hiragana": "むだ[な]",
     "kanji": "無駄[な]",
-    "arti": "\"Sia-sia",
-    "chapter": "tidak berguna\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Sia-sia, tidak berguna",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
@@ -7751,13 +7677,12 @@
     "source": "standard"
   },
   {
-    "id": "-ve2yotS2F0YSBC",
+    "id": "-m9lrapS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "ほんとう",
     "kanji": "本当",
-    "arti": "\"Beneran",
-    "chapter": "betul\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Beneran, betul",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
@@ -7797,13 +7722,12 @@
     "source": "standard"
   },
   {
-    "id": "-77itjgS2F0YSBC",
+    "id": "-8vm90rS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "ほうそう",
     "kanji": "放送",
-    "arti": "\"Siaran",
-    "chapter": "pengumuman\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Siaran, pengumuman",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
@@ -7915,13 +7839,12 @@
     "source": "standard"
   },
   {
-    "id": "-ixmaxyVW5na2Fw",
+    "id": "-v0i6q8VW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "たぶん",
     "kanji": "多分",
-    "arti": "\"Mungkin",
-    "chapter": "barangkali\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Mungkin, barangkali",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
@@ -7952,13 +7875,12 @@
     "source": "standard"
   },
   {
-    "id": "-fuw7qsVW5na2Fw",
+    "id": "95bwq0VW5na2Fw",
     "category": "Ungkapan",
     "hiragana": "〜について",
     "kanji": "〜について",
-    "arti": "\"Tentang ~",
-    "chapter": "mengenai ~\"",
-    "contohKalimat": "Bab 21",
+    "arti": "Tentang ~, mengenai ~",
+    "chapter": "Bab 21",
     "source": "standard"
   },
   {
@@ -7998,36 +7920,30 @@
     "source": "standard"
   },
   {
-    "id": "-r2qz27S2F0YSBL",
+    "id": "djkltnS2F0YSBL",
     "category": "Kata Kerja (Klp 2)",
     "hiragana": "きます",
     "kanji": "着ます",
-    "arti": "\"Memakai (untuk pakaian atas",
-    "chapter": "kemeja",
-    "contohKalimat": "dll)\"",
-    "contohKalimatArti": "Bab 22",
+    "arti": "Memakai (untuk pakaian atas, kemeja, dll)",
+    "chapter": "Bab 22",
     "source": "standard"
   },
   {
-    "id": "ivdr7S2F0YSBL",
+    "id": "iw0n3iS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "はきます",
     "kanji": "履きます",
-    "arti": "\"Memakai (untuk pakaian bawah",
-    "chapter": "celana",
-    "contohKalimat": "sepatu",
-    "contohKalimatArti": "dll)\"",
+    "arti": "Memakai (untuk pakaian bawah, celana, sepatu, dll)",
+    "chapter": "Bab 22",
     "source": "standard"
   },
   {
-    "id": "-uhr2fyS2F0YSBL",
+    "id": "-d814jpS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "かぶります",
     "kanji": "かぶります",
-    "arti": "\"Memakai (untuk di kepala",
-    "chapter": "topi",
-    "contohKalimat": "dll)\"",
-    "contohKalimatArti": "Bab 22",
+    "arti": "Memakai (untuk di kepala, topi, dll)",
+    "chapter": "Bab 22",
     "source": "standard"
   },
   {
@@ -8058,23 +7974,21 @@
     "source": "standard"
   },
   {
-    "id": "w3ln6fS2F0YSBC",
+    "id": "jhfzkeS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "わたしたち",
     "kanji": "私たち",
-    "arti": "\"Kami",
-    "chapter": "kita\"",
-    "contohKalimat": "Bab 22",
+    "arti": "Kami, kita",
+    "chapter": "Bab 22",
     "source": "standard"
   },
   {
-    "id": "-o99f2gS2F0YSBC",
+    "id": "-6zs6xtS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "コート",
     "kanji": "コート",
-    "arti": "\"Mantel",
-    "chapter": "coat\"",
-    "contohKalimat": "Bab 22",
+    "arti": "Mantel, coat",
+    "chapter": "Bab 22",
     "source": "standard"
   },
   {
@@ -8276,13 +8190,12 @@
     "source": "standard"
   },
   {
-    "id": "t128hrS2F0YSBC",
+    "id": "qk4mhxS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "おと",
     "kanji": "音",
-    "arti": "\"Bunyi",
-    "chapter": "suara\"",
-    "contohKalimat": "Bab 23",
+    "arti": "Bunyi, suara",
+    "chapter": "Bab 23",
     "source": "standard"
   },
   {
@@ -8439,13 +8352,12 @@
     "source": "standard"
   },
   {
-    "id": "6uz6jsS2F0YSBL",
+    "id": "-q8ha8uS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "おくります",
     "kanji": "送ります",
-    "arti": "\"Mengantar",
-    "chapter": "mengirimkan\"",
-    "contohKalimat": "Bab 24",
+    "arti": "Mengantar, mengirimkan",
+    "chapter": "Bab 24",
     "source": "standard"
   },
   {
@@ -8467,13 +8379,12 @@
     "source": "standard"
   },
   {
-    "id": "cgx3tyS2F0YSBL",
+    "id": "-q9w5epS2F0YSBL",
     "category": "Kata Kerja (Klp 3)",
     "hiragana": "せつめいします",
     "kanji": "説明します",
-    "arti": "\"Menjelaskan",
-    "chapter": "menerangkan\"",
-    "contohKalimat": "Bab 24",
+    "arti": "Menjelaskan, menerangkan",
+    "chapter": "Bab 24",
     "source": "standard"
   },
   {
@@ -8522,13 +8433,12 @@
     "source": "standard"
   },
   {
-    "id": "-c3jhu5S2F0YSBC",
+    "id": "-y9v9w8S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "ぜんぶ",
     "kanji": "全部",
-    "arti": "\"Semua",
-    "chapter": "segalanya\"",
-    "contohKalimat": "Bab 24",
+    "arti": "Semua, segalanya",
+    "chapter": "Bab 24",
     "source": "standard"
   },
   {
@@ -8559,13 +8469,12 @@
     "source": "standard"
   },
   {
-    "id": "-cmdotnS2F0YSBL",
+    "id": "-v2wzinS2F0YSBL",
     "category": "Kata Kerja (Klp 2)",
     "hiragana": "かんがえます",
     "kanji": "考えます",
-    "arti": "\"Berpikir",
-    "chapter": "memikirkan\"",
-    "contohKalimat": "Bab 25",
+    "arti": "Berpikir, memikirkan",
+    "chapter": "Bab 25",
     "source": "standard"
   },
   {
@@ -8578,13 +8487,12 @@
     "source": "standard"
   },
   {
-    "id": "-n8jdy7S2F0YSBL",
+    "id": "yc9frqS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "つきます",
     "kanji": "着きます",
-    "arti": "\"Tiba",
-    "chapter": "sampai\"",
-    "contohKalimat": "Bab 25",
+    "arti": "Tiba, sampai",
+    "chapter": "Bab 25",
     "source": "standard"
   },
   {
@@ -8597,23 +8505,21 @@
     "source": "standard"
   },
   {
-    "id": "-c4frcjS2F0YSBL",
+    "id": "-mmd6wdS2F0YSBL",
     "category": "Kata Kerja (Klp 1)",
     "hiragana": "がんばります",
     "kanji": "頑張ります",
-    "arti": "\"Berusaha",
-    "chapter": "bekerja keras\"",
-    "contohKalimat": "Bab 25",
+    "arti": "Berusaha, bekerja keras",
+    "chapter": "Bab 25",
     "source": "standard"
   },
   {
-    "id": "-xq3prrS2F0YSBC",
+    "id": "feyjpeS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "いなか",
     "kanji": "田舎",
-    "arti": "\"Kampung",
-    "chapter": "desa\"",
-    "contohKalimat": "Bab 25",
+    "arti": "Kampung, desa",
+    "chapter": "Bab 25",
     "source": "standard"
   },
   {
@@ -8635,13 +8541,12 @@
     "source": "standard"
   },
   {
-    "id": "94vf7kS2F0YSBC",
+    "id": "-c1zd20S2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "いみ",
     "kanji": "意味",
-    "arti": "\"Arti",
-    "chapter": "makna\"",
-    "contohKalimat": "Bab 25",
+    "arti": "Arti, makna",
+    "chapter": "Bab 25",
     "source": "standard"
   },
   {
@@ -8681,13 +8586,12 @@
     "source": "standard"
   },
   {
-    "id": "hiboytS2F0YSBC",
+    "id": "-u98pvzS2F0YSBC",
     "category": "Kata Benda",
     "hiragana": "ひま",
     "kanji": "暇",
-    "arti": "\"Waktu luang",
-    "chapter": "senggang\"",
-    "contohKalimat": "Bab 25",
+    "arti": "Waktu luang, senggang",
+    "chapter": "Bab 25",
     "source": "standard"
   },
   {
