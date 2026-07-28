@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { loadSRS, type SRSStore } from '@/lib/srs'
+import { loadSRS, calculateChapterProgress, type SRSStore } from '@/lib/srs'
 import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
 import { playTap } from '@/lib/sounds'
 import { type ChapterStory } from '@/lib/stories'
@@ -36,17 +36,16 @@ function ChaptersSelectContent() {
         map.get(v.chapter)!.push(v.id)
       }
     })
-    
-    const MAX_LEVEL = 6
+
     return Array.from(map.entries()).map(([name, ids]) => {
-      let totalLevelsAchieved = 0
-      ids.forEach(id => {
-        const level = srsStore[id]?.level || 0
-        totalLevelsAchieved += Math.min(level, MAX_LEVEL)
-      })
-      const maxPossibleLevels = ids.length * MAX_LEVEL
-      const pct = maxPossibleLevels > 0 ? Math.round((totalLevelsAchieved / maxPossibleLevels) * 100) : 0
-      return { name, pct, count: ids.length }
+      const prog = calculateChapterProgress(ids, srsStore)
+      return { 
+        name, 
+        pct: prog.pct, 
+        count: ids.length, 
+        masteredCount: prog.masteredCount,
+        learningCount: prog.learningCount 
+      }
     }).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
   }, [vocab, srsStore])
 
@@ -113,7 +112,9 @@ function ChaptersSelectContent() {
                         </span>
                         <div>
                           <h4 className="text-xs font-black text-[var(--color-text-1)] truncate w-36" title={ch.name}>{ch.name}</h4>
-                          <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5">{ch.count} kosakata</p>
+                          <p className="text-[9px] font-bold text-[var(--color-text-2)] mt-0.5">
+                            {ch.masteredCount}/{ch.count} hafal • {ch.count} kata
+                          </p>
                         </div>
                       </div>
                       <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{

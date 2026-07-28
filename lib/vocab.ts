@@ -1,7 +1,7 @@
 import Papa from 'papaparse'
 import defaultVocabData from '@/public/data/vocab-default.json'
 
-export type Category = 'Kata Benda' | 'Kata Kerja' | 'Kata Sifat' | 'Ungkapan' | 'Angka' | 'Hari' | 'Uang'
+export type Category = 'Kata Benda' | 'Kata Kerja' | 'Kata Sifat' | 'Ungkapan' | 'Angka' | 'Hari' | 'Uang' | 'Tubuh' | 'Keluarga'
 
 export interface VocabItem {
   id: string

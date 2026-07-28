@@ -189,6 +189,31 @@ export default function PracticeHubPage() {
         <div className="space-y-6">
           {/* Main Practice Categories */}
           <div className="grid grid-cols-2 gap-3">
+            {/* Kuis Kosakata Per Bab (Featured) */}
+            <Link
+              href="/quiz/chapters"
+              onClick={playTap}
+              className="col-span-2 block no-underline active:scale-[0.98] transition-transform"
+            >
+              <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-between border border-indigo-400/30">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl bg-white/20 p-2.5 rounded-xl backdrop-blur-md">📖</span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-black text-sm text-white">Kuis Kosakata Per Bab</h3>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-indigo-950 uppercase tracking-wider">SRS Flashcard</span>
+                    </div>
+                    <p className="text-[10px] font-medium text-indigo-100 mt-0.5">
+                      Pilih Bab kosakata (Google Sheets / Standard) untuk kuis hafalan SRS per bab
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs font-black bg-white text-indigo-600 px-3 py-2 rounded-xl shrink-0 shadow-sm flex items-center gap-1">
+                  Pilih Bab ➔
+                </span>
+              </div>
+            </Link>
+
             {/* Hiragana & Katakana */}
             <Link
               href="/kana"
@@ -233,6 +258,47 @@ export default function PracticeHubPage() {
                 </p>
               </div>
             </Link>
+          </div>
+
+          {/* Specialized Practice Section: Ungkapan Sehari-hari */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h2 className="text-sm font-extrabold text-[var(--color-text-1)] uppercase tracking-wider">
+                  🎯 Latihan Praktik Sehari-hari
+                </h2>
+                <p className="text-[10px] font-bold text-[var(--color-text-3)]">
+                  Hari, Tanggal, Waktu, Angka, Uang, Tubuh & Salam
+                </p>
+              </div>
+              <Link href="/quiz/special" onClick={playTap} className="text-[10px] font-extrabold text-[var(--color-accent)] no-underline hover:underline">
+                Lihat Semua →
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              {[
+                { title: 'Hari & Waktu', desc: 'Senin-Minggu, Jam, Menit', icon: '📅', url: '/quiz/special?type=hari' },
+                { title: 'Angka & Counter', desc: '1-10rb, ~つ, ~人, ~本...', icon: '🔢', url: '/quiz/special?type=angka' },
+                { title: 'Tanggal & Bulan', desc: '1-31日, 1-12月', icon: '📆', url: '/quiz/special?type=hari' },
+                { title: 'Uang & Belanja', desc: 'Nominal Yen & Kasir', icon: '💴', url: '/quiz/special?type=uang' },
+                { title: 'Anggota Tubuh', desc: '頭, 目, 耳, 手, 足...', icon: '🧠', url: '/quiz/special?type=tubuh' },
+                { title: 'Keluarga & Salam', desc: '家族, Salam & Percakapan', icon: '🤝', url: '/quiz/special?type=salam' },
+              ].map((item, idx) => (
+                <Link
+                  key={idx}
+                  href={item.url}
+                  onClick={playTap}
+                  className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-3 flex flex-col justify-between no-underline hover:border-[var(--color-accent)] transition-all active:scale-[0.98] shadow-xs"
+                >
+                  <span className="text-2xl mb-2">{item.icon}</span>
+                  <div>
+                    <h4 className="text-xs font-black text-[var(--color-text-1)] truncate">{item.title}</h4>
+                    <p className="text-[9px] font-bold text-[var(--color-text-3)] mt-0.5 line-clamp-1">{item.desc}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* Section: Latihan Per Bab (1.459 Soal Extracted) */}

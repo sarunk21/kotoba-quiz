@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { loadSRS, type SRSStore } from '@/lib/srs'
+import { loadSRS, calculateChapterProgress, type SRSStore } from '@/lib/srs'
 import { playTap } from '@/lib/sounds'
 import { 
   SPECIALIZED_DATA, 
@@ -11,7 +11,7 @@ import {
   CHAPTER_METADATA 
 } from '@/lib/specialized'
 
-type SpecialType = 'angka' | 'hari' | 'uang'
+type SpecialType = 'angka' | 'hari' | 'uang' | 'tubuh' | 'keluarga' | 'salam'
 
 function SpecialSelectContent() {
   const router = useRouter()
@@ -26,14 +26,8 @@ function SpecialSelectContent() {
     const items = SPECIALIZED_DATA[type] || []
     const chapterItems = items.filter(v => v.chapter === chapterName)
     if (chapterItems.length === 0) return 0
-    const MAX_LEVEL = 6
-    let totalLevelsAchieved = 0
-    chapterItems.forEach(item => {
-      const level = srsStore[item.id]?.level || 0
-      totalLevelsAchieved += Math.min(level, MAX_LEVEL)
-    })
-    const maxPossibleLevels = chapterItems.length * MAX_LEVEL
-    return Math.round((totalLevelsAchieved / maxPossibleLevels) * 100)
+    const prog = calculateChapterProgress(chapterItems.map(i => i.id), srsStore)
+    return prog.pct
   }
 
   const isSpecialChapterUnlocked = (type: SpecialType, chapterName: string) => {
@@ -44,7 +38,7 @@ function SpecialSelectContent() {
     
     const prevChapter = sequence[index - 1]
     const prevPct = getSpecialChapterPct(type, prevChapter)
-    return prevPct >= 40
+    return prevPct >= 30
   }
 
   const isAllSpecialChaptersUnlocked = (type: SpecialType) => {
@@ -54,8 +48,11 @@ function SpecialSelectContent() {
 
   const tabList = [
     { key: 'angka', label: 'Angka', icon: '🔢' },
-    { key: 'hari', label: 'Waktu/Hari', icon: '📅' },
-    { key: 'uang', label: 'Uang/Harga', icon: '💴' }
+    { key: 'hari', label: 'Waktu & Hari', icon: '📅' },
+    { key: 'uang', label: 'Uang', icon: '💴' },
+    { key: 'tubuh', label: 'Tubuh', icon: '🧠' },
+    { key: 'keluarga', label: 'Keluarga', icon: '👨‍👩‍👧‍👦' },
+    { key: 'salam', label: 'Salam', icon: '🤝' },
   ] as const
 
   return (
@@ -79,7 +76,7 @@ function SpecialSelectContent() {
         </header>
 
         {/* Tab Buttons */}
-        <div className="flex gap-2 p-1 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl mb-6 shrink-0 select-none shadow-sm">
+        <div className="flex gap-1.5 p-1.5 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl mb-6 shrink-0 select-none shadow-sm overflow-x-auto no-scrollbar">
           {tabList.map(tab => {
             const isActive = activeTab === tab.key
             return (
@@ -89,7 +86,7 @@ function SpecialSelectContent() {
                   playTap()
                   setActiveTab(tab.key)
                 }}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-black transition-all ${
+                className={`flex-1 min-w-[90px] flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-black transition-all shrink-0 ${
                   isActive 
                     ? 'bg-[var(--color-accent)] text-white shadow-sm'
                     : 'text-[var(--color-text-2)] hover:bg-[var(--color-bg)]'
@@ -105,7 +102,7 @@ function SpecialSelectContent() {
         {/* Chapters List */}
         <div className="space-y-4 my-auto">
           <p className="font-extrabold text-[10px] uppercase tracking-wider text-[var(--color-text-3)] mb-1">
-            Fokus Bab ({activeTab === 'angka' ? 'Angka & Penghitung' : activeTab === 'hari' ? 'Hari & Waktu' : 'Uang & Harga'}):
+            Fokus Bab ({tabList.find(t => t.key === activeTab)?.label}):
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

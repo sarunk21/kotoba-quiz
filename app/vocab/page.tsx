@@ -555,10 +555,16 @@ export default function VocabPage() {
         {/* CSV Actions & Stats Banner */}
         <section className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl p-4 shadow-card flex items-center justify-between gap-3">
           <div className="flex flex-col gap-0.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-3)]">Backup & Restore</span>
-            <span className="text-xs font-bold text-[var(--color-text-1)]">Gunakan format CSV Google Sheets</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-3)]">Kelola & Latihan</span>
+            <span className="text-xs font-bold text-[var(--color-text-1)]">Kuis Kosakata Per Bab</span>
           </div>
           <div className="flex gap-2">
+            <Link
+              href="/quiz/chapters"
+              className="text-xs font-extrabold px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white no-underline active:scale-95 transition-transform flex items-center gap-1 shadow-sm"
+            >
+              📖 Kuis Per Bab
+            </Link>
             {sheetsUrlInput && (
               <button 
                 onClick={handleSyncFromSavedLink}
@@ -566,7 +572,7 @@ export default function VocabPage() {
                 title="Tarik ulang dari Google Sheets"
                 disabled={loadingImportLink}
               >
-                {loadingImportLink ? '⏳' : '🔄'} Sync Sheet
+                {loadingImportLink ? '⏳' : '🔄'} Sync
               </button>
             )}
             <button 
@@ -636,6 +642,17 @@ export default function VocabPage() {
               </select>
             </div>
           </div>
+
+          {selectedChapter !== 'All' && (
+            <div className="flex justify-end pt-1">
+              <Link
+                href={`/quiz?chapter=${encodeURIComponent(selectedChapter)}`}
+                className="text-xs font-black px-3.5 py-2 rounded-xl bg-[var(--color-accent)] text-white no-underline active:scale-95 transition-transform flex items-center gap-1.5 shadow-sm"
+              >
+                ⚡ Mulai Kuis {selectedChapter} ➔
+              </Link>
+            </div>
+          )}
         </section>
 
         {/* Selection Control Bar */}

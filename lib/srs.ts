@@ -171,22 +171,66 @@ export function buildQueue(
   }
 }
 
-/** Stats summary for home screen */
+// Granular level weights for immediate, satisfying visual progress feedback (Level 0-6)
+export const LEVEL_WEIGHTS = [0, 0.25, 0.45, 0.65, 0.85, 0.95, 1.0]
+
+/** Calculate chapter progress with granular level weights */
+export function calculateChapterProgress(vocabIds: string[], store: SRSStore) {
+  if (!vocabIds || vocabIds.length === 0) {
+    return { pct: 0, masteredCount: 0, learningCount: 0, newCount: 0, total: 0 }
+  }
+
+  let totalWeight = 0
+  let masteredCount = 0
+  let learningCount = 0
+  let newCount = 0
+
+  for (const id of vocabIds) {
+    const wp = store[id]
+    const lvl = wp ? Math.min(Math.max(wp.level, 0), MAX_LEVEL) : 0
+    totalWeight += LEVEL_WEIGHTS[lvl] ?? 0
+
+    if (lvl === 0) {
+      newCount++
+    } else if (lvl >= MASTERED_LEVEL) {
+      masteredCount++
+    } else {
+      learningCount++
+    }
+  }
+
+  const pct = Math.round((totalWeight / vocabIds.length) * 100)
+  return {
+    pct,
+    masteredCount,
+    learningCount,
+    newCount,
+    total: vocabIds.length,
+  }
+}
+
+/** Stats summary for home screen & dashboards */
 export function getSRSSummary(vocabIds: string[], store: SRSStore) {
   const today = todayStr()
   let dueCount = 0
   let newCount = 0
   let masteredCount = 0
   let learningCount = 0
-  let totalLevelsAchieved = 0
+  let totalWeight = 0
+  let totalCorrect = 0
+  let totalWrong = 0
 
   for (const id of vocabIds) {
     const wp = store[id]
     if (!wp || wp.level === 0) {
       newCount++
     } else {
-      totalLevelsAchieved += Math.min(wp.level, MAX_LEVEL)
-      if (wp.level >= MASTERED_LEVEL) {
+      const lvl = Math.min(Math.max(wp.level, 0), MAX_LEVEL)
+      totalWeight += LEVEL_WEIGHTS[lvl] ?? 0
+      totalCorrect += wp.correctCount || 0
+      totalWrong += wp.wrongCount || 0
+
+      if (lvl >= MASTERED_LEVEL) {
         masteredCount++
         if (wp.nextReview <= today) dueCount++ // mastered but due for refresh
       } else {
@@ -196,10 +240,11 @@ export function getSRSSummary(vocabIds: string[], store: SRSStore) {
     }
   }
 
-  const maxPossibleLevels = vocabIds.length * MAX_LEVEL
-  const pct = maxPossibleLevels > 0 ? Math.round((totalLevelsAchieved / maxPossibleLevels) * 100) : 0
+  const pct = vocabIds.length > 0 ? Math.round((totalWeight / vocabIds.length) * 100) : 0
+  const totalAnswered = totalCorrect + totalWrong
+  const accuracyPct = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0
 
-  return { dueCount, newCount, masteredCount, learningCount, total: vocabIds.length, pct }
+  return { dueCount, newCount, masteredCount, learningCount, total: vocabIds.length, pct, accuracyPct }
 }
 
 /** Stats summary for all kana */

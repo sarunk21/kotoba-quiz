@@ -28,13 +28,13 @@ export const SPECIALIZED_DATA: Record<string, VocabItem[]> = {
     { id: 'special|angka|muttsu', category: 'Angka', hiragana: 'むっつ', kanji: '六つ', arti: 'Enam buah (Muttsu - benda umum)', chapter: 'Penghitung' },
     { id: 'special|angka|nanatsu', category: 'Angka', hiragana: 'ななつ', kanji: '七つ', arti: 'Tujuh buah (Nanatsu - benda umum)', chapter: 'Penghitung' },
     { id: 'special|angka|yattsu', category: 'Angka', hiragana: 'やっつ', kanji: '八つ', arti: 'Delapan buah (Yattsu - benda umum)', chapter: 'Penghitung' },
-    { id: 'special|angka|kokonotsu', category: 'Angka', hiragana: '\u3053\u3053\u306e\u3064', kanji: '九つ', arti: 'Sembilan buah (Kokonotsu - benda umum)', chapter: 'Penghitung' },
+    { id: 'special|angka|kokonotsu', category: 'Angka', hiragana: 'ここのおつ', kanji: '九つ', arti: 'Sembilan buah (Kokonotsu - benda umum)', chapter: 'Penghitung' },
     { id: 'special|angka|too', category: 'Angka', hiragana: 'とお', kanji: '十', arti: 'Sepuluh buah (Too - benda umum)', chapter: 'Penghitung' },
     { id: 'special|angka|hitori', category: 'Angka', hiragana: 'ひとり', kanji: '一人', arti: 'Satu orang (Hitori - irregular)', chapter: 'Orang' },
     { id: 'special|angka|futari', category: 'Angka', hiragana: 'ふたり', kanji: '二人', arti: 'Dua orang (Futari - irregular)', chapter: 'Orang' },
     { id: 'special|angka|sannin', category: 'Angka', hiragana: 'さんにん', kanji: '三人', arti: 'Tiga orang', chapter: 'Orang' },
     { id: 'special|angka|yonin', category: 'Angka', hiragana: 'よにん', kanji: '四人', arti: 'Empat orang (Yonin - irregular)', chapter: 'Orang' },
-    { id: 'special|angka|ippon', category: 'Angka', hiragana: 'いっぽん', kanji: '一本', arti: 'Satu batang/botol (Ippon - benda panjang)', chapter: 'Batang' },
+    { id: 'special|angka|ippon', category: 'Angka', hiragana: 'いっぽん', kanji: '一本', arti: 'Satu batang/botol (Ippon)', chapter: 'Batang' },
     { id: 'special|angka|nihon', category: 'Angka', hiragana: 'にほん', kanji: '二本', arti: 'Dua batang/botol', chapter: 'Batang' },
     { id: 'special|angka|sanbon', category: 'Angka', hiragana: 'さんぼん', kanji: '三本', arti: 'Tiga batang/botol (Sanbon - irregular)', chapter: 'Batang' },
     { id: 'special|angka|roppon', category: 'Angka', hiragana: 'ろっぽん', kanji: '六本', arti: 'Enam batang/botol (Roppon - irregular)', chapter: 'Batang' },
@@ -59,7 +59,7 @@ export const SPECIALIZED_DATA: Record<string, VocabItem[]> = {
     { id: 'special|hari|tgl6', category: 'Hari', hiragana: 'むいか', kanji: '6日', arti: 'Tanggal 6 (Muika - irregular)', chapter: 'Tanggal' },
     { id: 'special|hari|tgl7', category: 'Hari', hiragana: 'なのか', kanji: '7日', arti: 'Tanggal 7 (Nanoka - irregular)', chapter: 'Tanggal' },
     { id: 'special|hari|tgl8', category: 'Hari', hiragana: 'ようか', kanji: '8日', arti: 'Tanggal 8 (Youka - irregular)', chapter: 'Tanggal' },
-    { id: 'special|hari|tgl9', category: 'Hari', hiragana: '\u3053\u3053\u306e\u304b', kanji: '9日', arti: 'Tanggal 9 (Kokonoka - irregular)', chapter: 'Tanggal' },
+    { id: 'special|hari|tgl9', category: 'Hari', hiragana: 'ここのおか', kanji: '9日', arti: 'Tanggal 9 (Kokonoka - irregular)', chapter: 'Tanggal' },
     { id: 'special|hari|tgl10', category: 'Hari', hiragana: 'とおか', kanji: '10日', arti: 'Tanggal 10 (Tooka - irregular)', chapter: 'Tanggal' },
     { id: 'special|hari|tgl14', category: 'Hari', hiragana: 'じゅうよっか', kanji: '14日', arti: 'Tanggal 14 (Juuyokka - irregular)', chapter: 'Tanggal' },
     { id: 'special|hari|tgl20', category: 'Hari', hiragana: 'はつか', kanji: '20日', arti: 'Tanggal 20 (Hatsuka - irregular)', chapter: 'Tanggal' },
@@ -79,21 +79,81 @@ export const SPECIALIZED_DATA: Record<string, VocabItem[]> = {
   uang: [
     { id: 'special|uang|100', category: 'Uang', hiragana: 'ひゃくえん', kanji: '百円', arti: '100 Yen (Hyaku-en)', chapter: 'Yen' },
     { id: 'special|uang|300', category: 'Uang', hiragana: 'さんびゃくえん', kanji: '三百円', arti: '300 Yen (Sanbyaku-en - irregular)', chapter: 'Yen' },
+    { id: 'special|uang|500', category: 'Uang', hiragana: 'ごひゃくえん', kanji: '五百円', arti: '500 Yen (Gohyaku-en)', chapter: 'Yen' },
     { id: 'special|uang|600', category: 'Uang', hiragana: 'ろっぴゃくえん', kanji: '六百円', arti: '600 Yen (Roppyaku-en - irregular)', chapter: 'Yen' },
     { id: 'special|uang|800', category: 'Uang', hiragana: 'はっぴゃくえん', kanji: '八百円', arti: '800 Yen (Happyaku-en - irregular)', chapter: 'Yen' },
     { id: 'special|uang|1000', category: 'Uang', hiragana: 'せんえん', kanji: '千円', arti: '1.000 Yen (Sen-en)', chapter: 'Yen' },
     { id: 'special|uang|3000', category: 'Uang', hiragana: 'さんぜんえん', kanji: '三千円', arti: '3.000 Yen (Sanzen-en - irregular)', chapter: 'Yen' },
+    { id: 'special|uang|5000', category: 'Uang', hiragana: 'ごせんえん', kanji: '五千円', arti: '5.000 Yen (Gosen-en)', chapter: 'Yen' },
     { id: 'special|uang|8000', category: 'Uang', hiragana: 'はっせんえん', kanji: '八千円', arti: '8.000 Yen (Hassen-en - irregular)', chapter: 'Yen' },
     { id: 'special|uang|10000', category: 'Uang', hiragana: 'いちまんえん', kanji: '一万円', arti: '10.000 Yen (Ichiman-en)', chapter: 'Yen' },
     { id: 'special|uang|ikura', category: 'Uang', hiragana: 'いくらですか', kanji: 'いくらですか', arti: 'Berapa harganya?', chapter: 'Tanya' },
-    { id: 'special|uang|nanen', category: 'Uang', hiragana: 'なんえん', kanji: '何円', arti: 'Berapa Yen? (Nan-en)', chapter: 'Tanya' }
+    { id: 'special|uang|nanen', category: 'Uang', hiragana: 'なんえん', kanji: '何円', arti: 'Berapa Yen? (Nan-en)', chapter: 'Tanya' },
+    { id: 'special|uang|kaikei', category: 'Uang', hiragana: 'おかいけい', kanji: 'お会計', arti: 'Minta tagihan / kasir (O-kaikei)', chapter: 'Tanya' },
+    { id: 'special|uang|otsuri', category: 'Uang', hiragana: 'おつり', kanji: 'お釣り', arti: 'Uang kembalian (O-tsuri)', chapter: 'Tanya' }
+  ],
+  tubuh: [
+    { id: 'special|tubuh|atama', category: 'Tubuh', hiragana: 'あたま', kanji: '頭', arti: 'Kepala (Atama)', chapter: 'Kepala' },
+    { id: 'special|tubuh|kami', category: 'Tubuh', hiragana: 'かみ', kanji: '髪', arti: 'Rambut (Kami)', chapter: 'Kepala' },
+    { id: 'special|tubuh|kao', category: 'Tubuh', hiragana: 'かお', kanji: '顔', arti: 'Wajah (Kao)', chapter: 'Kepala' },
+    { id: 'special|tubuh|me', category: 'Tubuh', hiragana: 'め', kanji: '目', arti: 'Mata (Me)', chapter: 'Kepala' },
+    { id: 'special|tubuh|mimi', category: 'Tubuh', hiragana: 'みみ', kanji: '耳', arti: 'Telinga (Mimi)', chapter: 'Kepala' },
+    { id: 'special|tubuh|hana', category: 'Tubuh', hiragana: 'はな', kanji: '鼻', arti: 'Hidung (Hana)', chapter: 'Kepala' },
+    { id: 'special|tubuh|kuchi', category: 'Tubuh', hiragana: 'くち', kanji: '口', arti: 'Mulut (Kuchi)', chapter: 'Kepala' },
+    { id: 'special|tubuh|ha', category: 'Tubuh', hiragana: 'は', kanji: '歯', arti: 'Gigi (Ha)', chapter: 'Kepala' },
+    { id: 'special|tubuh|kubi', category: 'Tubuh', hiragana: 'くび', kanji: '首', arti: 'Leher (Kubi)', chapter: 'Badan' },
+    { id: 'special|tubuh|kata', category: 'Tubuh', hiragana: 'かた', kanji: '肩', arti: 'Bahu (Kata)', chapter: 'Badan' },
+    { id: 'special|tubuh|mune', category: 'Tubuh', hiragana: 'むね', kanji: '胸', arti: 'Dada (Mune)', chapter: 'Badan' },
+    { id: 'special|tubuh|onaka', category: 'Tubuh', hiragana: 'おなか', kanji: 'お腹', arti: 'Perut (Onaka)', chapter: 'Badan' },
+    { id: 'special|tubuh|senaka', category: 'Tubuh', hiragana: 'せなか', kanji: '背中', arti: 'Punggung (Senaka)', chapter: 'Badan' },
+    { id: 'special|tubuh|te', category: 'Tubuh', hiragana: 'て', kanji: '手', arti: 'Tangan (Te)', chapter: 'Anggota' },
+    { id: 'special|tubuh|yubi', category: 'Tubuh', hiragana: 'ゆび', kanji: '指', arti: 'Jari (Yubi)', chapter: 'Anggota' },
+    { id: 'special|tubuh|ashi', category: 'Tubuh', hiragana: 'あし', kanji: '足', arti: 'Kaki (Ashi)', chapter: 'Anggota' },
+    { id: 'special|tubuh|kokoro', category: 'Tubuh', hiragana: 'こころ', kanji: '心', arti: 'Hati / Jiwa (Kokoro)', chapter: 'Anggota' },
+    { id: 'special|tubuh|karada', category: 'Tubuh', hiragana: 'からだ', kanji: '体', arti: 'Tubuh / Badan (Karada)', chapter: 'Anggota' }
+  ],
+  keluarga: [
+    { id: 'special|keluarga|kazoku', category: 'Keluarga', hiragana: 'かぞく', kanji: '家族', arti: 'Keluarga (Kazoku)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|chichi', category: 'Keluarga', hiragana: 'ちち', kanji: '父', arti: 'Ayah sendiri (Chichi)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|haha', category: 'Keluarga', hiragana: 'はは', kanji: '母', arti: 'Ibu sendiri (Haha)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|otousan', category: 'Keluarga', hiragana: 'おとうさん', kanji: 'お父さん', arti: 'Ayah (Otousan)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|okaasan', category: 'Keluarga', hiragana: 'おかあさん', kanji: 'お母さん', arti: 'Ibu (Okaasan)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|ani', category: 'Keluarga', hiragana: 'あに', kanji: '兄', arti: 'Kakak Laki-laki sendiri (Ani)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|oniisan', category: 'Keluarga', hiragana: 'おにいさん', kanji: 'お兄さん', arti: 'Kakak Laki-laki (Oniisan)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|ane', category: 'Keluarga', hiragana: 'あね', kanji: '姉', arti: 'Kakak Perempuan sendiri (Ane)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|oneesan', category: 'Keluarga', hiragana: 'おねえさん', kanji: 'お姉さん', arti: 'Kakak Perempuan (Oneesan)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|otouto', category: 'Keluarga', hiragana: 'おとうと', kanji: '弟', arti: 'Adik Laki-laki (Otouto)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|imouto', category: 'Keluarga', hiragana: 'いもうと', kanji: '妹', arti: 'Adik Perempuan (Imouto)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|kodomo', category: 'Keluarga', hiragana: 'こども', kanji: '子供', arti: 'Anak (Kodomo)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|otto', category: 'Keluarga', hiragana: 'おっと', kanji: '夫', arti: 'Suami sendiri (Otto)', chapter: 'Keluarga' },
+    { id: 'special|keluarga|tsuma', category: 'Keluarga', hiragana: 'つま', kanji: '妻', arti: 'Istri sendiri (Tsuma)', chapter: 'Keluarga' }
+  ],
+  salam: [
+    { id: 'special|salam|ohayou', category: 'Ungkapan', hiragana: 'おはようございます', kanji: 'おはようございます', arti: 'Selamat pagi (Ohayou gozaimasu)', chapter: 'Salam' },
+    { id: 'special|salam|konnichiwa', category: 'Ungkapan', hiragana: 'こんにちは', kanji: 'こんにちは', arti: 'Selamat siang / Halo (Konnichiwa)', chapter: 'Salam' },
+    { id: 'special|salam|konbanwa', category: 'Ungkapan', hiragana: 'こんばんは', kanji: 'こんばんは', arti: 'Selamat malam (Konbanwa)', chapter: 'Salam' },
+    { id: 'special|salam|oyasumi', category: 'Ungkapan', hiragana: 'おやすみなさい', kanji: 'おやすみなさい', arti: 'Selamat tidur (Oyasuminasai)', chapter: 'Salam' },
+    { id: 'special|salam|arigatou', category: 'Ungkapan', hiragana: 'ありがとうございます', kanji: 'ありがとうございます', arti: 'Terima kasih banyak (Arigatou gozaimasu)', chapter: 'Salam' },
+    { id: 'special|salam|sumimasen', category: 'Ungkapan', hiragana: 'すみません', kanji: 'すみません', arti: 'Permisi / Maaf (Sumimasen)', chapter: 'Salam' },
+    { id: 'special|salam|gomennasai', category: 'Ungkapan', hiragana: 'ごめんなさい', kanji: 'ごめんなさい', arti: 'Mohon maaf (Gomen nasai)', chapter: 'Salam' },
+    { id: 'special|salam|itadakimasu', category: 'Ungkapan', hiragana: 'いただきます', kanji: 'いただきます', arti: 'Selamat makan (Itadakimasu)', chapter: 'Salam' },
+    { id: 'special|salam|gochisosama', category: 'Ungkapan', hiragana: 'ごちそうさまでした', kanji: 'ごちそうさまでした', arti: 'Terima kasih atas hidangannya (Gochisosama)', chapter: 'Salam' },
+    { id: 'special|salam|ittekimasu', category: 'Ungkapan', hiragana: 'いってきます', kanji: '行きます', arti: 'Saya berangkat dulu (Ittekimasu)', chapter: 'Percakapan' },
+    { id: 'special|salam|itterasshai', category: 'Ungkapan', hiragana: 'いってらっしゃい', kanji: 'いってらっしゃい', arti: 'Hati-hati di jalan / Selamat jalan (Itterasshai)', chapter: 'Percakapan' },
+    { id: 'special|salam|tadaima', category: 'Ungkapan', hiragana: 'ただいま', kanji: 'ただいま', arti: 'Saya pulang / Kembali (Tadaima)', chapter: 'Percakapan' },
+    { id: 'special|salam|okaeri', category: 'Ungkapan', hiragana: 'おかえりなさい', kanji: 'おかえりなさい', arti: 'Selamat datang kembali di rumah (Okaerinasai)', chapter: 'Percakapan' },
+    { id: 'special|salam|daijoubu', category: 'Ungkapan', hiragana: 'だいじょうぶです', kanji: '大丈夫です', arti: 'Tidak apa-apa / Baik-baik saja (Daijoubu)', chapter: 'Percakapan' },
+    { id: 'special|salam|yoroshiku', category: 'Ungkapan', hiragana: 'よろしくおねがいします', kanji: 'よろしくお願いします', arti: 'Mohon bimbingan / kerjasamanya (Yoroshiku)', chapter: 'Percakapan' }
   ]
 }
 
 export const SPECIAL_CHAPTER_SEQUENCES: Record<string, string[]> = {
   angka: ['Dasar', 'Ratusan', 'Ribuan', 'Penghitung', 'Orang', 'Batang'],
   hari: ['Hari', 'Tanggal', 'Waktu', 'Menit'],
-  uang: ['Yen', 'Tanya']
+  uang: ['Yen', 'Tanya'],
+  tubuh: ['Kepala', 'Badan', 'Anggota'],
+  keluarga: ['Keluarga'],
+  salam: ['Salam', 'Percakapan']
 }
 
 export const CHAPTER_METADATA: Record<string, Record<string, { label: string; icon: string }>> = {
@@ -113,7 +173,18 @@ export const CHAPTER_METADATA: Record<string, Record<string, { label: string; ic
   },
   uang: {
     Yen: { label: 'Nominal Yen (100 - 10.000)', icon: '💴' },
-    Tanya: { label: 'Kalimat Tanya Harga', icon: '💬' },
+    Tanya: { label: 'Kalimat Tanya Harga & Kasir', icon: '💬' },
+  },
+  tubuh: {
+    Kepala: { label: 'Kepala & Wajah', icon: '🧠' },
+    Badan: { label: 'Leher, Dada & Perut', icon: '🫁' },
+    Anggota: { label: 'Tangan, Kaki & Tubuh', icon: '🖐️' },
+  },
+  keluarga: {
+    Keluarga: { label: 'Anggota Keluarga', icon: '👨‍👩‍👧‍👦' },
+  },
+  salam: {
+    Salam: { label: 'Salam Sehari-hari (Aisatsu)', icon: '🤝' },
+    Percakapan: { label: 'Ungkapan Percakapan', icon: '💬' },
   }
 }
-
