@@ -31,6 +31,11 @@ const TOTAL_QUESTIONS = 10
 const shuffle = <T,>(a: T[]) => [...a].sort(() => Math.random() - 0.5)
 
 function getChoices(correct: VocabItem, pool: VocabItem[]): string[] {
+  // If item has pre-defined custom choices, use them shuffled
+  if ((correct as any).choices && Array.isArray((correct as any).choices) && (correct as any).choices.length >= 4) {
+    return shuffle([...(correct as any).choices])
+  }
+
   // First, try to get wrong choices of the same category
   const sameCategoryPool = pool.filter(v => v.id !== correct.id && v.category === correct.category)
   
