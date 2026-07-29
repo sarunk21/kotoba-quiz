@@ -1,18 +1,58 @@
 # 🎌 言葉カード — Kotoba Quiz
 
-A beautiful, premium mobile-optimized flashcard application for learning Japanese vocabulary, built with Next.js, React 19, and Tailwind CSS. Features Google Sheets integration for automatic vocabulary synchronization, Firestore cloud backups, and full Capacitor compatibility for native mobile deployment.
+> **Aplikasi Flashcard & Kuis Bahasa Jepang Premium, Responsif, Offline-First & PWA / Capacitor Mobile App.**
 
-![Kotoba Quiz Screenshot](./public/screenshot.png)
+![Kotoba Quiz Interface Banner](./public/screenshots/quiz_feedback.jpg)
 
-## ✨ Fitur Utama
+---
 
-- **🎨 Desain Premium & Haptic-Like UI**: Antarmuka modern yang terinspirasi dari aplikasi pembelajaran bahasa premium seperti Bunpo, lengkap dengan mikro-animasi dan transisi mulus.
-- **🔄 Spaced Repetition System (SRS)**: Sistem antrean kuis berbasis tingkat kepahaman (Level 0-6) untuk optimasi memori jangka panjang.
-- **📊 Google Sheets Integration**: Kemudahan impor dan pembaruan database kosakata secara massal langsung dari Google Sheets (CSV).
-- **☁️ Firebase Firestore Sync**: Sinkronisasi data kemajuan belajar secara instan dan aman di awan menggunakan Firebase Auth dan Firestore.
-- **📱 Capacitor Native Platform**: Dirancang agar kompatibel penuh untuk dideploy menjadi aplikasi native di **Android** dan **iOS**.
-- **🔔 Pengingat Harian Pintar**: Sistem notifikasi lokal (Local Notifications) yang secara otomatis akan menjadwalkan ulang notifikasi jika Anda sudah berlatih hari ini.
-- **🔥 Streak & Progress Mingguan**: Pelacakan streak Duolingo-style lengkap dengan indikator aktivitas mingguan.
+## 🌟 Tampilan Real Aplikasi (App Screenshots)
+
+<div align="center">
+  <table border="0">
+    <tr>
+      <td width="33%" align="center">
+        <b>🎮 Mode Kuis & Bottom Sheet Overlay Feedback</b><br/><br/>
+        <img src="./public/screenshots/quiz_feedback.jpg" width="100%" alt="Kuis & Bottom Sheet Overlay Feedback" />
+      </td>
+      <td width="33%" align="center">
+        <b>📚 Kelola Kosakata & Database Google Sheets</b><br/><br/>
+        <img src="./public/screenshots/vocab_manager.jpg" width="100%" alt="Kelola Kosakata" />
+      </td>
+      <td width="33%" align="center">
+        <b>あ Kana Learning Hub & Progress Level SRS</b><br/><br/>
+        <img src="./public/screenshots/kana_progress.png" width="100%" alt="Kana Hub Progress" />
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## ✨ Fitur-Fitur Unggulan (Key Features)
+
+- **💬 Interactive Bottom Sheet Feedback (Duolingo Style)**:
+  Setiap kuis (Kosakata SRS, Kana, Partikel, Susun Kalimat, & Latihan Bab) dilengkapi dengan **Overlay Sheet Melayang** di bagian bawah untuk feedback instan (`✨ Benar! 正解！` / `❌ Kurang Tepat`) dan kunci jawaban tanpa menggeser kartu pilihan.
+
+- **🛡️ Modal Konfirmasi Keluar & Pencegahan Back accidental**:
+  Mencegah pemain keluar dari kuis secara tidak sengaja (baik via tombol navigasi aplikasi maupun tombol *Back* fisik/gesture Android & iOS).
+
+- **あ Kana Learning Hub & Weighted SRS Progress**:
+  Sistem pembelajaran Hiragana & Katakana lengkap dengan audio pelafalan asli, latihan karakter mirip (*Confusable Kana*), serta indikator kemajuan granular (*Weighted Level 0-6 System*) yang langsung bertambah secara visual setelah tiap sesi latihan.
+
+- **📖 2.200+ Soal Kuis Per Bab (Bab 1 – 25 Minna no Nihongo)**:
+  Tersedia 2 kategori kuis per bab dengan pemilih topik (*Topic Selector Tabs*) yang bersih:
+  1. **QUIZ Latihan A, B, C**: 1.300+ Soal Tata Bahasa & Struktur Kalimat.
+  2. **QUIZ Kosakata**: 909 Soal Hafalan Kosakata dengan pilihan jawaban kustom bawaan dari Google Forms.
+
+- **🔄 Spaced Repetition System (SRS) & Offline-First**:
+  Menyimpan seluruh progres memori di `localStorage` dan secara otomatis disinkronkan ke **Firebase Firestore** saat online.
+
+- **📊 Impor & Sinkronisasi Massal Google Sheets**:
+  Mendukung impor dan pembaruan database kosakata pribadi secara massal cukup dengan menempelkan link CSV Google Sheets Anda.
+
+- **📱 Full PWA & Capacitor Native Mobile Ready**:
+  Dapat di-install sebagai **Progressive Web App (PWA)** dengan Service Worker offline, atau di-build menjadi aplikasi native Android & iOS via Capacitor.
 
 ---
 
@@ -20,72 +60,68 @@ A beautiful, premium mobile-optimized flashcard application for learning Japanes
 
 - **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
 - **Library**: [React 19](https://react.dev/)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Native Wrapper**: [Capacitor v8](https://capacitorjs.com/)
-- **Database & Auth**: [Firebase](https://firebase.google.com/) & [NextAuth.js](https://next-auth.js.org/)
-- **Notifikasi**: [Capacitor Local Notifications](https://capacitorjs.com/docs/apis/local-notifications)
+- **Styling**: Vanilla CSS Design Tokens & Tailwind CSS v4
+- **Native Mobile Wrapper**: [Capacitor v8](https://capacitorjs.com/)
+- **Database & Sync**: [Firebase Firestore](https://firebase.google.com/) & [NextAuth.js](https://next-auth.js.org/)
+- **Notification System**: Capacitor Local Notifications & Web Notifications Service Worker
 
 ---
 
-## 📋 Struktur Data & Kolom Google Sheets
+## 📋 Format Database Google Sheets (5 Kolom)
 
-Aplikasi ini menggunakan format Google Sheets dengan struktur **5 kolom**. Pastikan tabel Anda memiliki susunan header sebagai berikut:
+Kotoba Quiz menggunakan format spreadsheet **5 kolom** standar berikut:
 
 | Kategori | Hiragana | Kanji | Arti | Bab |
 | :--- | :--- | :--- | :--- | :--- |
-| Kata Benda | わたし | 私 | Saya | Perkenalan |
-| Kata Kerja | ねます | 寝ます | Tidur | Aktivitas |
+| Kata Benda | わたし | 私 | Saya | Bab 1 |
+| Kata Kerja | ねます | 寝ます | Tidur | Bab 1 |
+| Kata Sifat | おおきい | 大きい | Besar | Bab 2 |
 
-> [!NOTE]
-> Kolom ke-5 (`Bab`) digunakan untuk pengelompokan tingkat kemajuan di menu utama. Jika dikosongkan, kosakata akan dikelompokkan ke dalam kategori "Tanpa Bab".
-
-### Langkah Menghubungkan Google Sheets:
-1. Buat spreadsheet di Google Sheets sesuai dengan format kolom di atas.
-2. Klik **File** → **Share** → **Publish to web**.
-3. Pilih opsi **Entire Document** / sheet terkait, lalu ubah formatnya menjadi **Comma-separated values (.csv)**.
-4. Klik **Publish** dan salin URL hasil publikasi tersebut.
-5. Tempel URL tersebut pada halaman **Pengaturan** di aplikasi Kotoba Quiz Anda untuk sinkronisasi otomatis.
+> [!TIP]
+> **Cara Sinkronisasi CSV Google Sheets**:
+> 1. Buat spreadsheet sesuai 5 kolom di atas.
+> 2. Di Google Sheets, pilih **File** ➔ **Share** ➔ **Publish to web**.
+> 3. Ubah format dari *Web Page* menjadi **Comma-separated values (.csv)** lalu klik **Publish**.
+> 4. Salin link publikasi CSV lalu tempel pada menu **Kelola Kosakata ➔ Link Google Sheets** di aplikasi Kotoba Quiz.
 
 ---
 
-## 🚀 Memulai Pengoperasian Lokal
+## 🚀 Memulai Pengoperasian Lokal (Local Setup)
 
-### Prasyarat
-Pastikan Anda sudah menginstal [Node.js](https://nodejs.org/) (versi 18+ direkomendasikan) di komputer Anda.
+```bash
+# 1. Clone repositori
+git clone https://github.com/sarunk21/kotoba-quiz.git
+cd kotoba-quiz
 
-### Langkah Instalasi
-1. Clone repositori ini:
-   ```bash
-   git clone https://github.com/sarunk21/kotoba-quiz.git
-   cd kotoba-quiz
-   ```
-2. Instal dependensi:
-   ```bash
-   npm install
-   ```
-3. Jalankan server pengembangan lokal:
-   ```bash
-   npm run dev
-   ```
-4. Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
+# 2. Install dependensi
+npm install
+
+# 3. Jalankan server pengembangan lokal
+npm run dev
+
+# 4. Akses aplikasi di browser
+# http://localhost:3000
+```
 
 ---
 
-## 📱 Membangun Aplikasi Native Mobile (Capacitor)
+## 📱 Membangun Aplikasi Native Mobile (Android & iOS)
 
-Untuk menjalankan atau mem-build Kotoba Quiz sebagai aplikasi Android atau iOS:
+```bash
+# Lakukan build web terlebih dahulu
+npm run build
 
-1. Lakukan build proyek web Next.js terlebih dahulu:
-   ```bash
-   npm run build
-   ```
-2. Sinkronisasikan file build ke platform native:
-   ```bash
-   npx cap sync
-   ```
-3. Buka proyek di Android Studio atau Xcode:
-   ```bash
-   npx cap open android
-   # atau
-   npx cap open ios
-   ```
+# Sinkronkan aset build ke platform Capacitor
+npx cap sync
+
+# Buka proyek native di Android Studio atau Xcode
+npx cap open android
+# atau
+npx cap open ios
+```
+
+---
+
+<div align="center">
+  <sub>Developed with ❤️ for Japanese Learners worldwide by <b>Sarunk</b></sub>
+</div>
