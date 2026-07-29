@@ -25,6 +25,7 @@ interface ChapterExercise {
 export default function PracticeHubPage() {
   const [exercises, setExercises] = useState<ChapterExercise[]>([])
   const [loadingExercises, setLoadingExercises] = useState(true)
+  const [topicFilter, setTopicFilter] = useState<'latihan' | 'vocab'>('latihan')
   const [selectedBab, setSelectedBab] = useState<string | null>(null)
   const [activeQuiz, setActiveQuiz] = useState<ChapterExercise | null>(null)
   const [currentQIndex, setCurrentQIndex] = useState(0)
@@ -34,17 +35,19 @@ export default function PracticeHubPage() {
   const [quizFinished, setQuizFinished] = useState(false)
 
   useEffect(() => {
-    fetch('/data/practice-default.json')
+    setLoadingExercises(true)
+    const file = topicFilter === 'latihan' ? '/data/practice-default.json' : '/data/vocab-practice-default.json'
+    fetch(file)
       .then(res => res.json())
       .then((data: ChapterExercise[]) => {
         setExercises(data)
         setLoadingExercises(false)
       })
       .catch(err => {
-        console.error('[PracticeHub] Error loading practice-default.json:', err)
+        console.error('[PracticeHub] Error loading practice json:', err)
         setLoadingExercises(false)
       })
-  }, [])
+  }, [topicFilter])
 
   const startChapterQuiz = (ch: ChapterExercise) => {
     playTap()
@@ -326,16 +329,40 @@ export default function PracticeHubPage() {
             </div>
           </div>
 
-          {/* Section: Latihan Per Bab (1.459 Soal Extracted) */}
+          {/* Section: Latihan Per Bab (Topic Filter) */}
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3.5">
               <div>
-                <h2 className="text-sm font-extrabold text-[var(--color-text-1)] uppercase tracking-wider">
-                  📖 Latihan Per Bab (Bab 1–25)
+                <h2 className="text-sm font-black text-[var(--color-text-1)] uppercase tracking-wider">
+                  📖 Kuis & Latihan Per Bab (Bab 1–25)
                 </h2>
-                <p className="text-[10px] font-bold text-[var(--color-text-3)]">
-                  1.459 Soal Latihan Pilihan Ganda
+                <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">
+                  {topicFilter === 'latihan' ? '1.007 Soal Latihan A, B, C & Tata Bahasa' : '909 Soal Kuis Hafalan Kosakata'}
                 </p>
+              </div>
+
+              {/* Topic Filter Selector */}
+              <div className="flex items-center gap-1 bg-white dark:bg-[#1a1d24] p-1 rounded-2xl border border-[var(--color-border)] self-start sm:self-auto shadow-xs">
+                <button
+                  onClick={() => { playTap(); setTopicFilter('latihan') }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    topicFilter === 'latihan'
+                      ? 'bg-[var(--color-accent)] text-white shadow-xs'
+                      : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)]'
+                  }`}
+                >
+                  QUIZ Latihan A, B, C
+                </button>
+                <button
+                  onClick={() => { playTap(); setTopicFilter('vocab') }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    topicFilter === 'vocab'
+                      ? 'bg-[var(--color-accent)] text-white shadow-xs'
+                      : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)]'
+                  }`}
+                >
+                  QUIZ Kosakata
+                </button>
               </div>
             </div>
 
@@ -343,7 +370,7 @@ export default function PracticeHubPage() {
               {loadingExercises ? (
                 <div className="col-span-2 py-8 text-center bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-2xl">
                   <div className="w-6 h-6 border-3 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-xs font-bold text-[var(--color-text-2)]">Memuat 1.459 Soal Latihan...</p>
+                  <p className="text-xs font-bold text-[var(--color-text-2)]">Memuat Soal Kuis...</p>
                 </div>
               ) : (
                 exercises.map((ex, idx) => (
