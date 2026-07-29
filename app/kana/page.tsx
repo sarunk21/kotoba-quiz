@@ -49,14 +49,22 @@ export default function KanaPage() {
   // Stats per group per type
   function groupStats(groupKey: string, type: KanaType) {
     const cards = KANA.filter(k => k.group === groupKey)
-    let mastered = 0, learning = 0, newW = 0
+    let mastered = 0, learning = 0, newW = 0, points = 0
     for (const c of cards) {
       const wp = getWordProgress(srsStore, kanaId(c.id, type))
-      if (wp.level >= MASTERED_LEVEL) mastered++
-      else if (wp.level > 0) learning++
-      else newW++
+      if (wp.level >= 1) {
+        mastered++
+        if (wp.level >= 5) points += 100
+        else if (wp.level === 4) points += 90
+        else if (wp.level === 3) points += 75
+        else if (wp.level === 2) points += 50
+        else points += 30
+      } else {
+        newW++
+      }
     }
-    return { mastered, learning, new: newW, total: cards.length }
+    const pct = cards.length > 0 ? Math.round(points / cards.length) : 0
+    return { mastered, learning, new: newW, total: cards.length, pct }
   }
 
   // Overall stats
@@ -68,13 +76,16 @@ export default function KanaPage() {
     for (const t of typesToCount) {
       for (const c of KANA) {
         const wp = getWordProgress(srsStore, kanaId(c.id, t))
-        if (wp.level >= MASTERED_LEVEL) mastered++
-        else if (wp.level > 0) { learning++; if (wp.nextReview <= today) due++ }
-        else newW++
+        if (wp.level >= 1) {
+          mastered++
+          if (wp.nextReview <= today && wp.level < MASTERED_LEVEL) due++
+        } else {
+          newW++
+        }
       }
     }
     const total = KANA.length * typesToCount.length
-    return { mastered, learning, new: newW, due, total }
+    return { mastered, learning: total - mastered - newW, new: newW, due, total }
   }, [srsStore])
 
   const stats = overallStats(activeType)
@@ -341,20 +352,20 @@ export default function KanaPage() {
                 {GROUPS.map(g => {
                   const typeToStat: KanaType = activeType === 'both' ? 'hiragana' : activeType
                   const gs = groupStats(g.key, typeToStat)
-                  const pct = Math.round((gs.mastered / gs.total) * 100)
-                  const barCol = pct === 100 ? 'var(--color-green)' : gs.mastered > 0 ? 'var(--color-accent)' : 'var(--color-text-3)'
+                  const pct = gs.pct
+                  const barCol = pct >= 80 ? 'var(--color-green)' : pct > 0 ? 'var(--color-accent)' : 'var(--color-text-3)'
                   return (
                     <div key={g.key} className="flex items-center gap-3">
-                      <span className="jp text-sm font-black w-8 shrink-0 text-center text-[var(--color-text-1)]">
+                      <span className="jp text-sm font-black w-9 shrink-0 text-center text-[var(--color-text-1)]">
                         {g.short}
                       </span>
-                      <div className="flex-1 rounded-full overflow-hidden h-2 bg-[var(--color-subtle)]">
+                      <div className="flex-1 rounded-full overflow-hidden h-2.5 bg-[var(--color-subtle)]">
                         <div 
                           className="h-full rounded-full transition-all duration-500" 
                           style={{ width: `${pct}%`, background: barCol }} 
                         />
                       </div>
-                      <span className="text-xs font-bold w-12 text-right" style={{ color: barCol }}>
+                      <span className="text-xs font-black w-14 text-right" style={{ color: barCol }}>
                         {gs.mastered}/{gs.total}
                       </span>
                     </div>
