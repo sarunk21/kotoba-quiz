@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { playTap } from '@/lib/sounds'
+import { playTap, speakJapanese } from '@/lib/sounds'
+import { addFuriganaToSentence } from '@/lib/vocab'
 import BottomNav from '@/components/BottomNav'
 
 interface PracticeQuestion {
@@ -33,6 +34,12 @@ export default function PracticeHubPage() {
   const [score, setScore] = useState(0)
   const [isAnswered, setIsAnswered] = useState(false)
   const [quizFinished, setQuizFinished] = useState(false)
+  const [showFurigana, setShowFurigana] = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kotoba_show_furigana')
+    setShowFurigana(saved !== 'false')
+  }, [])
 
   useEffect(() => {
     setLoadingExercises(true)
@@ -130,21 +137,62 @@ export default function PracticeHubPage() {
             <div>
               {/* Question Header */}
               <div className="flex items-center justify-between mb-4 border-b border-[var(--color-border)] pb-3">
-                <span className="text-xs font-extrabold text-[var(--color-accent)] uppercase tracking-wider">
-                  {activeQuiz.bab} • Soal {currentQIndex + 1} / {activeQuiz.questions.length}
-                </span>
-                <button
-                  onClick={() => setActiveQuiz(null)}
-                  className="text-xs font-bold text-[var(--color-text-3)] hover:text-red-500"
-                >
-                  ✕ Keluar
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-extrabold text-[var(--color-accent)] uppercase tracking-wider">
+                    {activeQuiz.bab} • Soal {currentQIndex + 1} / {activeQuiz.questions.length}
+                  </span>
+                  {/* Furigana Toggle */}
+                  <button 
+                    onClick={() => {
+                      const newVal = !showFurigana
+                      setShowFurigana(newVal)
+                      localStorage.setItem('kotoba_show_furigana', String(newVal))
+                      playTap()
+                    }}
+                    className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all active:scale-95 cursor-pointer ${
+                      showFurigana 
+                        ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
+                        : 'bg-[var(--color-bg)] text-[var(--color-text-3)] border-[var(--color-border)]'
+                    }`}
+                    title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
+                  >
+                    <span>あ</span>
+                    <span>{showFurigana ? 'ON' : 'OFF'}</span>
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => speakJapanese(activeQuiz.questions[currentQIndex].title)}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-xs border border-[var(--color-border)] text-[var(--color-text-2)]"
+                    title="Dengarkan Suara"
+                  >
+                    🔊
+                  </button>
+                  <button
+                    onClick={() => setActiveQuiz(null)}
+                    className="text-xs font-bold text-[var(--color-text-3)] hover:text-red-500 cursor-pointer"
+                  >
+                    ✕ Keluar
+                  </button>
+                </div>
               </div>
 
               {/* Question Title */}
-              <h3 className="text-base font-extrabold text-[var(--color-text-1)] mb-4 leading-relaxed">
-                {activeQuiz.questions[currentQIndex].title}
+              <h3 className="text-base font-extrabold text-[var(--color-text-1)] mb-3 leading-relaxed">
+                {showFurigana ? (
+                  <span dangerouslySetInnerHTML={{ 
+                    __html: addFuriganaToSentence(activeQuiz.questions[currentQIndex].title) 
+                  }} />
+                ) : (
+                  activeQuiz.questions[currentQIndex].title
+                )}
               </h3>
+
+              {activeQuiz.questions[currentQIndex].description && (
+                <div className="mb-4 p-3 rounded-xl bg-[var(--color-subtle)] border border-[var(--color-border)] text-xs font-semibold text-[var(--color-text-2)]">
+                  💡 {activeQuiz.questions[currentQIndex].description}
+                </div>
+              )}
 
               {/* Choice Buttons */}
               <div className="space-y-2.5 mb-6">

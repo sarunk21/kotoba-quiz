@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
-import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
+import { playCorrect, playWrong, playFinish, playLoseHeart, playTap, speakJapanese } from '@/lib/sounds'
 import { addFuriganaToSentence, extractVocabRefFromSentence } from '@/lib/vocab'
 import { updateAfterSession } from '@/lib/stats'
 import BottomNav from '@/components/BottomNav'
@@ -119,22 +119,19 @@ function ParticlesQuizContent() {
   }, [questions, currentIndex])
 
   const handleSelect = (option: string) => {
-    if (isChecked) return
+    if (isChecked || !currentQuestion) return
     playTap()
     setSelectedOption(option)
-  }
-
-  const handleCheck = () => {
-    if (isChecked || !selectedOption || !currentQuestion) return
 
     const correct = currentQuestion.correct
-    const isUserCorrect = selectedOption === correct
+    const isUserCorrect = option === correct
 
     setIsCorrect(isUserCorrect)
     setIsChecked(true)
 
     if (isUserCorrect) {
       playCorrect()
+      speakJapanese(currentQuestion.sentence.replace('___', correct))
       setScore(s => s + 1)
     } else {
       playWrong()
@@ -428,10 +425,20 @@ function ParticlesQuizContent() {
             </div>
 
             {/* Question Card */}
-            <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-6 text-center">
-              <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-3 block">
-                PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS MEMBEDAKAN ${selectedParticle?.toUpperCase()}`})
-              </span>
+            <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-6 text-center relative overflow-hidden">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)]">
+                  PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS ${selectedParticle?.toUpperCase()}`})
+                </span>
+                <button 
+                  onClick={() => speakJapanese(currentQuestion.sentence.replace('___', currentQuestion.correct))}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-xs border border-[var(--color-border)] text-[var(--color-text-2)] cursor-pointer"
+                  title="Dengarkan Suara Pelafalan"
+                >
+                  🔊
+                </button>
+              </div>
+
               <h2 className="text-2xl font-black jp tracking-wide leading-relaxed text-[var(--color-text-1)] mb-4 select-text">
                 {showFurigana ? (
                   <span dangerouslySetInnerHTML={{ 
@@ -477,38 +484,21 @@ function ParticlesQuizContent() {
             </div>
 
             {/* Multiple Choice Options */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              {currentQuestion.options.map((opt) => {
+            <div className="grid grid-cols-2 gap-3.5 mb-6">
+              {currentQuestion.options.map((opt, idx) => {
                 const isSelected = selectedOption === opt
-                let btnStyle = {
-                  background: 'var(--color-white)',
-                  color: 'var(--color-text-1)',
-                  borderColor: 'var(--color-border)'
-                }
+                const isCorrectOpt = opt === currentQuestion.correct
 
-                if (isSelected) {
-                  btnStyle = {
-                    background: 'var(--color-accent-light)',
-                    color: 'var(--color-accent)',
-                    borderColor: 'var(--color-accent)'
-                  }
-                }
+                let cardStyle = "bg-white dark:bg-[#1a1d24] border-[var(--color-border)] text-[var(--color-text-1)] hover:border-[var(--color-accent)]"
 
                 if (isChecked) {
-                  const isCorrectOpt = opt === currentQuestion.correct
                   if (isCorrectOpt) {
-                    btnStyle = {
-                      background: 'rgba(34, 197, 94, 0.1)',
-                      color: 'rgb(34, 197, 94)',
-                      borderColor: 'rgb(34, 197, 94)'
-                    }
+                    cardStyle = "border-green-500 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 font-extrabold shadow-md shadow-green-500/10"
                   } else if (isSelected && !isCorrect) {
-                    btnStyle = {
-                      background: 'rgba(239, 68, 68, 0.1)',
-                      color: 'rgb(239, 68, 68)',
-                      borderColor: 'rgb(239, 68, 68)'
-                    }
+                    cardStyle = "border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-extrabold"
                   }
+                } else if (isSelected) {
+                  cardStyle = "border-[var(--color-accent)] bg-[var(--color-accent-light)] text-[var(--color-accent)] font-extrabold shadow-md"
                 }
 
                 return (
@@ -516,32 +506,16 @@ function ParticlesQuizContent() {
                     key={opt}
                     onClick={() => handleSelect(opt)}
                     disabled={isChecked}
-                    className="rounded-2xl p-4 text-base font-extrabold border-2 transition-all active:scale-95 text-center flex items-center justify-center min-h-[64px]"
-                    style={btnStyle}
+                    className={`rounded-2xl p-4 border-2 transition-all active:scale-95 flex items-center justify-between min-h-[68px] cursor-pointer shadow-xs ${cardStyle}`}
                   >
-                    <span className="jp text-lg">{opt}</span>
+                    <span className="text-xs font-black opacity-50">{String.fromCharCode(65 + idx)}</span>
+                    <span className="jp text-2xl font-black">{opt}</span>
+                    <span className="w-4 text-right text-xs">
+                      {isChecked && isCorrectOpt ? '✨' : isChecked && isSelected && !isCorrect ? '❌' : ''}
+                    </span>
                   </button>
                 )
               })}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-auto">
-              {!isChecked && (
-                <button 
-                  onClick={handleCheck}
-                  disabled={!selectedOption}
-                  className="w-full rounded-2xl py-4 text-base font-extrabold active:scale-95 transition-transform"
-                  style={{
-                    background: selectedOption ? 'var(--color-accent)' : 'var(--color-subtle)',
-                    color: selectedOption ? '#fff' : 'var(--color-text-3)',
-                    boxShadow: selectedOption ? '0 8px 20px rgba(91,94,244,0.28)' : 'none',
-                    opacity: selectedOption ? 1 : 0.6
-                  }}
-                >
-                  Periksa Jawaban 🔍
-                </button>
-              )}
             </div>
 
             {/* Fixed Bottom Feedback Sheet */}
@@ -554,13 +528,13 @@ function ParticlesQuizContent() {
                       : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-300'
                   }`}>
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-xl">{isCorrect ? '✓' : '✗'}</span>
+                      <span className="text-xl">{isCorrect ? '✨' : '❌'}</span>
                       <h4 className={`text-xs font-black uppercase ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                        {isCorrect ? 'Jawaban Benar!' : 'Jawaban Kurang Tepat'}
+                        {isCorrect ? 'Jawaban Benar! 正解！' : 'Jawaban Kurang Tepat'}
                       </h4>
                     </div>
                     <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed">
-                      {currentQuestion.explanation}
+                      💡 {currentQuestion.explanation}
                     </p>
                   </div>
 

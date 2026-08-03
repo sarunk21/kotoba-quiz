@@ -3,7 +3,8 @@
 import { useEffect, useState, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CustomQuiz, CustomQuestion } from '../page'
-import { playCorrect, playWrong, playFinish, playLoseHeart, playTap } from '@/lib/sounds'
+import { playCorrect, playWrong, playFinish, playLoseHeart, playTap, speakJapanese } from '@/lib/sounds'
+import { addFuriganaToSentence } from '@/lib/vocab'
 
 export default function CustomQuizPracticePage() {
   return (
@@ -37,6 +38,12 @@ function CustomQuizPracticeContent() {
   const [isGameOver, setIsGameOver] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const [showFurigana, setShowFurigana] = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('kotoba_show_furigana')
+    setShowFurigana(saved !== 'false')
+  }, [])
 
   // Intercept browser / device back button during active quiz
   useEffect(() => {
@@ -268,12 +275,48 @@ function CustomQuizPracticeContent() {
               )}
 
               {/* Question Card */}
-              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-5 text-center">
-                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-3 block">
-                  PERTANYAAN {currentIndex + 1} DARI {questions.length}
-                </span>
+              <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-5 text-center relative overflow-hidden">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)]">
+                    PERTANYAAN {currentIndex + 1} DARI {questions.length}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {/* Furigana Toggle */}
+                    <button 
+                      onClick={() => {
+                        const newVal = !showFurigana
+                        setShowFurigana(newVal)
+                        localStorage.setItem('kotoba_show_furigana', String(newVal))
+                        playTap()
+                      }}
+                      className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all active:scale-95 cursor-pointer ${
+                        showFurigana 
+                          ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
+                          : 'bg-[var(--color-bg)] text-[var(--color-text-3)] border-[var(--color-border)]'
+                      }`}
+                      title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
+                    >
+                      <span>あ</span>
+                      <span>{showFurigana ? 'ON' : 'OFF'}</span>
+                    </button>
+                    <button 
+                      onClick={() => speakJapanese(currentQuestion.title)}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-xs border border-[var(--color-border)] text-[var(--color-text-2)] cursor-pointer"
+                      title="Dengarkan Suara"
+                    >
+                      🔊
+                    </button>
+                  </div>
+                </div>
+
                 <h2 className="text-xl font-black jp tracking-wide leading-relaxed text-[var(--color-text-1)] select-text">
-                  {currentQuestion.title}
+                  {showFurigana ? (
+                    <span dangerouslySetInnerHTML={{ 
+                      __html: addFuriganaToSentence(currentQuestion.title) 
+                    }} />
+                  ) : (
+                    currentQuestion.title
+                  )}
                 </h2>
               </div>
 
