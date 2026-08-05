@@ -795,7 +795,7 @@ export default function VocabPage() {
         {/* Floating Action Button for Add Word */}
         <button 
           onClick={openAddModal}
-          className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 shadow-[0_8px_25px_rgba(91,94,244,0.45)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white border-2 border-white/40 dark:border-white/20 cursor-pointer"
+          className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] right-5 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 shadow-[0_8px_25px_rgba(91,94,244,0.45)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white border-2 border-white/40 dark:border-white/20 cursor-pointer"
           title="Tambah Kosakata Baru"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

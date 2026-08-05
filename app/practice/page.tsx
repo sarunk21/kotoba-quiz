@@ -222,36 +222,6 @@ export default function PracticeHubPage() {
                   )
                 })}
               </div>
-
-              {/* Fixed Bottom Feedback Sheet */}
-              {isAnswered && (
-                <div className="fixed bottom-0 left-0 right-0 z-50 anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl border-t bg-white dark:bg-[#1a1d24] border-[var(--color-border)] rounded-t-[32px]">
-                  <div className="max-w-sm md:max-w-2xl mx-auto px-5 py-5 flex flex-col gap-3">
-                    <div className={`p-4 rounded-2xl flex items-center justify-between border ${
-                      selectedChoice === activeQuiz.questions[currentQIndex].correctAnswer 
-                        ? 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-300' 
-                        : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-300'
-                    }`}>
-                      <div>
-                        <p className="font-extrabold text-sm">
-                          {selectedChoice === activeQuiz.questions[currentQIndex].correctAnswer ? '✨ Benar! 正解！' : '❌ Kurang Tepat'}
-                        </p>
-                        <p className="text-xs font-semibold mt-0.5">
-                          Jawaban benar: <strong className="jp text-sm font-extrabold">{activeQuiz.questions[currentQIndex].correctAnswer}</strong>
-                        </p>
-                      </div>
-                      <span className="text-2xl">{selectedChoice === activeQuiz.questions[currentQIndex].correctAnswer ? '👏' : '💡'}</span>
-                    </div>
-
-                    <button 
-                      onClick={nextQuestion}
-                      className="w-full rounded-2xl py-3.5 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)] cursor-pointer"
-                    >
-                      {currentQIndex < activeQuiz.questions.length - 1 ? 'Soal Berikutnya ➔' : 'Lihat Hasil 🎉'}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -466,7 +436,36 @@ export default function PracticeHubPage() {
           </div>
         </div>
       )}
-      <BottomNav />
+      {/* Fixed Bottom Feedback Sheet */}
+      {activeQuiz && isAnswered && (
+        <div className="fixed bottom-0 left-0 right-0 z-[160] anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.25)] backdrop-blur-xl border-t bg-white dark:bg-[#1a1d24] border-[var(--color-border)] rounded-t-[32px]">
+          <div className="max-w-sm md:max-w-2xl mx-auto px-5 pt-5 pb-[calc(1.75rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-3">
+            <div className={`p-4 rounded-2xl flex items-center justify-between border ${
+              selectedChoice === activeQuiz.questions[currentQIndex].correctAnswer 
+                ? 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-300' 
+                : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-300'
+            }`}>
+              <div>
+                <p className="font-extrabold text-sm">
+                  {selectedChoice === activeQuiz.questions[currentQIndex].correctAnswer ? '✨ Benar! 正解！' : '❌ Kurang Tepat'}
+                </p>
+                <p className="text-xs font-semibold mt-0.5">
+                  Jawaban benar: <strong className="jp text-sm font-extrabold">{activeQuiz.questions[currentQIndex].correctAnswer}</strong>
+                </p>
+              </div>
+              <span className="text-2xl">{selectedChoice === activeQuiz.questions[currentQIndex].correctAnswer ? '👏' : '💡'}</span>
+            </div>
+
+            <button 
+              onClick={nextQuestion}
+              className="w-full rounded-2xl py-3.5 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)] cursor-pointer"
+            >
+              {currentQIndex < activeQuiz.questions.length - 1 ? 'Soal Berikutnya ➔' : 'Lihat Hasil 🎉'}
+            </button>
+          </div>
+        </div>
+      )}
+      {!activeQuiz && <BottomNav />}
     </main>
   )
 }

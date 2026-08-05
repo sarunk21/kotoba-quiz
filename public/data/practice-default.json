@@ -16,7 +16,7 @@
           "Saya Mike Miller",
           "Anda Mike Miller"
         ],
-        "correctAnswer": "Saya bukan Mike Miller",
+        "correctAnswer": "Saya Mike Miller",
         "bab": "Bab 1"
       },
       {
@@ -29,7 +29,7 @@
           "Saya bukan pegawai perusahaan",
           "Anda adalah pegawai perusahaan"
         ],
-        "correctAnswer": "Saya adalah pegawai bank",
+        "correctAnswer": "Saya adalah pegawai perusahaan",
         "bab": "Bab 1"
       },
       {
@@ -42,7 +42,7 @@
           "Sdr. Wang bukan orang Cina",
           "Sdr. Wang bukan orang Jepang"
         ],
-        "correctAnswer": "Sdr. Wang adalah orang Jepang",
+        "correctAnswer": "Sdr. Wang adalah orang Cina",
         "bab": "Bab 1"
       },
       {
@@ -55,7 +55,7 @@
           "Sdr. Wang adalah dokter",
           "Sdr. Wang adalah guru"
         ],
-        "correctAnswer": "Sdr. Wang adalah perawat",
+        "correctAnswer": "Sdr. Wang adalah dokter",
         "bab": "Bab 1"
       },
       {
@@ -68,7 +68,7 @@
           "Saya bukan Carl Schmidt",
           "Anda Carl Schmidt"
         ],
-        "correctAnswer": "Saya Carl Schmidt",
+        "correctAnswer": "Saya bukan Carl Schmidt",
         "bab": "Bab 1"
       },
       {
@@ -81,7 +81,7 @@
           "Saya adalah pelajar",
           "Saya bukan pelajar"
         ],
-        "correctAnswer": "Saya adalah wali kelas",
+        "correctAnswer": "Saya bukan wali kelas",
         "bab": "Bab 1"
       },
       {
@@ -107,7 +107,7 @@
           "Sdr. Ii bukan pelajar",
           "Sdr. Ii bukan guru"
         ],
-        "correctAnswer": "Sdr. Ii adalah pelajar",
+        "correctAnswer": "Sdr. Ii bukan pelajar",
         "bab": "Bab 1"
       },
       {
@@ -120,7 +120,7 @@
           "Apakah orang itu Sdr. Kimura?",
           "Orang itu juga Sdr. Kimura"
         ],
-        "correctAnswer": "Orang itu adalah Sdr. Kimura",
+        "correctAnswer": "Apakah orang itu Sdr. Kimura?",
         "bab": "Bab 1"
       },
       {
@@ -133,7 +133,7 @@
           "Apakah orang itu Sdri. Maria",
           "Orang itu juga Sdri. Maria"
         ],
-        "correctAnswer": "Orang itu adalah Sdri. Maria",
+        "correctAnswer": "Apakah orang itu Sdri. Maria",
         "bab": "Bab 1"
       },
       {
@@ -146,7 +146,7 @@
           "Siapakah orang ini?",
           "Siapakah orang itu?"
         ],
-        "correctAnswer": "Dimanakah orang itu?",
+        "correctAnswer": "Siapakah orang itu?",
         "bab": "Bab 1"
       },
       {
@@ -159,7 +159,7 @@
           "Saya bukan pegawai IMC",
           "Saya adalah IMC"
         ],
-        "correctAnswer": "Saya datang dari IMC",
+        "correctAnswer": "Saya adalah pegawai IMC",
         "bab": "Bab 1"
       },
       {
@@ -172,7 +172,7 @@
           "Sdri. Karina bukan mahasiswi Universitas Fuji",
           "Sdri. Karina juga mahasiswi Universitas Fuji"
         ],
-        "correctAnswer": "Sdri. Karina adalah guru Universitas Fuji",
+        "correctAnswer": "Sdri. Karina adalah mahasiswi Universitas Fuji",
         "bab": "Bab 1"
       },
       {
@@ -185,7 +185,7 @@
           "Sdr. Watt bukan mahasiswa Universitas Sakura",
           "Sdr. Watt juga mahasiswa Universitas Sakura"
         ],
-        "correctAnswer": "Sdr. Watt adalah mahasiswa Universitas Sakura",
+        "correctAnswer": "Sdr. Watt adalah guru Universitas Sakura",
         "bab": "Bab 1"
       },
       {
@@ -198,7 +198,7 @@
           "Sdr. Santos adalah orang Brazil",
           "Sdr. Santos juga orang Brazil"
         ],
-        "correctAnswer": "Sdr. Santos datang dari Brazil",
+        "correctAnswer": "Sdr. Santos adalah orang Brazil",
         "bab": "Bab 1"
       },
       {
@@ -776,7 +776,7 @@
           "Ini berapa?",
           "Itu berapa?"
         ],
-        "correctAnswer": "Apa itu?",
+        "correctAnswer": "Apa ini?",
         "bab": "Bab 2"
       },
       {
@@ -802,7 +802,7 @@
           "Apakah itu angka [7], atau angka [1]?",
           "Apakah itu angka [1], atau angka [7]?"
         ],
-        "correctAnswer": "Itu adalah angka [1], dan angka [7].",
+        "correctAnswer": "Apakah itu angka [7], atau angka [1]?",
         "bab": "Bab 2"
       },
       {
@@ -828,7 +828,7 @@
           "Ini adalah buku mengenai mobil",
           "Ini buku apa?"
         ],
-        "correctAnswer": "Ini adalah buku Bahasa Jepang",
+        "correctAnswer": "Ini adalah buku mengenai mobil",
         "bab": "Bab 2"
       },
       {
@@ -867,7 +867,7 @@
           "Ini adalah buku mengenai mobil",
           "Ini buku apa?"
         ],
-        "correctAnswer": "Ini adalah buku Bahasa Jepang",
+        "correctAnswer": "Ini buku apa?",
         "bab": "Bab 2"
       },
       {
@@ -880,7 +880,7 @@
           "Itu adalah tas guru",
           "Itu adalah tas saya"
         ],
-        "correctAnswer": "Itu tas siapa?",
+        "correctAnswer": "Itu adalah tas saya",
         "bab": "Bab 2"
       },
       {
@@ -893,7 +893,7 @@
           "Itu adalah tas guru",
           "Itu adalah tas saya"
         ],
-        "correctAnswer": "Itu tas siapa?",
+        "correctAnswer": "Itu adalah tas Sdr. Satou",
         "bab": "Bab 2"
       },
       {
@@ -906,7 +906,7 @@
           "Itu adalah tas guru",
           "Itu adalah tas saya"
         ],
-        "correctAnswer": "Itu tas siapa?",
+        "correctAnswer": "Itu adalah tas Sdr. Satou",
         "bab": "Bab 2"
       },
       {
@@ -932,7 +932,7 @@
           "Itu milik saya",
           "Itu juga milik saya"
         ],
-        "correctAnswer": "Ini milik saya",
+        "correctAnswer": "Itu milik saya",
         "bab": "Bab 2"
       },
       {
@@ -945,7 +945,7 @@
           "Ini juga milik Sdr. Satou",
           "Itu juga milik Sdr. Satou"
         ],
-        "correctAnswer": "Ini milik Sdr. Satou",
+        "correctAnswer": "Itu milik Sdr. Satou",
         "bab": "Bab 2"
       },
       {
@@ -958,7 +958,7 @@
           "Ini juga milik guru",
           "Itu milik guru"
         ],
-        "correctAnswer": "Ini milik guru",
+        "correctAnswer": "Itu juga milik guru",
         "bab": "Bab 2"
       },
       {
@@ -984,7 +984,7 @@
           "Buku catatan ini adalah milik saya",
           "Apakah buku catatan ini milik saya?"
         ],
-        "correctAnswer": "Buku catatan ini bukan milik saya",
+        "correctAnswer": "Buku catatan ini juga milik saya",
         "bab": "Bab 2"
       },
       {
@@ -1432,7 +1432,7 @@
           "Di sini ruang kelas",
           "Dimana ruang kelas"
         ],
-        "correctAnswer": "Di situ ruang kelas",
+        "correctAnswer": "Di sini ruang kelas",
         "bab": "Bab 3"
       },
       {
@@ -1445,7 +1445,7 @@
           "Di situ universitas",
           "Dimana universitas"
         ],
-        "correctAnswer": "Di sana universitas",
+        "correctAnswer": "Di sini universitas",
         "bab": "Bab 3"
       },
       {
@@ -1471,7 +1471,7 @@
           "Meja Informasi di sini",
           "Meja Informasi di situ"
         ],
-        "correctAnswer": "Dimana Meja Informasi?",
+        "correctAnswer": "Meja Informasi di sini",
         "bab": "Bab 3"
       },
       {
@@ -1484,7 +1484,7 @@
           "Meja Informasi di sini",
           "Meja Informasi di situ"
         ],
-        "correctAnswer": "Dimana Meja Informasi?",
+        "correctAnswer": "Meja Informasi di situ",
         "bab": "Bab 3"
       },
       {
@@ -1497,7 +1497,7 @@
           "Meja Informasi di sini",
           "Meja Informasi di situ"
         ],
-        "correctAnswer": "Dimana Meja Informasi?",
+        "correctAnswer": "Meja Informasi di sana",
         "bab": "Bab 3"
       },
       {
@@ -1523,7 +1523,7 @@
           "Mesin Jual Otomatis di lantai 2",
           "Mesin Jual Otomatis ada 2 lantai"
         ],
-        "correctAnswer": "Mesin Jual Otomatis di lantai 2?",
+        "correctAnswer": "Mesin Jual Otomatis 2 kali",
         "bab": "Bab 3"
       },
       {
@@ -1575,7 +1575,7 @@
           "Dimana Sdr. Satou?",
           "Sdr. Satou di situ"
         ],
-        "correctAnswer": "Sdr. Satou juga di sana",
+        "correctAnswer": "Dimana Sdr. Satou?",
         "bab": "Bab 3"
       },
       {
@@ -1588,7 +1588,7 @@
           "Lift di sana",
           "Lift di situ"
         ],
-        "correctAnswer": "Dimana lift?",
+        "correctAnswer": "Lift di sini",
         "bab": "Bab 3"
       },
       {
@@ -1601,7 +1601,7 @@
           "Lift di sana",
           "Lift di situ"
         ],
-        "correctAnswer": "Dimana lift?",
+        "correctAnswer": "Lift di sini",
         "bab": "Bab 3"
       },
       {
@@ -1614,7 +1614,7 @@
           "Lift di sana",
           "Lift di situ"
         ],
-        "correctAnswer": "Dimana lift?",
+        "correctAnswer": "Lift di sini",
         "bab": "Bab 3"
       },
       {
@@ -1640,7 +1640,7 @@
           "Perusahaannya juga IMC",
           "Perusahaannya IMC?"
         ],
-        "correctAnswer": "Perusahaannya bukan IMC",
+        "correctAnswer": "Perusahaannya adalah IMC",
         "bab": "Bab 3"
       },
       {
@@ -1666,7 +1666,7 @@
           "Itu mobil Jepang?",
           "Ini mobil Jepang?"
         ],
-        "correctAnswer": "Itu mobil Jepang",
+        "correctAnswer": "Ini mobil Jepang",
         "bab": "Bab 3"
       },
       {
@@ -1679,7 +1679,7 @@
           "Itu mobil Amerika?",
           "Ini mobil Amerika?"
         ],
-        "correctAnswer": "Itu mobil Amerika",
+        "correctAnswer": "Ini mobil Amerika",
         "bab": "Bab 3"
       },
       {
@@ -1692,7 +1692,7 @@
           "Itu mobil Jerman?",
           "Ini mobil Jerman?"
         ],
-        "correctAnswer": "Itu mobil Jerman",
+        "correctAnswer": "Ini mobil Jerman",
         "bab": "Bab 3"
       },
       {
@@ -2303,7 +2303,7 @@
           "Swiss",
           "Inggris"
         ],
-        "correctAnswer": "Jerman",
+        "correctAnswer": "Swiss",
         "bab": "Bab 3"
       }
     ]
@@ -2325,7 +2325,7 @@
           "Sekarang pukul 4 lewat 5 menit",
           "Sekarang pukul 4 atau pukul 5"
         ],
-        "correctAnswer": "Sudah 4 jam lebih 5 menit",
+        "correctAnswer": "Sekarang pukul 4 lewat 5 menit",
         "bab": "Bab 4"
       },
       {
@@ -2338,7 +2338,7 @@
           "Sekarang pukul 9 setengah",
           "30 menit lagi menuju pukul 9"
         ],
-        "correctAnswer": "Sudah 9 jam",
+        "correctAnswer": "Sekarang pukul 9 setengah",
         "bab": "Bab 4"
       },
       {
@@ -2364,7 +2364,7 @@
           "Liburnya Hari Rabu",
           "Liburnya Hari Kamis"
         ],
-        "correctAnswer": "Liburnya Hari Senin",
+        "correctAnswer": "Liburnya Hari Rabu",
         "bab": "Bab 4"
       },
       {
@@ -2416,7 +2416,7 @@
           "Istirahat Siang dari jam 12:30 dan jam 1:15",
           "Istirahat Siang dari jam 12:30 sampai jam 1:15"
         ],
-        "correctAnswer": "Apakah Istirahat Siang dari jam 12:30 atau jam 1:15?",
+        "correctAnswer": "Istirahat Siang dari jam 12:30 atau jam 1:15",
         "bab": "Bab 4"
       },
       {
@@ -2494,7 +2494,7 @@
           "Saya bekerja dari hari Selasa sampai hari Jumat",
           "Saya bekerja dari hari Selasa sampai hari Kamis"
         ],
-        "correctAnswer": "Saya bekerja dari hari Senin sampai hari Sabtu",
+        "correctAnswer": "Saya bekerja dari hari Senin sampai hari Jumat",
         "bab": "Bab 4"
       },
       {
@@ -2507,7 +2507,7 @@
           "Saya belajar setiap minggu",
           "Saya belajar setiap bulan"
         ],
-        "correctAnswer": "Saya belajar setiap pagi",
+        "correctAnswer": "Saya belajar setiap hari",
         "bab": "Bab 4"
       },
       {
@@ -2520,7 +2520,7 @@
           "Saya akan belajar minggu depan",
           "Saya akan belajar besok"
         ],
-        "correctAnswer": "Saya akan belajar pagi ini",
+        "correctAnswer": "Saya akan belajar besok",
         "bab": "Bab 4"
       },
       {
@@ -2533,7 +2533,7 @@
           "Saya sudah belajar kemarin",
           "Saya sudah belajar 2 hari yang lalu"
         ],
-        "correctAnswer": "Saya sudah belajar minggu lalu",
+        "correctAnswer": "Saya sudah belajar kemarin",
         "bab": "Bab 4"
       },
       {
@@ -2572,7 +2572,7 @@
           "Libur",
           "Tidak Libur"
         ],
-        "correctAnswer": "Sudah libur",
+        "correctAnswer": "Belum libur",
         "bab": "Bab 4"
       },
       {
@@ -3249,7 +3249,7 @@
           "Saya belum pergi ke supermarket",
           "Saya belum pulang dari supermarket"
         ],
-        "correctAnswer": "Saya pulang dari supermarket",
+        "correctAnswer": "Saya pergi ke supermarket",
         "bab": "Bab 5"
       },
       {
@@ -3262,7 +3262,7 @@
           "Saya belum pergi ke perusahaan",
           "Saya belum pulang dari perusahaan"
         ],
-        "correctAnswer": "Saya pulang dari perusahaan",
+        "correctAnswer": "Saya pergi ke perusahaan",
         "bab": "Bab 5"
       },
       {
@@ -3275,7 +3275,7 @@
           "Saya belum pergi ke Tokyo",
           "Saya belum pulang dari Tokyo"
         ],
-        "correctAnswer": "Saya pulang dari Tokyo",
+        "correctAnswer": "Saya pergi ke Tokyo",
         "bab": "Bab 5"
       },
       {
@@ -3288,7 +3288,7 @@
           "Kamu belum pergi kemana?",
           "Kamu belum pulang dari mana?"
         ],
-        "correctAnswer": "Kamu pulang dari mana?",
+        "correctAnswer": "Kamu mau pergi kemana?",
         "bab": "Bab 5"
       },
       {
@@ -3314,7 +3314,7 @@
           "Saya pergi ke kantor menggunakan Sepeda",
           "Saya pergi ke kantor menggunakan kereta bawah tanah"
         ],
-        "correctAnswer": "Saya pergi ke kantor menggunakan bus",
+        "correctAnswer": "Saya pergi ke kantor menggunakan kereta bawah tanah",
         "bab": "Bab 5"
       },
       {
@@ -3327,7 +3327,7 @@
           "Saya pergi ke kantor menggunakan Sepeda",
           "Saya pergi ke kantor menggunakan kereta bawah tanah"
         ],
-        "correctAnswer": "Saya pergi ke kantor menggunakan bus",
+        "correctAnswer": "Saya pergi ke kantor menggunakan Sepeda",
         "bab": "Bab 5"
       },
       {
@@ -3366,7 +3366,7 @@
           "Saya pergi ke Jepang bersama keluarga",
           "Saya datang ke Jepang bersama keluarga"
         ],
-        "correctAnswer": "Saya pergi ke Jepang bersama teman",
+        "correctAnswer": "Saya pergi ke Jepang bersama keluarga",
         "bab": "Bab 5"
       },
       {
@@ -3405,7 +3405,7 @@
           "Saya pulang ke negara asal Hari Sabtu",
           "Saya pulang ke negara asal Hari Minggu"
         ],
-        "correctAnswer": "Saya pulang ke negara asal Hari Senin",
+        "correctAnswer": "Saya pulang ke negara asal Hari Minggu",
         "bab": "Bab 5"
       },
       {
@@ -3418,7 +3418,7 @@
           "Saya pulang ke negara asal minggu depan",
           "Saya pulang ke negara asal tahun depan"
         ],
-        "correctAnswer": "Saya pulang ke negara asal bulan depan",
+        "correctAnswer": "Saya pulang ke negara asal minggu depan",
         "bab": "Bab 5"
       },
       {
@@ -3431,7 +3431,7 @@
           "Kapan kamu pergi ke negara asal?",
           "Apakah kamu pernah pulang ke negara asal?"
         ],
-        "correctAnswer": "Kapan kamu datang ke negara asal?",
+        "correctAnswer": "Kapan kamu pulang ke negara asal?",
         "bab": "Bab 5"
       },
       {
@@ -4025,7 +4025,7 @@
           "Saya makan roti",
           "Saya makan daging dan sayur"
         ],
-        "correctAnswer": "Saya makan buah",
+        "correctAnswer": "Saya makan roti",
         "bab": "Bab 6"
       },
       {
@@ -4051,7 +4051,7 @@
           "Saya makan roti",
           "Saya makan daging dan sayur"
         ],
-        "correctAnswer": "Saya makan buah",
+        "correctAnswer": "Saya makan daging dan sayur",
         "bab": "Bab 6"
       },
       {
@@ -4064,7 +4064,7 @@
           "Kamu tidak makan apa?",
           "Kamu suka makan apa?"
         ],
-        "correctAnswer": "Kamu makan apa?",
+        "correctAnswer": "Kamu sedang makan",
         "bab": "Bab 6"
       },
       {
@@ -4103,7 +4103,7 @@
           "Saya pulang dari Kobe",
           "Saya sudah pergi ke Kobe"
         ],
-        "correctAnswer": "Saya tinggal di Kobe",
+        "correctAnswer": "Saya pergi ke Kobe",
         "bab": "Bab 6"
       },
       {
@@ -4116,7 +4116,7 @@
           "Kamu suka melakukan apa?",
           "Kamu bekerja sebagai apa?"
         ],
-        "correctAnswer": "Kamu tidak melakukan apa?",
+        "correctAnswer": "Kamu melakukan apa?",
         "bab": "Bab 6"
       },
       {
@@ -4181,7 +4181,7 @@
           "Maukah kamu pergi ke Kyoto bersama?",
           "Kamu sudah pergi ke Kyoto?"
         ],
-        "correctAnswer": "Kamu pergi ke Kyoto bersama siapa?",
+        "correctAnswer": "Saya tidak mau pergi ke Kyoto bersama",
         "bab": "Bab 6"
       },
       {
@@ -4207,7 +4207,7 @@
           "Maukah kamu minum teh bersama?",
           "Kita sedang minum teh bersama"
         ],
-        "correctAnswer": "Kapan kita minum teh bersama?",
+        "correctAnswer": "Saya tidak mau minum teh bersama",
         "bab": "Bab 6"
       },
       {
@@ -4780,7 +4780,7 @@
           "Saya makan nasi menggunakan sumpit",
           "Kamu makan nasi menggunakan apa?"
         ],
-        "correctAnswer": "Saya makan nasi menggunakan pisau dan garpu",
+        "correctAnswer": "Saya makan nasi menggunakan sendok dan garpu",
         "bab": "Bab 7"
       },
       {
@@ -4819,7 +4819,7 @@
           "Saya menulis laporan menggunakan Bahasa Inggris",
           "Kamu menulis laporan menggunakan bahasa apa?"
         ],
-        "correctAnswer": "Saya menulis laporan menggunakan Bahasa Cina",
+        "correctAnswer": "Saya menulis laporan menggunakan Bahasa Jepang",
         "bab": "Bab 7"
       },
       {
@@ -4832,7 +4832,7 @@
           "Saya menulis laporan menggunakan Bahasa Inggris",
           "Kamu menulis laporan menggunakan bahasa apa?"
         ],
-        "correctAnswer": "Saya menulis laporan menggunakan Bahasa Cina",
+        "correctAnswer": "Saya menulis laporan menggunakan Bahasa Inggris",
         "bab": "Bab 7"
       },
       {
@@ -4858,7 +4858,7 @@
           "Apakah ``Arigatou`` dalam Bahasa Inggris ``Thank You``?",
           "``Arigatou``orang Inggris adalah ``Thank You``"
         ],
-        "correctAnswer": "``Arigatou`` di Inggris adalah ``Thank You``",
+        "correctAnswer": "``Arigatou`` dalam Bahasa Inggris adalah ``Thank You``",
         "bab": "Bab 7"
       },
       {
@@ -4897,7 +4897,7 @@
           "Apa ``Arigatou`` di Taiwan?",
           "Apa ``Arigatou`` di Thailand?"
         ],
-        "correctAnswer": "Apa ``Arigatou`` dalam Bahasa Taiwan?",
+        "correctAnswer": "Apa ``Arigatou`` dalam Bahasa Thailand?",
         "bab": "Bab 7"
       },
       {
@@ -4910,7 +4910,7 @@
           "Saya memberikan cokelat ke Sdr. Satou",
           "Saya dan Sdr. Satou mendapatkan cokelat"
         ],
-        "correctAnswer": "Saya mendapat cokelat dari Sdr. Satou",
+        "correctAnswer": "Saya dan Sdr. Satou memberikan cokelat",
         "bab": "Bab 7"
       },
       {
@@ -4923,7 +4923,7 @@
           "Saya memberikan cokelat ke teman",
           "Saya dan teman mendapatkan cokelat"
         ],
-        "correctAnswer": "Saya mendapat cokelat dari teman",
+        "correctAnswer": "Saya dan teman memberikan cokelat",
         "bab": "Bab 7"
       },
       {
@@ -4936,7 +4936,7 @@
           "Saya memberikan cokelat ke dia",
           "Saya dan dia mendapatkan cokelat"
         ],
-        "correctAnswer": "Saya mendapat cokelat dari dia",
+        "correctAnswer": "Saya dan dia memberikan cokelat",
         "bab": "Bab 7"
       },
       {
@@ -4949,7 +4949,7 @@
           "Kamu ingin memberikan cokelat ke siapa?",
           "Kamu tidak memberikan cokelat ke siapa?"
         ],
-        "correctAnswer": "Kamu dapat cokelat dari siapa?",
+        "correctAnswer": "Kamu memberikan cokelat ke siapa?",
         "bab": "Bab 7"
       },
       {
@@ -4962,7 +4962,7 @@
           "Saya memberikan buku kepada Sdr. Watt",
           "Saya dan Sdr. Watt mendapat buku"
         ],
-        "correctAnswer": "Saya akan dapat buku dari Sdr. Watt",
+        "correctAnswer": "Saya memberikan buku kepada Sdr. Watt",
         "bab": "Bab 7"
       },
       {
@@ -4975,7 +4975,7 @@
           "Saya memberikan buku kepada siswa",
           "Saya dapat buku dari guru"
         ],
-        "correctAnswer": "Saya akan dapat buku dari guru",
+        "correctAnswer": "Saya memberikan buku kepada siswa",
         "bab": "Bab 7"
       },
       {
@@ -4988,7 +4988,7 @@
           "Saya dapat buku dari perusahaan",
           "Saya memberikan buku kepada perusahaan"
         ],
-        "correctAnswer": "Saya akan dapat buku dari perusahaan",
+        "correctAnswer": "Saya memberikan buku kepada perusahaan",
         "bab": "Bab 7"
       },
       {
@@ -5014,7 +5014,7 @@
           "Barangnya sudah dikirim",
           "Barangnya akan dikirim"
         ],
-        "correctAnswer": "Barangnya dikirim kapan?",
+        "correctAnswer": "Barangnya sudah dikirim",
         "bab": "Bab 7"
       },
       {
@@ -5027,7 +5027,7 @@
           "Sudah pergi ke Kastil Osaka?",
           "Saya akan pergi ke Kastil Osaka"
         ],
-        "correctAnswer": "Saya pergi ke Kastil Osaka",
+        "correctAnswer": "Saya sudah pergi ke Kastil Osaka",
         "bab": "Bab 7"
       },
       {
@@ -5053,7 +5053,7 @@
           "Ya, sudah dikirim.",
           "Ya, akan saya kirim."
         ],
-        "correctAnswer": "Ya, akan dikirim.",
+        "correctAnswer": "Ya, sudah dikirim.",
         "bab": "Bab 7"
       },
       {
@@ -5066,7 +5066,7 @@
           "Ya, sudah pergi.",
           "Ya, saya akan pergi."
         ],
-        "correctAnswer": "Ya, akan pergi.",
+        "correctAnswer": "Ya, sudah pergi.",
         "bab": "Bab 7"
       },
       {
@@ -5092,7 +5092,7 @@
           "Tidak, saya tidak bisa.",
           "Tidak, saya belum bisa."
         ],
-        "correctAnswer": "Tidak, terima kasih.",
+        "correctAnswer": "Tidak, belum.",
         "bab": "Bab 7"
       },
       {
@@ -5626,7 +5626,7 @@
           "Kota itu dimana?",
           "Kota itu bagaimana?"
         ],
-        "correctAnswer": "Kota ini dimana?",
+        "correctAnswer": "Kota ini bagaimana?",
         "bab": "Bab 8"
       },
       {
@@ -6182,7 +6182,7 @@
           "ほん",
           "しゅくだい"
         ],
-        "correctAnswer": "ほん",
+        "correctAnswer": "おしごと",
         "bab": "Bab 8"
       },
       {
@@ -6347,7 +6347,7 @@
           "Saya suka film",
           "Saya suka majalah"
         ],
-        "correctAnswer": "Saya suka olah raga",
+        "correctAnswer": "Saya suka film",
         "bab": "Bab 9"
       },
       {
@@ -6360,7 +6360,7 @@
           "Saya suka film",
           "Saya suka bermain"
         ],
-        "correctAnswer": "Saya suka sepak bola",
+        "correctAnswer": "Saya suka olahraga",
         "bab": "Bab 9"
       },
       {
@@ -6386,7 +6386,7 @@
           "Sdr. Santos pintar bermain sepak bola",
           "Sdr. Santos pintar olah raga"
         ],
-        "correctAnswer": "Sdr. Santos pintar bermain basket",
+        "correctAnswer": "Sdr. Santos senang bermain sepak bola",
         "bab": "Bab 9"
       },
       {
@@ -6399,7 +6399,7 @@
           "Sdr. Santos hobi memasak",
           "Sdr. Santos pintar soal masakan"
         ],
-        "correctAnswer": "Sdr. Santos senang memasak",
+        "correctAnswer": "Sdr. Santos pintar soal masakan",
         "bab": "Bab 9"
       },
       {
@@ -6464,7 +6464,7 @@
           "Saya menyukai uang",
           "Saya menyukai mobil"
         ],
-        "correctAnswer": "Saya mempunyai mobil",
+        "correctAnswer": "Saya mempunyai uang",
         "bab": "Bab 9"
       },
       {
@@ -6490,7 +6490,7 @@
           "Saya ada janji",
           "Saya harus pergi"
         ],
-        "correctAnswer": "Saya ada urusan",
+        "correctAnswer": "Saya ada janji",
         "bab": "Bab 9"
       },
       {
@@ -6516,7 +6516,7 @@
           "Saya sibuk, jadi tidak nonton TV.",
           "Saya tidak sibuk karena nonton TV."
         ],
-        "correctAnswer": "Saya lelah, jadi tidak nonton TV.",
+        "correctAnswer": "Saya tidak sibuk nonton TV.",
         "bab": "Bab 9"
       },
       {
@@ -6555,7 +6555,7 @@
           "Kenapa tidak menonton TV?",
           "Suka menonton TV seperti apa?"
         ],
-        "correctAnswer": "Kenapa menonton TV?",
+        "correctAnswer": "Kenapa tidak menonton TV?",
         "bab": "Bab 9"
       },
       {
@@ -7138,7 +7138,7 @@
           "Di sana ada gedung",
           "Di situ ada gedung"
         ],
-        "correctAnswer": "Di sana ada bir",
+        "correctAnswer": "Di sana ada gedung",
         "bab": "Bab 10"
       },
       {
@@ -7164,7 +7164,7 @@
           "Di situ ada apa?",
           "Di sana ada apa?"
         ],
-        "correctAnswer": "Di sana tidak ada apa apa",
+        "correctAnswer": "Di situ ada apa?",
         "bab": "Bab 10"
       },
       {
@@ -7177,7 +7177,7 @@
           "Di sana ada Sdr. Yamada",
           "Di situ ada Sdr. Yamada"
         ],
-        "correctAnswer": "Di sana tidak ada Sdr. Yamada",
+        "correctAnswer": "Di sana ada Sdr. Yamada",
         "bab": "Bab 10"
       },
       {
@@ -7190,7 +7190,7 @@
           "Di sana ada seorang perempuan",
           "Di situ ada seorang perempuan"
         ],
-        "correctAnswer": "Di sana tidak ada seorang perempuan",
+        "correctAnswer": "Di sana ada seorang perempuan",
         "bab": "Bab 10"
       },
       {
@@ -7203,7 +7203,7 @@
           "Di sana ada anak kecil",
           "Di situ ada anak kecil"
         ],
-        "correctAnswer": "Di sana tidak ada anak kecil",
+        "correctAnswer": "Di sana ada anak kecil",
         "bab": "Bab 10"
       },
       {
@@ -7216,7 +7216,7 @@
           "Ada siapa di sana?",
           "Ada siapa di situ?"
         ],
-        "correctAnswer": "Di sana tidak ada siapa-siapa",
+        "correctAnswer": "Ada siapa di sana?",
         "bab": "Bab 10"
       },
       {
@@ -7229,7 +7229,7 @@
           "Di sebelah cafe ada super market",
           "Di depan super market ada cafe"
         ],
-        "correctAnswer": "Di dalam super market ada cafe",
+        "correctAnswer": "Di sebelah super market ada cafe",
         "bab": "Bab 10"
       },
       {
@@ -7255,7 +7255,7 @@
           "Di belakang kiri Sdr. Satou ada Sdr. Karina",
           "Di depan Sdr. Satou ada Sdr. Karina"
         ],
-        "correctAnswer": "Di belakang Sdr. Satou ada Sdr. Karina",
+        "correctAnswer": "Di depan Sdr. Satou ada Sdr. Karina",
         "bab": "Bab 10"
       },
       {
@@ -7268,7 +7268,7 @@
           "Di belakang kiri Sdr. Satou ada Sdr. Karina",
           "Di depan Sdr. Satou ada Sdr. Karina"
         ],
-        "correctAnswer": "Di belakang Sdr. Satou ada Sdr. Karina",
+        "correctAnswer": "Di sebelah kanan Sdr. Satou ada Sdr. Karina",
         "bab": "Bab 10"
       },
       {
@@ -7281,7 +7281,7 @@
           "Rumah Sdr. Miller ada di Osaka",
           "Kantor Sdr. Miller ada di dekat Osaka"
         ],
-        "correctAnswer": "Kantor Sdr. Miller ada di Osaka",
+        "correctAnswer": "Rumah Sdr. Miller ada di dekat Osaka",
         "bab": "Bab 10"
       },
       {
@@ -7294,7 +7294,7 @@
           "Rumah Sdr. Miller ada di belakang taman",
           "Rumah Sdr. Miller ada di dekat taman"
         ],
-        "correctAnswer": "Rumah Sdr. Miller ada di sebelah taman",
+        "correctAnswer": "Rumah Sdr. Miller ada di depan taman",
         "bab": "Bab 10"
       },
       {
@@ -7307,7 +7307,7 @@
           "Rumah Sdr. Miller ada di belakang sekolah",
           "Rumah Sdr. Miller ada di dekat sekolah"
         ],
-        "correctAnswer": "Rumah Sdr. Miller ada di sebelah sekolah",
+        "correctAnswer": "Rumah Sdr. Miller ada di dekat sekolah",
         "bab": "Bab 10"
       },
       {
@@ -7333,7 +7333,7 @@
           "Sdr. Miller ada di sana",
           "Sdr. Miller ada di mana?"
         ],
-        "correctAnswer": "Sdr. Miller ada di sini",
+        "correctAnswer": "Sdr. Miller ada di situ",
         "bab": "Bab 10"
       },
       {
@@ -7346,7 +7346,7 @@
           "Sdr. Miller ada di kantin",
           "Sdr. Miller ada di kantor"
         ],
-        "correctAnswer": "Sdr. Miller ada di ruang kelas",
+        "correctAnswer": "Sdr. Miller ada di ruang rapat",
         "bab": "Bab 10"
       },
       {
@@ -7359,7 +7359,7 @@
           "Sdr. Miller ada di dalam lift",
           "Sdr. Miller ada di depan lift"
         ],
-        "correctAnswer": "Sdr. Miller ada di belakang lift",
+        "correctAnswer": "Sdr. Miller ada di depan lift",
         "bab": "Bab 10"
       },
       {
@@ -7372,7 +7372,7 @@
           "Sdr. Miller pergi ke mana?",
           "Sdr. Miller ada di dekat apa?"
         ],
-        "correctAnswer": "Sdr. Miller ada di sebelah mana?",
+        "correctAnswer": "Sdr. Miller ada di mana?",
         "bab": "Bab 10"
       },
       {
@@ -8612,7 +8612,7 @@
           "Bagaimana (keadaan) Kyoto?",
           "Kyoto dingin"
         ],
-        "correctAnswer": "Kyoto indah",
+        "correctAnswer": "Kyoto bersalju",
         "bab": "Bab 12"
       },
       {
@@ -8677,7 +8677,7 @@
           "Tenang",
           "Tidak tenang"
         ],
-        "correctAnswer": "Indah",
+        "correctAnswer": "Tidak indah",
         "bab": "Bab 12"
       },
       {
@@ -8690,7 +8690,7 @@
           "Tenang",
           "Tidak tenang"
         ],
-        "correctAnswer": "Indah",
+        "correctAnswer": "Tidak indah",
         "bab": "Bab 12"
       },
       {
@@ -8703,7 +8703,7 @@
           "Dingin",
           "Tidak dingin"
         ],
-        "correctAnswer": "Tidak panas",
+        "correctAnswer": "Panas",
         "bab": "Bab 12"
       },
       {
@@ -9420,7 +9420,7 @@
           "Saya ingin punya komputer",
           "Saya ingin punya mobil"
         ],
-        "correctAnswer": "Saya ingin punya teman",
+        "correctAnswer": "Saya ingin punya mobil",
         "bab": "Bab 13"
       },
       {
@@ -9433,7 +9433,7 @@
           "Saya ingin punya komputer",
           "Saya ingin punya mobil"
         ],
-        "correctAnswer": "Saya ingin punya teman",
+        "correctAnswer": "Saya ingin punya rumah",
         "bab": "Bab 13"
       },
       {
@@ -9485,7 +9485,7 @@
           "Saya ingin bekerja di luar kota",
           "Saya ingin bekerja di luar negeri"
         ],
-        "correctAnswer": "Saya ingin bekerja di dalam negeri",
+        "correctAnswer": "Saya ingin bekerja di luar negeri",
         "bab": "Bab 13"
       },
       {
@@ -9524,7 +9524,7 @@
           "Tidak ingin makan",
           "Tidak ingin pergi"
         ],
-        "correctAnswer": "Ingin makan",
+        "correctAnswer": "Tidak ingin makan",
         "bab": "Bab 13"
       },
       {
@@ -9589,7 +9589,7 @@
           "Saya pergi belajar seni di Kyoto",
           "Saya pergi belanja ke Kyoto"
         ],
-        "correctAnswer": "Saya pergi makan masakan Jepang di Kyoto",
+        "correctAnswer": "Saya pergi belajar seni di Kyoto",
         "bab": "Bab 13"
       },
       {
@@ -9602,7 +9602,7 @@
           "Kamu pergi ke Kyoto untuk melakukan apa?",
           "Kamu ke Kyoto dengan apa"
         ],
-        "correctAnswer": "Kamu ke Kyoto untuk membeli apa?",
+        "correctAnswer": "Kamu pergi ke Kyoto untuk melakukan apa?",
         "bab": "Bab 13"
       },
       {
@@ -10274,7 +10274,7 @@
           "Maaf, tolong simpan garamnya",
           "Maaf, tolong ambilkan garam"
         ],
-        "correctAnswer": "Maaf, tolong simpan gulanya",
+        "correctAnswer": "Maaf, tolong simpan garamnya",
         "bab": "Bab 14"
       },
       {
@@ -10287,7 +10287,7 @@
           "Maaf, tolong beri tahu alamatnya",
           "Maaf, tolong beri tahu nomor rumahnya"
         ],
-        "correctAnswer": "Maaf, tolong telfon saya",
+        "correctAnswer": "Maaf, tolong beri tahu nomor telfonnya",
         "bab": "Bab 14"
       },
       {
@@ -10326,7 +10326,7 @@
           "Apakah perlu saya ambilkan?",
           "Mari kita ambil"
         ],
-        "correctAnswer": "Apakah perlu saya bantu?",
+        "correctAnswer": "Mari kita ambil",
         "bab": "Bab 14"
       },
       {
@@ -10365,7 +10365,7 @@
           "Pak Miller sudah membaca laporan",
           "Apakah Pak Miller sedang membaca laporan?"
         ],
-        "correctAnswer": "Pak Miller akan membaca laporan",
+        "correctAnswer": "Sekarang Pak Miller sedang membaca laporan",
         "bab": "Bab 14"
       },
       {
@@ -10378,7 +10378,7 @@
           "Apakah Pak Miller sedang menonton TV?",
           "Sekarang Pak Miller sedang menonton TV"
         ],
-        "correctAnswer": "Pak Miller sudah menonton TV",
+        "correctAnswer": "Sekarang Pak Miller sedang menonton TV",
         "bab": "Bab 14"
       },
       {
@@ -10391,7 +10391,7 @@
           "Sekarang Pak Miller sedang belajar Bahasa Jepang",
           "Apakah Pak Miller sedang belajar Bahasa Jepang?"
         ],
-        "correctAnswer": "Pak Miller akan belajar Bahasa Jepang",
+        "correctAnswer": "Sekarang Pak Miller sedang belajar Bahasa Jepang",
         "bab": "Bab 14"
       },
       {
@@ -10916,7 +10916,7 @@
           "Apakah saya boleh menulis pakai spidol?",
           "Apakah saya boleh menulis?"
         ],
-        "correctAnswer": "Apakah saya boleh menulis pakai ballpoint?",
+        "correctAnswer": "Apakah saya boleh menulis pakai pensil?",
         "bab": "Bab 15"
       },
       {
@@ -10955,7 +10955,7 @@
           "Dilarang minum minuman beralkohol",
           "Saya tidak pernah minum alkohol"
         ],
-        "correctAnswer": "Dilarang minum dan pergi",
+        "correctAnswer": "Saya tidak bisa minum alohol",
         "bab": "Bab 15"
       },
       {
@@ -10968,7 +10968,7 @@
           "Dilarang ambil foto di situ",
           "Dilarang ambil foto di sini"
         ],
-        "correctAnswer": "Dilarang mengambil foto dan pergi",
+        "correctAnswer": "Saya tidak bisa ambil foto",
         "bab": "Bab 15"
       },
       {
@@ -10981,7 +10981,7 @@
           "Dilarang parkir mobil di sini",
           "Dilarang ambil mobil di situ"
         ],
-        "correctAnswer": "Dilarang parkir sepeda di sini",
+        "correctAnswer": "Dilarang parkir mobil di sini",
         "bab": "Bab 15"
       },
       {
@@ -11020,7 +11020,7 @@
           "Saya sudah menikah (tapi sekarang sudah tidak lagi)",
           "Saya belum menikah"
         ],
-        "correctAnswer": "Saya akan menikah",
+        "correctAnswer": "Saya sudah menikah (dan masih sampai sekarang).",
         "bab": "Bab 15"
       },
       {
@@ -11593,7 +11593,7 @@
           "Karina san badannya tinggi.",
           "Karina san rambutnya pendek."
         ],
-        "correctAnswer": "Karina san hidungnya mancung.",
+        "correctAnswer": "Karina san matanya besar.",
         "bab": "Bab 16"
       },
       {
@@ -11606,7 +11606,7 @@
           "Karina san badannya tinggi.",
           "Karina san rambutnya pendek."
         ],
-        "correctAnswer": "Karina san hidungnya mancung.",
+        "correctAnswer": "Karina san rambutnya pendek.",
         "bab": "Bab 16"
       },
       {
@@ -12179,7 +12179,7 @@
           "Tolong jangan merokok",
           "Saya tidak bisa merokok"
         ],
-        "correctAnswer": "Tolong merokok",
+        "correctAnswer": "Saya tidak merokok",
         "bab": "Bab 17"
       },
       {
@@ -12192,7 +12192,7 @@
           "Silakan masuk ke sana",
           "Tolong jangan masuk ke sana"
         ],
-        "correctAnswer": "Silakan masuk ke sini",
+        "correctAnswer": "Tolong jangan masuk ke sini",
         "bab": "Bab 17"
       },
       {
@@ -12270,7 +12270,7 @@
           "Harus tulis nama",
           "Tidak boleh tulis nama"
         ],
-        "correctAnswer": "Tidak bisa tulis nama",
+        "correctAnswer": "Harus tulis nama",
         "bab": "Bab 17"
       },
       {
@@ -12283,7 +12283,7 @@
           "Tidak boleh melepas sepatu",
           "Harus melepas sepatu"
         ],
-        "correctAnswer": "Tidak perlu melepas sepatu",
+        "correctAnswer": "Harus melepas sepatu",
         "bab": "Bab 17"
       },
       {
@@ -12309,7 +12309,7 @@
           "Laporannya akan ditulis besok",
           "Laporannya akan dikumpulkan lusa"
         ],
-        "correctAnswer": "Laporannya akan ditulis lusa",
+        "correctAnswer": "Laporannya akan dikumpulkan besok",
         "bab": "Bab 17"
       },
       {
@@ -12887,7 +12887,7 @@
           "Sdr. Miller bisa Bahasa Jepang",
           "Sdr. Miller  bisa membaca kanji"
         ],
-        "correctAnswer": "Sdr. Miller bisa mengemudikan mobil",
+        "correctAnswer": "Sdr. Miller bisa Bahasa Jepang",
         "bab": "Bab 18"
       },
       {
@@ -12926,7 +12926,7 @@
           "Sdr. Miller bisa Bahasa Jepang",
           "Sdr. Miller  bisa membaca kanji"
         ],
-        "correctAnswer": "Sdr. Miller bisa mengemudikan mobil",
+        "correctAnswer": "Sdr. Miller bisa bermain piano",
         "bab": "Bab 18"
       },
       {
@@ -12965,7 +12965,7 @@
           "Di sini bisa beli karcis",
           "Apakah di sini bisa beli karcis?"
         ],
-        "correctAnswer": "Di sini bisa dapat karcis",
+        "correctAnswer": "Di sini bisa menjual karcis",
         "bab": "Bab 18"
       },
       {
@@ -12978,7 +12978,7 @@
           "Di sini bisa simpan uang",
           "Apakah di sini bisa menukarkan uang?"
         ],
-        "correctAnswer": "Di sini bisa dapat uang",
+        "correctAnswer": "Di sini bisa menukarkan uang",
         "bab": "Bab 18"
       },
       {
@@ -13017,7 +13017,7 @@
           "Hobi saya adalah olah raga",
           "Hobi saya adalah mengambil foto binatang"
         ],
-        "correctAnswer": "Hobi saya adalah naik kuda",
+        "correctAnswer": "Hobi saya adalah mengambil foto binatang",
         "bab": "Bab 18"
       },
       {
@@ -13082,7 +13082,7 @@
           "Setelah Natal, sudah beli hadiah",
           "Setelah Natal, beli hadiah"
         ],
-        "correctAnswer": "Sebelum Natal, sudah beli hadiah",
+        "correctAnswer": "Setelah Natal, sudah beli hadiah",
         "bab": "Bab 18"
       },
       {
@@ -13095,7 +13095,7 @@
           "5 tahun lalu datang ke Jepang",
           "Setelah 5 tahun, datang ke Jepang"
         ],
-        "correctAnswer": "Sebelum 5 tahun, datang ke Jepang.",
+        "correctAnswer": "5 tahun lalu datang ke Jepang",
         "bab": "Bab 18"
       },
       {
@@ -13763,7 +13763,7 @@
           "Setiap malam belajar Bahasa Jepang, dan juga main menggunakan laptop.",
           "Setiap malam nonton TV, dan juga membaca buku."
         ],
-        "correctAnswer": "Setiap malam menulis surat, dan juga mendengarkan musik.",
+        "correctAnswer": "Setiap malam menulis surat, dan juga membaca buku.",
         "bab": "Bab 19"
       },
       {
@@ -13789,7 +13789,7 @@
           "Setiap malam belajar Bahasa Jepang, dan juga main menggunakan laptop.",
           "Setiap malam nonton TV, dan juga membaca buku."
         ],
-        "correctAnswer": "Setiap malam menulis surat, dan juga mendengarkan musik.",
+        "correctAnswer": "Setiap malam belajar Bahasa Jepang, dan juga main menggunakan laptop.",
         "bab": "Bab 19"
       },
       {
@@ -14036,7 +14036,7 @@
           "します",
           "した"
         ],
-        "correctAnswer": "します",
+        "correctAnswer": "しましたり",
         "bab": "Bab 19"
       },
       {
@@ -14552,7 +14552,7 @@
           "Saya sudah pergi ke Tokyo.",
           "Saya tidak pergi ke Tokyo"
         ],
-        "correctAnswer": "Saya pergi ke Tokyo.",
+        "correctAnswer": "Minggu depan saya akan pergi ke Tokyo.",
         "bab": "Bab 20"
       },
       {
@@ -14565,7 +14565,7 @@
           "Setiap hari saya sibuk.",
           "Saya sudah sibuk."
         ],
-        "correctAnswer": "Setiap hari saya tidak sibuk.",
+        "correctAnswer": "Setiap hari saya sibuk.",
         "bab": "Bab 20"
       },
       {
@@ -14591,7 +14591,7 @@
           "Saya sudah jadi pegawai IMC",
           "Saya pernah menjadi pegawai IMC"
         ],
-        "correctAnswer": "Saya bukan pegawai IMC",
+        "correctAnswer": "Saya pegawai IMC",
         "bab": "Bab 20"
       },
       {
@@ -14630,7 +14630,7 @@
           "Saya ingin pergi ke kantor wali kota",
           "Saya harus pergi ke kantor wali kota"
         ],
-        "correctAnswer": "Saya pergi ke kantor wali kota",
+        "correctAnswer": "Saya tidak pergi ke kantor wali kota",
         "bab": "Bab 20"
       },
       {
@@ -14656,7 +14656,7 @@
           "Saya bisa bicara Bahasa Jerman",
           "Saya ingin bicara Bahasa Jerman"
         ],
-        "correctAnswer": "Saya tidak bisa bicara Bahasa Jerman",
+        "correctAnswer": "Saya bisa bicara Bahasa Jerman",
         "bab": "Bab 20"
       },
       {
@@ -14669,7 +14669,7 @@
           "Saya akan pergi ke Jerman",
           "Saya ingin pergi ke Jerman"
         ],
-        "correctAnswer": "Saya tidak pernah ke Jerman",
+        "correctAnswer": "Saya pernah pergi ke Jerman",
         "bab": "Bab 20"
       },
       {
@@ -14708,7 +14708,7 @@
           "つかれ",
           "つかれる"
         ],
-        "correctAnswer": "つかれ",
+        "correctAnswer": "つかれた",
         "bab": "Bab 20"
       },
       {
@@ -14721,7 +14721,7 @@
           "かく",
           "かき"
         ],
-        "correctAnswer": "かき",
+        "correctAnswer": "かかない",
         "bab": "Bab 20"
       },
       {
@@ -14760,7 +14760,7 @@
           "いたくなかった",
           "いたくない"
         ],
-        "correctAnswer": "いたかった",
+        "correctAnswer": "いたい",
         "bab": "Bab 20"
       },
       {
@@ -14773,7 +14773,7 @@
           "たのしくない",
           "たのしくなかった"
         ],
-        "correctAnswer": "たのしくなかった",
+        "correctAnswer": "たのしい",
         "bab": "Bab 20"
       },
       {
@@ -14864,7 +14864,7 @@
           "しなかった",
           "しない"
         ],
-        "correctAnswer": "した",
+        "correctAnswer": "する",
         "bab": "Bab 20"
       },
       {
@@ -15245,7 +15245,7 @@
           "ない",
           "ある"
         ],
-        "correctAnswer": "ない",
+        "correctAnswer": "ないけど",
         "bab": "Bab 20"
       },
       {
@@ -15358,7 +15358,7 @@
           "Saya rasa Satou san tidak main golf",
           "Satou san main golf"
         ],
-        "correctAnswer": "Satou san tidak main golf",
+        "correctAnswer": "Saya rasa Satou san tidak suka main golf",
         "bab": "Bab 21"
       },
       {
@@ -15371,7 +15371,7 @@
           "Saya rasa Yamada san akan pulang",
           "Yamada san akan pulang"
         ],
-        "correctAnswer": "Yamada san sudah pulang",
+        "correctAnswer": "Saya rasa Yamada san sudah pulang",
         "bab": "Bab 21"
       },
       {
@@ -15384,7 +15384,7 @@
           "Saya rasa lusa dingin",
           "Lusa dingin"
         ],
-        "correctAnswer": "Besok dingin",
+        "correctAnswer": "Saya rasa besok dingin",
         "bab": "Bab 21"
       },
       {
@@ -15397,7 +15397,7 @@
           "Saya rasa lusa juga cuacanya akan baik",
           "Lusa juga cuacanya tidak baik"
         ],
-        "correctAnswer": "Besok juga cuacanya akan baik",
+        "correctAnswer": "Saya rasa besok juga cuacanya akan baik",
         "bab": "Bab 21"
       },
       {
@@ -15410,7 +15410,7 @@
           "Saya rasa kuda itu berguna",
           "Kuda itu dulu berguna"
         ],
-        "correctAnswer": "Kuda itu berguna",
+        "correctAnswer": "Saya rasa kuda itu berguna",
         "bab": "Bab 21"
       },
       {
@@ -15423,7 +15423,7 @@
           "Saya rasa anak-anak harus bermain di luar",
           "Anak-anak tidak harus bermain di luar"
         ],
-        "correctAnswer": "Anak-anak harus bermain di luar",
+        "correctAnswer": "Anak-anak tidak harus bermain di luar",
         "bab": "Bab 21"
       },
       {
@@ -15436,7 +15436,7 @@
           "Apakah manga itu seru?",
           "Manga itu tidak seru"
         ],
-        "correctAnswer": "Manga itu seru",
+        "correctAnswer": "Saya rasa manga itu seru",
         "bab": "Bab 21"
       },
       {
@@ -15449,7 +15449,7 @@
           "Saya rasa handphone itu praktis",
           "Handphone itu tidak murah"
         ],
-        "correctAnswer": "Handphone itu praktis",
+        "correctAnswer": "Saya rasa handphone itu murah",
         "bab": "Bab 21"
       },
       {
@@ -15475,7 +15475,7 @@
           "Saya bilang kepada Kepala Seksi, bahwa saya akan berhenti dari perusahaan",
           "Apakah saya akan berhenti dari perusahaan?"
         ],
-        "correctAnswer": "Saya akan berhenti dari perusahaan",
+        "correctAnswer": "Saya dan Kepala Seksi akan berhenti dari perusahaan",
         "bab": "Bab 21"
       },
       {
@@ -15488,7 +15488,7 @@
           "Saya bilang kepada Kepala Seksi, bahwa saya tidak punya mobil",
           "Apakah saya tidak punya mobil?"
         ],
-        "correctAnswer": "Saya tidak punya mobil",
+        "correctAnswer": "Saya dan Kepala Seksi tidak punya mobil",
         "bab": "Bab 21"
       },
       {
@@ -15501,7 +15501,7 @@
           "Saya bilang kepada Kepala Seksi, bahwa saya sudah membuat dokumen",
           "Apakah saya sudah membuat dokumen?"
         ],
-        "correctAnswer": "Saya sudah membuat dokumen",
+        "correctAnswer": "Saya dan Kepala Seksi sudah membuat dokumen",
         "bab": "Bab 21"
       },
       {
@@ -15514,7 +15514,7 @@
           "Saya bilang kepada Kepala Seksi, bahwa saya ingin libur",
           "Apakah saya ingin libur?"
         ],
-        "correctAnswer": "Saya ingin libur",
+        "correctAnswer": "Saya dan Kepala Seksi ingin libur",
         "bab": "Bab 21"
       },
       {
@@ -15527,7 +15527,7 @@
           "Saya bilang kepada Kepala Seksi, bahwa saya suka memancing",
           "Apakah saya suka memancing?"
         ],
-        "correctAnswer": "Saya suka memancing",
+        "correctAnswer": "Saya dan Kepala Seksi suka memancing",
         "bab": "Bab 21"
       },
       {
@@ -15540,7 +15540,7 @@
           "Apakah besok ada pesta?",
           "Kemarin datang ke pesta kan?"
         ],
-        "correctAnswer": "Besok akan datang ke pesta",
+        "correctAnswer": "Besok datang ke pesta kan?",
         "bab": "Bab 21"
       },
       {
@@ -15553,7 +15553,7 @@
           "Apakah kamu pergi ke konser?",
           "Kemarin datang ke kuil kan?"
         ],
-        "correctAnswer": "Di kuil ada konser",
+        "correctAnswer": "Di kuil ada konser kan?",
         "bab": "Bab 21"
       },
       {
@@ -15566,7 +15566,7 @@
           "Apakah pernah makan makanan Osaka?",
           "Makanan Osaka yang enak yang mana?"
         ],
-        "correctAnswer": "Makanan di Osaka enak",
+        "correctAnswer": "Makanan di Osaka enak kan?",
         "bab": "Bab 21"
       },
       {
@@ -15579,7 +15579,7 @@
           "Besok tidak libur kan?",
           "Apakah kemarin libur?"
         ],
-        "correctAnswer": "Besok libur",
+        "correctAnswer": "Besok libur kan?",
         "bab": "Bab 21"
       },
       {
@@ -15727,7 +15727,7 @@
           "びょういんだ",
           "びょういんが"
         ],
-        "correctAnswer": "びょういん",
+        "correctAnswer": "びょういんです",
         "bab": "Bab 21"
       },
       {
@@ -16141,7 +16141,7 @@
           "Buku yang tidak dibaca kemarin",
           "Buku yang dibaca kemarin"
         ],
-        "correctAnswer": "Buku yang tidak dibaca oleh anak-anak",
+        "correctAnswer": "Buku yang dibaca kemarin",
         "bab": "Bab 22"
       },
       {
@@ -16154,7 +16154,7 @@
           "Buku yang tidak dibaca kemarin",
           "Buku yang dibaca kemarin"
         ],
-        "correctAnswer": "Buku yang tidak dibaca oleh anak-anak",
+        "correctAnswer": "Buku yang dibaca kemarin",
         "bab": "Bab 22"
       },
       {
@@ -16167,7 +16167,7 @@
           "Orang yang makan sarapan",
           "Orang yang sudah makan sarapan"
         ],
-        "correctAnswer": "Orang yang tidak makan sarapan",
+        "correctAnswer": "Orang yang makan sarapan",
         "bab": "Bab 22"
       },
       {
@@ -16193,7 +16193,7 @@
           "Orang yang makan sarapan",
           "Orang yang sudah makan sarapan"
         ],
-        "correctAnswer": "Orang yang tidak makan sarapan",
+        "correctAnswer": "Orang yang makan sarapan",
         "bab": "Bab 22"
       },
       {
@@ -16206,7 +16206,7 @@
           "Orang yang makan sarapan",
           "Orang yang sudah makan sarapan"
         ],
-        "correctAnswer": "Orang yang tidak makan sarapan",
+        "correctAnswer": "Orang yang makan sarapan",
         "bab": "Bab 22"
       },
       {
@@ -16232,7 +16232,7 @@
           "Tempat yang tidak sedang dihuni siapapun.",
           "Tempat yang (dulu) dihuni ayah."
         ],
-        "correctAnswer": "Tempat yang sekarang sedang dihuni.",
+        "correctAnswer": "Tempat yang (dulu) tidak dihuni siapapun.",
         "bab": "Bab 22"
       },
       {
@@ -16375,7 +16375,7 @@
           "Saya suka orang yang suka membaca.",
           "Saya suka membaca buku tentang orang."
         ],
-        "correctAnswer": "Saya suka membaca.",
+        "correctAnswer": "Saya suka orang yang membaca buku.",
         "bab": "Bab 22"
       },
       {
@@ -16388,7 +16388,7 @@
           "Saya ingin punya rumah yang ada kolam beranang.",
           "Saya ingin punya kolam beranang dan rumah."
         ],
-        "correctAnswer": "Saya ingin punya kolam beranang.",
+        "correctAnswer": "Saya suka rumah yang ada kolam beranang.",
         "bab": "Bab 22"
       },
       {
@@ -16414,7 +16414,7 @@
           "Saya ada janji untuk pergi belanja.",
           "Saya suka pergi belanja."
         ],
-        "correctAnswer": "Saya tidak suka pergi belanja.",
+        "correctAnswer": "Saya ada janji untuk pergi belanja.",
         "bab": "Bab 22"
       },
       {
@@ -16982,7 +16982,7 @@
           "Saat tidak menyebrang jalan, hati-hati terhadap mobil.",
           "Saat belum menyebrang jalan, hati-hati terhadap mobil."
         ],
-        "correctAnswer": "Saat menyebrang jalan, hati-hati terhadap mobil.",
+        "correctAnswer": "Saat sudah menyebrang jalan, hati-hati terhadap mobil.",
         "bab": "Bab 23"
       },
       {
@@ -17008,7 +17008,7 @@
           "Saat tidak tahu cara memakainya, tolong tanya saya.",
           "Saat tidak tahu cara memakainya, tolong dengarkan saya."
         ],
-        "correctAnswer": "Saat ingin memakainya, tolong tanya saya.",
+        "correctAnswer": "Saat tidak tahu cara memakainya, tolong tanya saya.",
         "bab": "Bab 23"
       },
       {
@@ -17021,7 +17021,7 @@
           "Saat pulang ke rumah, aku akan beli kue.",
           "Saat pulang ke rumah, aku sudah beli kue"
         ],
-        "correctAnswer": "Saat belum pulang ke rumah, aku akan beli kue.",
+        "correctAnswer": "Saat sudah pulang ke rumah, aku akan beli kue.",
         "bab": "Bab 23"
       },
       {
@@ -17034,7 +17034,7 @@
           "Saat sudah pulang ke rumah, aku mengatakan \"Tadaima\"",
           "Saat sudah pulang ke rumah, tidak mengatakan \"Tadaima\""
         ],
-        "correctAnswer": "Saat belum pulang ke rumah, aku akan mengatakan \"Tadaima\"",
+        "correctAnswer": "Saat sudah pulang ke rumah, aku mengatakan \"Tadaima\"",
         "bab": "Bab 23"
       },
       {
@@ -17138,7 +17138,7 @@
           "Kalau belok di sini, ada kantor pos.",
           "Kalau belok ke sana, ada kantor pos."
         ],
-        "correctAnswer": "Kalau belok ke kiri, ada kantor pos.",
+        "correctAnswer": "Kalau belok ke kanan, ada kantor pos.",
         "bab": "Bab 23"
       },
       {
@@ -17346,7 +17346,7 @@
           "しりたい",
           "しらない"
         ],
-        "correctAnswer": "しりたい",
+        "correctAnswer": "しる",
         "bab": "Bab 23"
       },
       {
@@ -17628,7 +17628,7 @@
           "Sdr. Miller memberikan hadiah kepada saya",
           "Sdr. Miller memberikan kartu kepada saya"
         ],
-        "correctAnswer": "Sdr. Miller memberikan wine kepada saya",
+        "correctAnswer": "Sdr. Miller memberikan bunga kepada saya",
         "bab": "Bab 24"
       },
       {
@@ -17654,7 +17654,7 @@
           "Sdr. Miller memberikan hadiah kepada saya",
           "Sdr. Miller memberikan kartu kepada saya"
         ],
-        "correctAnswer": "Sdr. Miller memberikan bunga kepada saya",
+        "correctAnswer": "Sdr. Miller memberikan kartu kepada saya",
         "bab": "Bab 24"
       },
       {
@@ -17667,7 +17667,7 @@
           "Ini adalah teh Korea. Sdr. Wang memberikannya kepada saya.",
           "Ini adalah teh Cina. Sdr. Wang memberikannya kepada saya."
         ],
-        "correctAnswer": "Ini adalah topi Indonesia. Sdr. Karina memberikannya kepada saya.",
+        "correctAnswer": "Ini adalah kopi Brazil. Sdr. Santos memberikannya kepada saya.",
         "bab": "Bab 24"
       },
       {
@@ -17797,7 +17797,7 @@
           "Saya mengantarkan Sdr. Karina sampai stasiun.",
           "Sdr. Karina mengantarkan saya sampai stasiun."
         ],
-        "correctAnswer": "Saya mengantarkan Sdr. Karina.",
+        "correctAnswer": "Saya mengantarkan Sdr. Karina sampai stasiun.",
         "bab": "Bab 24"
       },
       {
@@ -18304,7 +18304,7 @@
           "せつめいして",
           "せつめい"
         ],
-        "correctAnswer": "せつめい",
+        "correctAnswer": "せつめいする",
         "bab": "Bab 24"
       },
       {
@@ -18317,7 +18317,7 @@
           "くれまして",
           "くれ"
         ],
-        "correctAnswer": "くれ",
+        "correctAnswer": "くれる",
         "bab": "Bab 24"
       },
       {
@@ -18330,7 +18330,7 @@
           "つれていって",
           "つれて"
         ],
-        "correctAnswer": "つれて",
+        "correctAnswer": "つれていく",
         "bab": "Bab 24"
       }
     ]
@@ -18378,7 +18378,7 @@
           "Kalau turun hujan, tidak pergi.",
           "Kalau murah, saya akan beli di toko itu."
         ],
-        "correctAnswer": "Kalau tidak ada waktu, tidak nonton film.",
+        "correctAnswer": "Kalau murah, saya akan beli di toko itu.",
         "bab": "Bab 25"
       },
       {
@@ -18391,7 +18391,7 @@
           "Kalau turun hujan, tidak pergi.",
           "Kalau murah, saya akan beli di toko itu."
         ],
-        "correctAnswer": "Kalau tidak ada waktu, tidak nonton film.",
+        "correctAnswer": "Kalau luang, saya akan pergi untuk bermain.",
         "bab": "Bab 25"
       },
       {
@@ -18430,7 +18430,7 @@
           "Kalau sudah pulang ke rumah, langsung mandi pakai shower.",
           "Kalau Sdr. Miller sudah datang, mari kita pergi keluar."
         ],
-        "correctAnswer": "Kalau sudah musim panas, ingin pulang ke desa.",
+        "correctAnswer": "Kalau sudah pulang ke rumah, langsung mandi pakai shower.",
         "bab": "Bab 25"
       },
       {
@@ -18469,7 +18469,7 @@
           "Walaupun tanpa uang, selalu menyenangkan.",
           "Walaupun tidak ada uang, setiap hari sulit."
         ],
-        "correctAnswer": "Walaupun tidak ada uang, setiap hari berjuang.",
+        "correctAnswer": "Walaupun tanpa uang, selalu menyenangkan.",
         "bab": "Bab 25"
       },
       {
@@ -18508,7 +18508,7 @@
           "Walaupun hari libur, saya tetap bangun cepat.",
           "Walaupun hari libur, saya bangun siang."
         ],
-        "correctAnswer": "Walaupun hari libur, saya tetap kerja.",
+        "correctAnswer": "Walaupun hari libur, saya tetap pergi dengan cepat.",
         "bab": "Bab 25"
       },
       {

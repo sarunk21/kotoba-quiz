@@ -520,8 +520,8 @@ function ParticlesQuizContent() {
 
             {/* Fixed Bottom Feedback Sheet */}
             {isChecked && (
-              <div className="fixed bottom-0 left-0 right-0 z-50 anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl border-t bg-white dark:bg-[#1a1d24] border-[var(--color-border)] rounded-t-[32px]">
-                <div className="max-w-sm md:max-w-2xl mx-auto px-5 py-5 flex flex-col gap-3.5">
+              <div className="fixed bottom-0 left-0 right-0 z-[160] anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl border-t bg-white dark:bg-[#1a1d24] border-[var(--color-border)] rounded-t-[32px]">
+                <div className="max-w-sm md:max-w-2xl mx-auto px-5 pt-5 pb-[calc(1.75rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-3.5">
                   <div className={`p-4 rounded-2xl border ${
                     isCorrect 
                       ? 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-300' 
@@ -552,7 +552,7 @@ function ParticlesQuizContent() {
 
         {/* ── Exit Confirmation Modal ── */}
         {showExitConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade">
+          <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade">
             <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-3xl p-6 max-w-xs w-full shadow-2xl text-center anim-pop">
               <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center text-2xl mx-auto mb-3">
                 ⚠️
@@ -584,7 +584,6 @@ function ParticlesQuizContent() {
           </div>
         )}
       </div>
-      <BottomNav />
     </div>
   )
 }

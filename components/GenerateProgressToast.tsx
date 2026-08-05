@@ -29,7 +29,7 @@ export function GenerateProgressToast() {
 
   return (
     <div
-      className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] w-[calc(100%-2rem)] max-w-sm anim-up"
+      className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-[200] w-[calc(100%-2rem)] max-w-sm anim-up"
       style={{ pointerEvents: 'none' }}
     >
       <div

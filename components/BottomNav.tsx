@@ -181,7 +181,7 @@ export default function BottomNav() {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-[130] flex justify-center px-4 pb-4 select-none">
+      <div className="fixed bottom-0 left-0 right-0 z-[130] flex justify-center px-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] select-none">
         <div 
           className="w-full max-w-sm md:max-w-2xl rounded-[28px] flex items-center justify-between py-2 px-3 border border-[var(--color-border)] bg-white/90 dark:bg-[#1a1d24]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)] transition-all duration-300 relative"
         >
