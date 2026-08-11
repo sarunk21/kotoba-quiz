@@ -4,4 +4,6 @@
     <string name="title_activity_main">Kotoba Quiz</string>
     <string name="package_name">com.kotobaquiz.app</string>
     <string name="custom_url_scheme">com.kotobaquiz.app</string>
+    <string name="widget_name">Kotoba Quiz Streak</string>
+    <string name="widget_description">Pantau streak belajar harian dan pertahankan apimu menyala!</string>
 </resources>

@@ -12,6 +12,7 @@ import { pushToCloud, syncToCloud, resetCloudData } from '@/lib/cloud'
 import { KANA } from '@/lib/kana'
 import { checkNotificationNeeds, showLocalNotification, rescheduleDailyReminderIfNeeded } from '@/lib/notifications'
 import BottomNav from '@/components/BottomNav'
+import StreakWidget from '@/components/StreakWidget'
 import { speakJapanese } from '@/lib/sounds'
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
@@ -23,8 +24,6 @@ const FALLBACK_WORDS = [
   { kanji: '森林浴', hiragana: 'しんりんよく', arti: 'Menghirup udara hutan untuk ketenangan jiwa (secara harfiah "mandi hutan").', category: 'Ungkapan', chapter: 'Kesehatan' },
   { kanji: '一期一会', hiragana: 'いちごいちえ', arti: 'Pertemuan sekali seumur hidup; menghargai setiap momen karena tidak akan terulang.', category: 'Yojijukugo', chapter: 'Kebijaksanaan' }
 ]
-
-const WEEKDAY_NAMES = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
 
 const PULL_THRESHOLD = 140 // px tarik ke bawah sebelum trigger
 
@@ -449,46 +448,6 @@ export default function Home() {
     }).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
   }, [vocab, srsStore])
 
-  const weeklyStreak = useMemo(() => {
-    const today = new Date()
-    const currentDayOfWeek = today.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const mondayIndex = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1
-
-    const streakActiveDays = new Array(7).fill(false)
-
-    if (stats && stats.currentStreak > 0 && stats.lastPlayedDate) {
-      const todayDateStr = getLocalDateString(today)
-      const yesterday = new Date()
-      yesterday.setDate(today.getDate() - 1)
-      const yesterdayDateStr = getLocalDateString(yesterday)
-
-      const isStreakValid = stats.lastPlayedDate === todayDateStr || stats.lastPlayedDate === yesterdayDateStr
-      if (isStreakValid) {
-        const lastPlayed = parseLocalDateString(stats.lastPlayedDate)
-        
-        for (let i = 0; i < stats.currentStreak; i++) {
-          const d = new Date(lastPlayed)
-          d.setDate(lastPlayed.getDate() - i)
-          const dayOfWeek = d.getDay()
-          const monIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-          
-          const startOfWeek = new Date(today)
-          startOfWeek.setDate(today.getDate() - mondayIndex)
-          startOfWeek.setHours(0, 0, 0, 0)
-          
-          if (d >= startOfWeek) {
-            streakActiveDays[monIdx] = true
-          }
-        }
-      }
-    }
-    return WEEKDAY_NAMES.map((label, idx) => ({
-      label,
-      active: streakActiveDays[idx],
-      isToday: idx === mondayIndex
-    }))
-  }, [stats])
-
   useEffect(() => {
     if (vocab.length > 0) {
       const dateNum = new Date().getDate()
@@ -610,43 +569,8 @@ export default function Home() {
             )}
 
 
-            {/* Weekly Streak Tracker */}
-            {stats && (
-              <div className="rounded-3xl p-5 mb-4 anim-up d1 border border-[var(--color-border)] bg-white dark:bg-[#1a1d24]" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-                <div className="flex items-center justify-between mb-3.5">
-                  <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Rencana Streak Mingguan</p>
-                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[var(--color-red-light)] text-[var(--color-red)]">
-                    🔥 {stats.currentStreak} Hari
-                  </span>
-                </div>
-                <div className="flex justify-between items-center px-1">
-                  {weeklyStreak.map((day, idx) => (
-                    <div key={idx} className="flex flex-col items-center gap-1.5">
-                      <div 
-                        className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-black transition-all relative ${
-                          day.active 
-                            ? 'bg-gradient-to-tr from-[var(--color-red)] to-[#ff8c42] text-white shadow-[0_3px_10px_rgba(239,68,68,0.25)]' 
-                            : day.isToday 
-                              ? 'border-2 border-dashed border-[var(--color-accent)] text-[var(--color-accent)] bg-[var(--color-accent-light)]' 
-                              : 'bg-[var(--color-bg)] text-[var(--color-text-3)]'
-                        }`}
-                      >
-                        {day.active ? '🔥' : day.label[0]}
-                        {day.isToday && !day.active && (
-                          <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-accent)] opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-accent)]"></span>
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[9px] font-black uppercase text-[var(--color-text-3)]" style={{ color: day.isToday ? 'var(--color-accent)' : 'var(--color-text-3)' }}>
-                        {day.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Interactive Daily Streak Widget */}
+            <StreakWidget />
 
             {/* Study Activity Heatmap */}
             {stats && <StudyHeatmap history={studyHistory} />}

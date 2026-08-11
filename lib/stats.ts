@@ -1,6 +1,7 @@
 'use client'
 
 import { getLocalDateString } from './dateUtils'
+import { syncStreakToNative } from './streak-bridge'
 
 export interface GameStats {
   currentStreak: number
@@ -62,6 +63,7 @@ export function loadStats(): GameStats {
 export function saveStats(stats: GameStats) {
   if (typeof window === 'undefined') return
   localStorage.setItem('kotoba_stats', JSON.stringify(stats))
+  syncStreakToNative(stats)
 }
 
 export function recordStudyHistory(questionsCount: number) {
