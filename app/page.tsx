@@ -17,6 +17,8 @@ import { DEFAULT_SHEETS_URL, CURRENT_VERSION } from '@/lib/constants'
 import { syncSheetsFromUrl } from '@/lib/sheetsSync'
 import { getSheetsUrl, getHistoryRaw, getLastUser, setLastUser, clearAccountData, isAutoSync } from '@/lib/storage'
 import { StudyHeatmap } from '@/components/home/StudyHeatmap'
+import { WordOfTheDay } from '@/components/home/WordOfTheDay'
+import { QuickAccess } from '@/components/home/QuickAccess'
 
 type SyncStatus = 'idle' | 'syncing' | 'ok' | 'error'
 
@@ -424,114 +426,9 @@ export default function Home() {
 
  {/* Study Activity Heatmap */}
  {stats && <StudyHeatmap history={studyHistory} />}
+  <WordOfTheDay word={wordOfTheDay} isFlipped={isWotdFlipped} onFlip={setIsWotdFlipped} />
+  <QuickAccess />
 
- {/* Word of the Day (Kata Hari Ini) */}
- {wordOfTheDay && (
- <div className="perspective-container h-48 w-full mb-4 anim-up d2 relative">
- <div className={`flip-card-inner h-full w-full transition-transform duration-500 style-3d ${isWotdFlipped ? 'flip-card-flipped' : ''}`}>
- 
- {/* Front Side */}
- <div className="flip-card-front h-full w-full rounded-3xl p-5 flex flex-col justify-between border border-[var(--color-border)] shadow-[0_2px_12px_rgba(0,0,0,0.04)] bg-[var(--color-surface)]">
- <div className="flex items-center justify-between">
- <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] flex items-center gap-1.5">
- <span className="text-base">✨</span> KATA HARI INI
- </span>
- <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)]">
- {wordOfTheDay.category}
- </span>
- </div>
-
- <div className="text-center my-auto flex flex-col items-center justify-center">
- <div className="flex items-center gap-2">
- <h2 className="text-3xl font-black text-[var(--color-text-1)] jp-serif tracking-wide leading-none">
- {wordOfTheDay.kanji || wordOfTheDay.hiragana}
- </h2>
- <button 
- onClick={(e) => {
- e.stopPropagation();
- speakJapanese(wordOfTheDay.hiragana || wordOfTheDay.kanji)
- }}
- className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-90 transition-all text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0"
- title="Putar Suara"
- >
- <VolumeIcon size={14} />
- </button>
- </div>
- {wordOfTheDay.kanji && wordOfTheDay.kanji !== wordOfTheDay.hiragana && (
- <p className="text-xs text-[var(--color-text-3)] mt-1.5 font-bold tracking-widest jp">{wordOfTheDay.hiragana}</p>
- )}
- </div>
-
- <div className="flex justify-center mt-1">
- <button 
- onClick={() => setIsWotdFlipped(true)}
- className="rounded-xl px-4 py-2 text-xs font-extrabold text-white bg-[var(--color-accent)] active:scale-95 transition-transform"
- >
- Lihat Arti 🔍
- </button>
- </div>
- </div>
-
- {/* Back Side */}
- <div className="flip-card-back h-full w-full rounded-3xl p-5 flex flex-col justify-between border border-[var(--color-border)] shadow-[0_2px_12px_rgba(0,0,0,0.04)] bg-[var(--color-surface)]">
- <div className="flex items-center justify-between">
- <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] flex items-center gap-1.5">
- <span className="text-base">💡</span> ARTI KATA
- </span>
- {wordOfTheDay.chapter && (
- <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)]">
- 📖 {wordOfTheDay.chapter}
- </span>
- )}
- </div>
-
- <div className="text-center my-auto px-2">
- <p className="text-base font-extrabold text-[var(--color-text-1)] leading-relaxed">
- {wordOfTheDay.arti}
- </p>
- </div>
-
- <div className="flex justify-center">
- <button 
- onClick={() => setIsWotdFlipped(false)}
- className="rounded-xl px-4 py-2 text-xs font-bold text-[var(--color-text-2)] bg-[var(--color-bg)] active:scale-95 transition-transform"
- >
- Balik ↩
- </button>
- </div>
- </div>
-
- </div>
- </div>
- )}
-
- {/* Materi & Tata Bahasa Quick Access */}
- <div className="rounded-3xl p-4.5 mb-4 anim-up d2 border border-[var(--color-border)] bg-[var(--color-surface)]" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
- <div className="flex items-center justify-between mb-3">
- <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)]">Quick Access & Modul Latihan</p>
- <Link href="/practice" className="text-[10px] font-extrabold text-[var(--color-accent)] no-underline hover:underline">
- Semua Latihan →
- </Link>
- </div>
- <div className="grid grid-cols-4 gap-2">
- <Link href="/quiz/chapters" className="no-underline flex flex-col items-center justify-center p-3 text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:bg-[var(--color-surface)] dark:hover:bg-[#222630] hover:border-[var(--color-accent)] transition-all active:scale-95 shadow-xs group">
- <span className="text-2xl mb-1 text-indigo-500 leading-none flex items-center justify-center h-7 group-hover:scale-110 transition-transform">📖</span>
- <span className="text-[9px] font-black text-[var(--color-text-1)] leading-tight">Kuis<br/>Per Bab</span>
- </Link>
- <Link href="/particles" className="no-underline flex flex-col items-center justify-center p-3 text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:bg-[var(--color-surface)] dark:hover:bg-[#222630] hover:border-[var(--color-accent)] transition-all active:scale-95 shadow-xs group">
- <span className="text-2xl mb-1 text-amber-500 jp font-extrabold leading-none flex items-center justify-center h-7 group-hover:scale-110 transition-transform">助</span>
- <span className="text-[9px] font-black text-[var(--color-text-1)] leading-tight">Latihan<br/>Partikel</span>
- </Link>
- <Link href="/sentences" className="no-underline flex flex-col items-center justify-center p-3 text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:bg-[var(--color-surface)] dark:hover:bg-[#222630] hover:border-[var(--color-accent)] transition-all active:scale-95 shadow-xs group">
- <span className="text-2xl mb-1 text-emerald-500 jp font-extrabold leading-none flex items-center justify-center h-7 group-hover:scale-110 transition-transform">文</span>
- <span className="text-[9px] font-black text-[var(--color-text-1)] leading-tight">Susun<br/>Kalimat</span>
- </Link>
- <Link href="/practice" className="no-underline flex flex-col items-center justify-center p-3 text-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] hover:bg-[var(--color-surface)] dark:hover:bg-[#222630] hover:border-[var(--color-accent)] transition-all active:scale-95 shadow-xs group">
- <span className="text-2xl mb-1 text-blue-500 leading-none flex items-center justify-center h-7 group-hover:scale-110 transition-transform">📝</span>
- <span className="text-[9px] font-black text-[var(--color-text-1)] leading-tight">Soal<br/>Per Bab</span>
- </Link>
- </div>
- </div>
 
  {/* Consolidated Study Status Tracker */}
  {srs && (
