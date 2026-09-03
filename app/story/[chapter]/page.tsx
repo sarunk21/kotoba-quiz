@@ -184,7 +184,7 @@ export default function StoryPage({ params }: PageProps) {
               playTap()
               router.back()
             }}
-            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform shrink-0 cursor-pointer"
+            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-[var(--color-surface)] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform shrink-0 cursor-pointer"
           >
             ←
           </button>
@@ -202,7 +202,7 @@ export default function StoryPage({ params }: PageProps) {
             </div>
           ) : (
             /* Static Paragraph Mode — backward compat for Stories tab (no scenes) */
-            <div className="rounded-[28px] p-6 md:p-8 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] shadow-sm anim-up relative overflow-hidden">
+            <div className="rounded-[28px] p-6 md:p-8 bg-[var(--color-surface)] border border-[var(--color-border)] shadow-sm anim-up relative overflow-hidden">
               <div className="absolute inset-0 bg-radial from-[var(--color-accent-light)]/20 via-transparent to-transparent opacity-60 pointer-events-none" />
               
               <div className="relative z-10">
@@ -231,7 +231,7 @@ export default function StoryPage({ params }: PageProps) {
           )}
 
           {/* Accordion Indonesian Translation */}
-          <div className="rounded-2xl border border-[var(--color-border)] overflow-hidden bg-white dark:bg-[#1a1d24] shadow-sm anim-up d1">
+          <div className="rounded-2xl border border-[var(--color-border)] overflow-hidden bg-[var(--color-surface)] shadow-sm anim-up d1">
             <button
               onClick={() => { playTap(); setShowTranslation(!showTranslation) }}
               className="w-full flex items-center justify-between p-4 font-extrabold text-xs text-[var(--color-text-1)] cursor-pointer hover:bg-[var(--color-bg)] transition-colors"
@@ -261,7 +261,7 @@ export default function StoryPage({ params }: PageProps) {
                 return (
                   <div 
                     key={v.id} 
-                    className="p-3 rounded-2xl bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] flex items-center justify-between shadow-xs"
+                    className="p-3 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-between shadow-xs"
                   >
                     <div className="min-w-0 pr-2">
                       <p className="jp text-sm font-bold text-[var(--color-text-1)] truncate">

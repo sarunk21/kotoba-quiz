@@ -1,61 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Noto+Serif+JP:wght@400;500;700;900&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Noto Sans JP', 'Plus Jakarta Sans', -apple-system, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
-  --color-bg: #f2f4f7;
+  --font-sans: 'Noto Sans JP', -apple-system, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+  --font-serif: 'Noto Serif JP', serif;
+
+  /* ── Washi & Torii — Light ── */
+  --color-bg: #f5f0e8;
+  --color-surface: #fffdf8;
+  --color-surface-hover: #f9f5ed;
+  --color-border: #e5ddd0;
+  --color-border-light: #ece6da;
+
+  --color-text-1: #2c2620;
+  --color-text-2: #7a7267;
+  --color-text-3: #b5ab9e;
+
+  --color-accent: #d64541;
+  --color-accent-hover: #c03a36;
+  --color-accent-dark: #c03a36;
+  --color-accent-light: #fbeaea;
+  --color-accent-glow: rgba(214,69,65,0.18);
+  --color-subtle: #ece6da;
   --color-white: #ffffff;
-  --color-subtle: #e8eaed;
-  --color-border: #e2e5ea;
 
-  --color-text-1: #111827;
-  --color-text-2: #6b7280;
-  --color-text-3: #b0b8c4;
+  --color-green: #2d8f5a;
+  --color-green-light: #e6f7ee;
+  --color-green-dark: #227347;
 
-  --color-accent: #5b5ef4;
-  --color-accent-light: #eeeeff;
-  --color-accent-dark: #4547d0;
+  --color-red: #d64541;
+  --color-red-light: #fbeaea;
+  --color-red-dark: #c03a36;
 
-  --color-green: #22c55e;
-  --color-green-light: #eafaf0;
-  --color-green-dark: #16a34a;
+  --color-amber: #c77f1b;
+  --color-amber-light: #fef3dc;
+  --color-amber-dark: #a36616;
 
-  --color-red: #ef4444;
-  --color-red-light: #fff1f1;
-  --color-red-dark: #dc2626;
+  --color-indigo: #4f46a5;
+  --color-indigo-light: #eceafe;
 
-  --color-amber: #f59e0b;
-  --color-amber-light: #fffbeb;
+  --color-purple: #7c3daa;
+  --color-purple-light: #f5ecfc;
 
-  --color-cat-noun: #5b5ef4;
-  --color-cat-noun-bg: #eeeeff;
-  --color-cat-verb: #10b981;
-  --color-cat-verb-bg: #e6faf3;
-  --color-cat-adj: #ec4899;
-  --color-cat-adj-bg: #fdf0f8;
+  --color-cat-noun: #4f46a5;
+  --color-cat-noun-bg: #eceafe;
+  --color-cat-verb: #2d8f5a;
+  --color-cat-verb-bg: #e6f7ee;
+  --color-cat-adj: #d64541;
+  --color-cat-adj-bg: #fbeaea;
+
+  --shadow-card: 0 1px 4px rgba(44,38,32,0.06);
+  --shadow-elevated: 0 6px 24px rgba(44,38,32,0.09);
+  --shadow-float: 0 12px 40px rgba(44,38,32,0.13);
+
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 }
 
 @variant dark (&:where(.dark, .dark *));
 
 .dark {
-  --color-bg: #0f1115;
-  --color-white: #1a1d24;
-  --color-subtle: #262a33;
-  --color-border: #2d333d;
+  /* ── Washi & Torii — Dark ── */
+  --color-bg: #141210;
+  --color-surface: #1e1b17;
+  --color-surface-hover: #28251f;
+  --color-border: #302b24;
+  --color-border-light: #26221c;
 
-  --color-text-1: #f9fafb;
-  --color-text-2: #9ca3af;
-  --color-text-3: #6b7280;
+  --color-text-1: #f0ebe3;
+  --color-text-2: #a09888;
+  --color-text-3: #6b6258;
 
-  --color-accent-light: rgba(91,94,244,0.15);
-  --color-green-light: rgba(34,197,94,0.15);
-  --color-red-light: rgba(239,68,68,0.15);
-  --color-amber-light: rgba(245,158,11,0.15);
+  --color-accent-light: rgba(214,69,65,0.15);
+  --color-accent-dark: #a5524f;
+  --color-accent-glow: rgba(214,69,65,0.25);
+  --color-subtle: #26221c;
+  --color-white: #1e1b17;
+  --color-green-light: rgba(45,143,90,0.12);
+  --color-red-light: rgba(214,69,65,0.12);
+  --color-amber-light: rgba(199,127,27,0.12);
+  --color-indigo-light: rgba(79,70,165,0.12);
+  --color-purple-light: rgba(124,61,170,0.12);
 
-  --color-cat-noun-bg: rgba(91,94,244,0.15);
-  --color-cat-verb-bg: rgba(16,185,129,0.15);
-  --color-cat-adj-bg: rgba(236,72,153,0.15);
+  --color-cat-noun-bg: rgba(79,70,165,0.12);
+  --color-cat-verb-bg: rgba(45,143,90,0.12);
+  --color-cat-adj-bg: rgba(214,69,65,0.12);
+
+  --shadow-card: 0 1px 4px rgba(0,0,0,0.25);
+  --shadow-elevated: 0 6px 24px rgba(0,0,0,0.35);
+  --shadow-float: 0 12px 40px rgba(0,0,0,0.45);
 }
 
 * {
@@ -72,14 +108,13 @@ html, body {
   min-height: 100dvh;
 }
 
-.jp      { font-family: 'Noto Sans JP', sans-serif; }
-.jp-serif { font-family: 'Noto Sans JP', sans-serif; }
+.jp      { font-family: var(--font-sans); }
+.jp-serif { font-family: var(--font-serif); }
 
 /* ── Shadows ── */
-.shadow-card { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-.shadow-btn  { box-shadow: 0 4px 14px rgba(91,94,244,0.28); }
-.shadow-green { box-shadow: 0 4px 14px rgba(34,197,94,0.28); }
-.shadow-red   { box-shadow: 0 4px 14px rgba(239,68,68,0.28); }
+.shadow-card    { box-shadow: var(--shadow-card); }
+.shadow-elevated { box-shadow: var(--shadow-elevated); }
+.shadow-float   { box-shadow: var(--shadow-float); }
 
 /* ── Animations ── */
 @keyframes slideUp {
@@ -119,10 +154,39 @@ html, body {
 .d4 { animation-delay: 0.2s;  opacity: 0; }
 
 /* ── Hide scrollbar utility ── */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Utility classes for new design tokens ── */
+.bg-surface     { background-color: var(--color-surface); }
+.bg-surface-hover { background-color: var(--color-surface-hover); }
+.bg-accent      { background-color: var(--color-accent); }
+.bg-accent-light { background-color: var(--color-accent-light); }
+.bg-green-light { background-color: var(--color-green-light); }
+.bg-red-light   { background-color: var(--color-red-light); }
+.bg-amber-light { background-color: var(--color-amber-light); }
+.bg-indigo-light { background-color: var(--color-indigo-light); }
+.bg-purple-light { background-color: var(--color-purple-light); }
+
+.text-accent    { color: var(--color-accent); }
+.text-green     { color: var(--color-green); }
+.text-red       { color: var(--color-red); }
+.text-amber     { color: var(--color-amber); }
+.text-indigo    { color: var(--color-indigo); }
+.text-purple    { color: var(--color-purple); }
+.text-text-1    { color: var(--color-text-1); }
+.text-text-2    { color: var(--color-text-2); }
+.text-text-3    { color: var(--color-text-3); }
+
+.border-app     { border-color: var(--color-border); }
+.border-light   { border-color: var(--color-border-light); }
+
+.rounded-sm     { border-radius: var(--radius-sm); }
+.rounded-md     { border-radius: var(--radius-md); }
+.rounded-lg     { border-radius: var(--radius-lg); }
+.rounded-xl     { border-radius: var(--radius-xl); }
+
+/* Badge variants */
+.badge-noun     { background: var(--color-cat-noun-bg); color: var(--color-cat-noun); }
+.badge-verb     { background: var(--color-cat-verb-bg); color: var(--color-cat-verb); }
+.badge-adj      { background: var(--color-cat-adj-bg); color: var(--color-cat-adj); }

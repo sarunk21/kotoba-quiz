@@ -3,595 +3,368 @@
 import { useState, useMemo, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { PARTICLE_QUESTIONS, type ParticleQuestion } from '@/lib/particles-data'
-import { playCorrect, playWrong, playFinish, playLoseHeart, playTap, speakJapanese } from '@/lib/sounds'
+import { playTap, speakJapanese } from '@/lib/sounds'
 import { addFuriganaToSentence, extractVocabRefFromSentence } from '@/lib/vocab'
-import { updateAfterSession } from '@/lib/stats'
+import { useQuizEngine, TOTAL_QUESTIONS } from '@/lib/quiz-engine'
+import { useQuizAudio } from '@/hooks/useQuizAudio'
+import { getShowFurigana, setShowFurigana as saveShowFurigana } from '@/lib/storage'
+import QuizHeader from '@/components/quiz/QuizHeader'
+import FeedbackSheet from '@/components/quiz/FeedbackSheet'
+import ResultScreen from '@/components/quiz/ResultScreen'
+import ExitConfirmModal from '@/components/quiz/ExitConfirmModal'
+import { IconVolume, IconLightbulb } from '@/components/ui/icons'
 import BottomNav from '@/components/BottomNav'
 
 function generateQuestions(particle: string): ParticleQuestion[] {
-  if (particle === 'all') {
-    return [...PARTICLE_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10)
-  }
+ if (particle === 'all') {
+ return [...PARTICLE_QUESTIONS].sort(() => Math.random() - 0.5).slice(0, TOTAL_QUESTIONS)
+ }
 
-  let targetPool: ParticleQuestion[] = []
-  let distractorPool: ParticleQuestion[] = []
+ let targetPool: ParticleQuestion[] = []
+ let distractorPool: ParticleQuestion[] = []
 
-  if (particle === 'lainnya') {
-    const lainnyaList = ['へ', 'と', 'も', 'から', 'まで']
-    targetPool = PARTICLE_QUESTIONS.filter(q => {
-      return lainnyaList.some(p => q.correct.includes(p))
-    })
-    distractorPool = PARTICLE_QUESTIONS.filter(q => {
-      const isTarget = lainnyaList.some(p => q.correct.includes(p))
-      const hasOption = lainnyaList.some(p => q.options.includes(p))
-      return !isTarget && hasOption
-    })
-  } else {
-    targetPool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(particle))
-    distractorPool = PARTICLE_QUESTIONS.filter(q => !q.correct.includes(particle) && q.options.includes(particle))
-  }
+ if (particle === 'lainnya') {
+ const lainnyaList = ['へ', 'と', 'も', 'から', 'まで']
+ targetPool = PARTICLE_QUESTIONS.filter(q => lainnyaList.some(p => q.correct.includes(p)))
+ distractorPool = PARTICLE_QUESTIONS.filter(q => {
+ const isTarget = lainnyaList.some(p => q.correct.includes(p))
+ const hasOption = lainnyaList.some(p => q.options.includes(p))
+ return !isTarget && hasOption
+ })
+ } else {
+ targetPool = PARTICLE_QUESTIONS.filter(q => q.correct.includes(particle))
+ distractorPool = PARTICLE_QUESTIONS.filter(q => !q.correct.includes(particle) && q.options.includes(particle))
+ }
 
-  const shuffledTargets = [...targetPool].sort(() => Math.random() - 0.5)
-  const shuffledDistractors = [...distractorPool].sort(() => Math.random() - 0.5)
+ const shuffledTargets = [...targetPool].sort(() => Math.random() - 0.5)
+ const shuffledDistractors = [...distractorPool].sort(() => Math.random() - 0.5)
 
-  // Aim for a mix: up to 5 target questions, and the rest distractors to make 10 total
-  const targetCount = Math.min(5, shuffledTargets.length)
-  const distractorCount = Math.min(10 - targetCount, shuffledDistractors.length)
+ const targetCount = Math.min(5, shuffledTargets.length)
+ const distractorCount = Math.min(TOTAL_QUESTIONS - targetCount, shuffledDistractors.length)
 
-  const selectedTargets = shuffledTargets.slice(0, targetCount)
-  const selectedDistractors = shuffledDistractors.slice(0, distractorCount)
+ const selectedTargets = shuffledTargets.slice(0, targetCount)
+ const selectedDistractors = shuffledDistractors.slice(0, distractorCount)
 
-  let combined = [...selectedTargets, ...selectedDistractors]
-  if (combined.length < 10) {
-    const remainingTargets = shuffledTargets.slice(targetCount)
-    const needed = 10 - combined.length
-    combined = [...combined, ...remainingTargets.slice(0, needed)]
-  }
+ let combined = [...selectedTargets, ...selectedDistractors]
+ if (combined.length < TOTAL_QUESTIONS) {
+ const remainingTargets = shuffledTargets.slice(targetCount)
+ const needed = TOTAL_QUESTIONS - combined.length
+ combined = [...combined, ...remainingTargets.slice(0, needed)]
+ }
 
-  // Shuffle final list so they are mixed in order
-  return combined.sort(() => Math.random() - 0.5)
-}
-
-function ParticlesQuizContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const pParam = searchParams.get('p')
-
-  // Selection state (null = show particle category selector screen)
-  const [selectedParticle, setSelectedParticle] = useState<string | null>(null)
-
-  // Initialize and sync quiz when query parameter 'p' changes
-  useEffect(() => {
-    if (pParam) {
-      const selectedPool = generateQuestions(pParam)
-      setQuestions(selectedPool)
-      setSelectedParticle(pParam)
-      setCurrentIndex(0)
-      setSelectedOption(null)
-      setIsChecked(false)
-      setLives(3)
-      setScore(0)
-      setIsGameOver(false)
-      setIsFinished(false)
-    } else {
-      setSelectedParticle(null)
-    }
-  }, [pParam])
-
-  const [showFurigana, setShowFurigana] = useState(false)
-
-  // Initialize showFurigana state on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('kotoba_show_furigana')
-    setShowFurigana(saved !== 'false') // default to true
-  }, [])
-
-  // Game States
-  const [questions, setQuestions] = useState<ParticleQuestion[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
-  const [isChecked, setIsChecked] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
-  const [lives, setLives] = useState(3)
-  const [score, setScore] = useState(0)
-  const [isGameOver, setIsGameOver] = useState(false)
-  const [isFinished, setIsFinished] = useState(false)
-  const [showExitConfirm, setShowExitConfirm] = useState(false)
-
-  // Intercept browser / device back button during active quiz
-  useEffect(() => {
-    if (selectedParticle === null || isFinished || isGameOver) return
-    window.history.pushState({ inQuiz: true }, '', window.location.href)
-
-    const handlePopState = () => {
-      window.history.pushState({ inQuiz: true }, '', window.location.href)
-      setShowExitConfirm(true)
-    }
-
-    window.addEventListener('popstate', handlePopState)
-    return () => {
-      window.removeEventListener('popstate', handlePopState)
-    }
-  }, [selectedParticle, isFinished, isGameOver])
-
-  const currentQuestion = useMemo(() => {
-    return questions[currentIndex] || null
-  }, [questions, currentIndex])
-
-  const handleSelect = (option: string) => {
-    if (isChecked || !currentQuestion) return
-    playTap()
-    setSelectedOption(option)
-
-    const correct = currentQuestion.correct
-    const isUserCorrect = option === correct
-
-    setIsCorrect(isUserCorrect)
-    setIsChecked(true)
-
-    if (isUserCorrect) {
-      playCorrect()
-      speakJapanese(currentQuestion.sentence.replace('___', correct))
-      setScore(s => s + 1)
-    } else {
-      playWrong()
-      playLoseHeart()
-      const nextLives = lives - 1
-      setLives(nextLives)
-      if (nextLives <= 0) {
-        updateAfterSession(score, currentIndex + 1)
-        setTimeout(() => setIsGameOver(true), 1200)
-      }
-    }
-  }
-
-  const handleNext = () => {
-    if (currentIndex + 1 >= questions.length) {
-      updateAfterSession(score, questions.length)
-      playFinish()
-      setIsFinished(true)
-    } else {
-      playTap()
-      setCurrentIndex(c => c + 1)
-      setSelectedOption(null)
-      setIsChecked(false)
-    }
-  }
-
-  const handleRestart = () => {
-    if (selectedParticle) {
-      playTap()
-      const selectedPool = generateQuestions(selectedParticle)
-      setQuestions(selectedPool)
-      setCurrentIndex(0)
-      setSelectedOption(null)
-      setIsChecked(false)
-      setLives(3)
-      setScore(0)
-      setIsGameOver(false)
-      setIsFinished(false)
-    }
-  }
-
-  const startQuizWithParticle = (part: string) => {
-    playTap()
-    router.push(`/particles?p=${part}`)
-  }
-
-  // Render Selection Screen
-  if (selectedParticle === null) {
-    const particleCounts = {
-      all: PARTICLE_QUESTIONS.length,
-      'は': PARTICLE_QUESTIONS.filter(q => q.correct.includes('は')).length,
-      'が': PARTICLE_QUESTIONS.filter(q => q.correct.includes('が')).length,
-      'を': PARTICLE_QUESTIONS.filter(q => q.correct.includes('を')).length,
-      'に': PARTICLE_QUESTIONS.filter(q => q.correct.includes('に')).length,
-      'で': PARTICLE_QUESTIONS.filter(q => q.correct.includes('で')).length,
-      'の': PARTICLE_QUESTIONS.filter(q => q.correct.includes('の')).length,
-      'lainnya': PARTICLE_QUESTIONS.filter(q => {
-        const p = q.correct
-        return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
-      }).length
-    }
-
-    return (
-      <div className="min-h-dvh flex flex-col justify-between" style={{ background: 'var(--color-bg)' }}>
-        <div className="max-w-sm md:max-w-2xl mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
-          {/* Top Header */}
-          <header className="flex items-center gap-4 mb-8 anim-up">
-            <button 
-              onClick={() => router.push('/')}
-              className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform shrink-0"
-            >
-              ←
-            </button>
-            <div>
-              <h1 className="text-lg font-black text-[var(--color-text-1)] leading-tight">Latihan Partikel</h1>
-              <p className="text-xs font-semibold text-[var(--color-text-2)]">Pilih fokus partikel yang ingin kamu latih</p>
-            </div>
-          </header>
-
-          <div className="space-y-4 my-auto">
-            {/* Campur Semua */}
-            <button 
-              onClick={() => startQuizWithParticle('all')}
-              className="w-full text-left bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-dark)] text-white rounded-[24px] p-5 shadow-[0_8px_24px_rgba(91,94,244,0.25)] border-none active:scale-[0.98] transition-transform cursor-pointer"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-black">⚡ Campur Semua</h3>
-                  <p className="text-[10px] opacity-85 font-bold mt-1">Latihan gabungan dari seluruh partikel ({particleCounts.all} soal)</p>
-                </div>
-                <span className="text-2xl">🎯</span>
-              </div>
-            </button>
-
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { key: 'は', title: 'Topik (は)', desc: 'Penunjuk Topik utama', icon: 'は', bg: 'bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900/40' },
-                { key: 'が', title: 'Subjek (が)', desc: 'Penunjuk Pelaku/Eksistensi', icon: 'が', bg: 'bg-cyan-50 dark:bg-cyan-950/20 text-cyan-600 dark:text-cyan-400 border-cyan-100 dark:border-cyan-900/40' },
-                { key: 'を', title: 'Objek (を)', desc: 'Penunjuk Target tindakan', icon: 'を', bg: 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-900/40' },
-                { key: 'に', title: 'Koordinat (に)', desc: 'Waktu spesifik / Tempat diam', icon: 'に', bg: 'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-500 border-amber-100 dark:border-amber-900/40' },
-                { key: 'で', title: 'Aktivitas (で)', desc: 'Latar aksi / Alat bantu', icon: 'で', bg: 'bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-900/40' },
-                { key: 'の', title: 'Kepunyaan (の)', desc: 'Lem perekat Kata Benda', icon: 'の', bg: 'bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900/40' }
-              ].map(p => (
-                <button
-                  key={p.key}
-                  onClick={() => startQuizWithParticle(p.key)}
-                  className="rounded-[24px] p-4 text-left border flex flex-col justify-between h-32 active:scale-95 transition-transform cursor-pointer bg-white dark:bg-[#1a1d24] border-[var(--color-border)] shadow-sm"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black jp text-base ${p.bg}`}>
-                      {p.icon}
-                    </span>
-                    <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)] border border-[var(--color-border)]">
-                      {(particleCounts as any)[p.key]} soal
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black text-[var(--color-text-1)] mt-2">{p.title}</h4>
-                    <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-tight">{p.desc}</p>
-                  </div>
-                </button>
-              ))}
-
-              {/* Lainnya */}
-              <button
-                onClick={() => startQuizWithParticle('lainnya')}
-                className="col-span-2 rounded-[24px] p-4 text-left border flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer bg-white dark:bg-[#1a1d24] border-[var(--color-border)] shadow-sm"
-              >
-                <div className="flex items-center gap-3.5">
-                  <span className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg bg-gray-100 dark:bg-gray-800 text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0">
-                    🔗
-                  </span>
-                  <div>
-                    <h4 className="text-xs font-black text-[var(--color-text-1)]">Partikel Lainnya (へ, と, も, から, まで)</h4>
-                    <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-tight">Menyatakan arah, penyerta, kesamaan, awal/akhir</p>
-                  </div>
-                </div>
-                <span className="text-[9px] font-black px-2.5 py-1 rounded-full bg-[var(--color-bg)] text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0">
-                  {particleCounts.lainnya} soal
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <BottomNav />
-      </div>
-    )
-  }
-
-  const progressPct = Math.round((currentIndex / questions.length) * 100)
-
-  return (
-    <div className="min-h-dvh flex flex-col justify-between" style={{ background: 'var(--color-bg)' }}>
-      <div className="max-w-sm md:max-w-2xl mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
-        {/* Top Header */}
-        <header className="flex items-center justify-between gap-4 mb-8 anim-up">
-          <button 
-            onClick={() => {
-              playTap()
-              setShowExitConfirm(true)
-            }}
-            className="w-9 h-9 rounded-2xl flex items-center justify-center font-bold bg-white dark:bg-[#1a1d24] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform cursor-pointer"
-          >
-            ←
-          </button>
-          
-          {/* Progress Bar */}
-          <div className="flex-1 h-3 rounded-full bg-[var(--color-subtle)] overflow-hidden border border-[var(--color-border)]">
-            <div 
-              className="h-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-dark)] transition-all duration-300 rounded-full"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-
-          {/* Lives Indicator */}
-          <div className="flex items-center gap-1">
-            {[1, 2, 3].map(h => (
-              <span key={h} className="text-lg transition-transform duration-300">
-                {h <= lives ? '❤️' : '🖤'}
-              </span>
-            ))}
-          </div>
-        </header>
-
-        {/* Game States Wrapper */}
-        {isGameOver ? (
-          /* Game Over Screen */
-          <div className="my-auto flex flex-col items-center text-center p-6 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] shadow-card anim-pop">
-            <span className="text-6xl mb-4">🕯️</span>
-            <h2 className="text-xl font-black text-[var(--color-text-1)] mb-2">Nyawa Habis!</h2>
-            <p className="text-xs font-semibold text-[var(--color-text-2)] mb-6 leading-relaxed">
-              Kamu melakukan 3 kesalahan. Jangan menyerah! Coba lagi untuk menguasai partikel Jepang.
-            </p>
-            <div className="w-full flex flex-col gap-2.5">
-              <button 
-                onClick={handleRestart}
-                className="w-full rounded-2xl py-3.5 text-sm font-extrabold bg-[var(--color-accent)] text-white shadow-btn active:scale-95 transition-transform"
-              >
-                Coba Lagi 🔄
-              </button>
-              <button 
-                onClick={() => router.push('/particles/guide')}
-                className="w-full rounded-2xl py-3.5 text-sm font-bold bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-500 active:scale-95 transition-transform"
-              >
-                Pelajari Panduan Partikel 📖
-              </button>
-              <button 
-                onClick={() => router.push('/particles')}
-                className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
-              >
-                Pilih Partikel Lain
-              </button>
-            </div>
-          </div>
-        ) : isFinished ? (
-          /* Finished Screen */
-          <div className="my-auto flex flex-col items-center text-center p-6 bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] shadow-card anim-pop">
-            <span className="text-6xl mb-4">🏆</span>
-            <h2 className="text-xl font-black text-[var(--color-text-1)] mb-2">Latihan Selesai!</h2>
-            <p className="text-xs font-semibold text-[var(--color-text-2)] mb-6">
-              Hebat! Kamu telah menyelesaikan latihan partikel hari ini.
-            </p>
-
-            {/* Scoreboard */}
-            <div className="grid grid-cols-2 gap-4 w-full mb-8">
-              <div className="rounded-2xl p-4 bg-[var(--color-accent-light)] border border-[var(--color-border)]">
-                <p className="text-xs font-bold text-[var(--color-text-2)]">Benar</p>
-                <p className="text-2xl font-black text-[var(--color-accent)] mt-1">{score} / {questions.length}</p>
-              </div>
-              <div className="rounded-2xl p-4 bg-green-50 dark:bg-green-950/20 border border-[var(--color-border)]">
-                <p className="text-xs font-bold text-[var(--color-text-2)]">Akurasi</p>
-                <p className="text-2xl font-black text-green-500 mt-1">{Math.round((score / questions.length) * 100)}%</p>
-              </div>
-            </div>
-
-            <div className="w-full flex flex-col gap-2.5">
-              <button 
-                onClick={handleRestart}
-                className="w-full rounded-2xl py-3.5 text-sm font-extrabold bg-[var(--color-accent)] text-white shadow-btn active:scale-95 transition-transform"
-              >
-                Latihan Lagi 🔄
-              </button>
-              <button 
-                onClick={() => router.push('/particles/guide')}
-                className="w-full rounded-2xl py-3.5 text-sm font-bold bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-500 active:scale-95 transition-transform"
-              >
-                Tinjau Panduan Partikel 📖
-              </button>
-              <button 
-                onClick={() => router.push('/particles')}
-                className="w-full rounded-2xl py-3.5 text-sm font-bold bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-transform"
-              >
-                Pilih Partikel Lain
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* Active Question Screen */
-          <div className="flex-1 flex flex-col justify-between anim-up">
-            {/* Guide Quick Link & Furigana Toggle */}
-            <div className="flex justify-between items-center mb-3">
-              {/* Furigana Toggle */}
-              <button 
-                onClick={() => {
-                  const newVal = !showFurigana
-                  setShowFurigana(newVal)
-                  localStorage.setItem('kotoba_show_furigana', String(newVal))
-                  playTap()
-                }}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border transition-all active:scale-95 cursor-pointer ${
-                  showFurigana 
-                    ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' 
-                    : 'bg-white dark:bg-[#1a1d24] text-[var(--color-text-3)] border-[var(--color-border)]'
-                }`}
-                title={showFurigana ? "Sembunyikan Furigana" : "Tampilkan Furigana"}
-              >
-                <span>あ</span>
-                <span>Furigana: {showFurigana ? 'ON' : 'OFF'}</span>
-              </button>
-
-              {/* Guide Link */}
-              <button 
-                onClick={() => {
-                  playTap()
-                  router.push('/particles/guide')
-                }}
-                className="text-[10px] font-extrabold text-[var(--color-accent)] hover:underline flex items-center gap-1 active:scale-95 transition-all cursor-pointer bg-[var(--color-accent-light)] px-2.5 py-1 rounded-full border-none"
-              >
-                📖 Lihat Panduan Partikel
-              </button>
-            </div>
-
-            {/* Question Card */}
-            <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-[32px] p-6 shadow-card mb-6 text-center relative overflow-hidden">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)]">
-                  PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS ${selectedParticle?.toUpperCase()}`})
-                </span>
-                <button 
-                  onClick={() => speakJapanese(currentQuestion.sentence.replace('___', currentQuestion.correct))}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--color-bg)] hover:bg-[var(--color-subtle)] active:scale-95 transition-all text-xs border border-[var(--color-border)] text-[var(--color-text-2)] cursor-pointer"
-                  title="Dengarkan Suara Pelafalan"
-                >
-                  🔊
-                </button>
-              </div>
-
-              <h2 className="text-2xl font-black jp tracking-wide leading-relaxed text-[var(--color-text-1)] mb-4 select-text">
-                {showFurigana ? (
-                  <span dangerouslySetInnerHTML={{ 
-                    __html: addFuriganaToSentence(
-                      isChecked 
-                        ? currentQuestion.sentence.replace('___', ` 【 ${currentQuestion.correct} 】 `) 
-                        : currentQuestion.sentence
-                    ) 
-                  }} />
-                ) : (
-                  isChecked 
-                    ? currentQuestion.sentence.replace('___', ` 【 ${currentQuestion.correct} 】 `) 
-                    : currentQuestion.sentence
-                )}
-              </h2>
-              <div className="h-[1.5px] w-full bg-[var(--color-border)] my-4" />
-              <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed select-text">
-                Arti: {currentQuestion.translation}
-              </p>
-
-              {/* Core Vocabulary Reference Breakdown */}
-              {(() => {
-                const refs = extractVocabRefFromSentence(currentQuestion.sentence)
-                if (refs.length === 0) return null
-                return (
-                  <div className="mt-4 pt-3 border-t border-[var(--color-border)] text-left">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-2 flex items-center gap-1">
-                      <span>📖</span> Kosakata Minna no Nihongo dalam Kalimat Ini:
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {refs.map((v, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[var(--color-subtle)] text-[10px] font-bold text-[var(--color-text-1)] border border-[var(--color-border)]">
-                          <span className="jp font-black text-xs">{v.kanji}</span>
-                          <span className="text-[var(--color-text-3)] text-[9px]">({v.hiragana})</span>
-                          <span className="text-[var(--color-text-2)]">{v.arti}</span>
-                          <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[var(--color-accent-light)] text-[var(--color-accent)] uppercase">{v.chapter}</span>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })()}
-            </div>
-
-            {/* Multiple Choice Options */}
-            <div className="grid grid-cols-2 gap-3.5 mb-6">
-              {currentQuestion.options.map((opt, idx) => {
-                const isSelected = selectedOption === opt
-                const isCorrectOpt = opt === currentQuestion.correct
-
-                let cardStyle = "bg-white dark:bg-[#1a1d24] border-[var(--color-border)] text-[var(--color-text-1)] hover:border-[var(--color-accent)]"
-
-                if (isChecked) {
-                  if (isCorrectOpt) {
-                    cardStyle = "border-green-500 bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 font-extrabold shadow-md shadow-green-500/10"
-                  } else if (isSelected && !isCorrect) {
-                    cardStyle = "border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-extrabold"
-                  }
-                } else if (isSelected) {
-                  cardStyle = "border-[var(--color-accent)] bg-[var(--color-accent-light)] text-[var(--color-accent)] font-extrabold shadow-md"
-                }
-
-                return (
-                  <button 
-                    key={opt}
-                    onClick={() => handleSelect(opt)}
-                    disabled={isChecked}
-                    className={`rounded-2xl p-4 border-2 transition-all active:scale-95 flex items-center justify-between min-h-[68px] cursor-pointer shadow-xs ${cardStyle}`}
-                  >
-                    <span className="text-xs font-black opacity-50">{String.fromCharCode(65 + idx)}</span>
-                    <span className="jp text-2xl font-black">{opt}</span>
-                    <span className="w-4 text-right text-xs">
-                      {isChecked && isCorrectOpt ? '✨' : isChecked && isSelected && !isCorrect ? '❌' : ''}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Fixed Bottom Feedback Sheet */}
-            {isChecked && (
-              <div className="fixed bottom-0 left-0 right-0 z-[160] anim-up shadow-[0_-8px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl border-t bg-white dark:bg-[#1a1d24] border-[var(--color-border)] rounded-t-[32px]">
-                <div className="max-w-sm md:max-w-2xl mx-auto px-5 pt-5 pb-[calc(1.75rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-3.5">
-                  <div className={`p-4 rounded-2xl border ${
-                    isCorrect 
-                      ? 'bg-green-50 dark:bg-green-950/40 border-green-200 dark:border-green-800/40 text-green-700 dark:text-green-300' 
-                      : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/40 text-rose-700 dark:text-rose-300'
-                  }`}>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-xl">{isCorrect ? '✨' : '❌'}</span>
-                      <h4 className={`text-xs font-black uppercase ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                        {isCorrect ? 'Jawaban Benar! 正解！' : 'Jawaban Kurang Tepat'}
-                      </h4>
-                    </div>
-                    <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed">
-                      💡 {currentQuestion.explanation}
-                    </p>
-                  </div>
-
-                  <button 
-                    onClick={handleNext}
-                    className="w-full rounded-2xl py-3.5 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)] cursor-pointer"
-                  >
-                    {currentIndex + 1 >= questions.length ? 'Selesaikan Latihan 🎉' : 'Lanjut →'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Exit Confirmation Modal ── */}
-        {showExitConfirm && (
-          <div className="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade">
-            <div className="bg-white dark:bg-[#1a1d24] border border-[var(--color-border)] rounded-3xl p-6 max-w-xs w-full shadow-2xl text-center anim-pop">
-              <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center text-2xl mx-auto mb-3">
-                ⚠️
-              </div>
-              <h3 className="text-base font-black text-[var(--color-text-1)] mb-1">
-                Keluar dari Latihan Partikel?
-              </h3>
-              <p className="text-xs font-semibold text-[var(--color-text-3)] mb-6">
-                Kemajuan sesi kuis ini belum selesai. Apakah Anda yakin ingin keluar?
-              </p>
-              <div className="flex flex-col gap-2.5">
-                <button
-                  onClick={() => { playTap(); setShowExitConfirm(false) }}
-                  className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-accent)] text-white active:scale-95 transition-all shadow-sm cursor-pointer"
-                >
-                  Lanjutkan Kuis ➔
-                </button>
-                <button
-                  onClick={() => {
-                    playTap()
-                    router.push('/particles')
-                  }}
-                  className="w-full py-3 rounded-xl font-extrabold text-xs bg-[var(--color-subtle)] text-rose-600 dark:text-rose-400 active:scale-95 transition-all cursor-pointer"
-                >
-                  Ya, Keluar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
+ return combined.sort(() => Math.random() - 0.5)
 }
 
 export default function ParticlesQuizPage() {
-  return (
-    <Suspense fallback={<div className="min-h-dvh flex items-center justify-center bg-[var(--color-bg)]"><p className="text-sm font-bold text-[var(--color-text-2)]">Memuat halaman kuis...</p></div>}>
-      <ParticlesQuizContent />
-    </Suspense>
-  )
+ return (
+ <Suspense fallback={<div className="min-h-dvh flex items-center justify-center bg-[var(--color-bg)]"><p className="text-sm font-bold text-[var(--color-text-2)]">Memuat halaman kuis...</p></div>}>
+ <ParticlesQuizContent />
+ </Suspense>
+ )
+}
+
+function ParticlesQuizContent() {
+ const router = useRouter()
+ const searchParams = useSearchParams()
+ const pParam = searchParams.get('p')
+
+ const [selectedParticle, setSelectedParticle] = useState<string | null>(null)
+ const [questions, setQuestions] = useState<ParticleQuestion[]>([])
+ const [showFurigana, setShowFurigana] = useState(true)
+
+ useEffect(() => {
+ setShowFurigana(getShowFurigana())
+ }, [])
+
+ useEffect(() => {
+ if (pParam) {
+ setQuestions(generateQuestions(pParam))
+ setSelectedParticle(pParam)
+ } else {
+ setSelectedParticle(null)
+ }
+ }, [pParam])
+
+ const engine = useQuizEngine<ParticleQuestion>({
+ queue: questions,
+ srsEnabled: true,
+ getSrsId: q => `particle_${q.id}`,
+ checkAnswer: (q, choice) => choice === q.correct,
+ })
+
+ // Auto-speak via hook terpusat
+ useQuizAudio(engine.phase, engine.currentItem, (item) => item.sentence.replace('___', item.correct), questions, engine.current)
+
+ const startQuizWithParticle = (part: string) => {
+ playTap()
+ router.push(`/particles?p=${part}`)
+ }
+
+ // ── 1. Selection Screen (if no ?p=) ──
+ if (selectedParticle === null) {
+ const particleCounts = {
+ all: PARTICLE_QUESTIONS.length,
+ 'は': PARTICLE_QUESTIONS.filter(q => q.correct.includes('は')).length,
+ 'が': PARTICLE_QUESTIONS.filter(q => q.correct.includes('が')).length,
+ 'を': PARTICLE_QUESTIONS.filter(q => q.correct.includes('を')).length,
+ 'に': PARTICLE_QUESTIONS.filter(q => q.correct.includes('に')).length,
+ 'で': PARTICLE_QUESTIONS.filter(q => q.correct.includes('で')).length,
+ 'の': PARTICLE_QUESTIONS.filter(q => q.correct.includes('の')).length,
+ 'lainnya': PARTICLE_QUESTIONS.filter(q => {
+ const p = q.correct
+ return p.includes('へ') || p.includes('と') || p.includes('も') || p.includes('から') || p.includes('まで')
+ }).length
+ }
+
+ return (
+ <div className="min-h-dvh flex flex-col justify-between bg-[var(--color-bg)]">
+ <div className="max-w-sm md:max-w-2xl mx-auto w-full px-4 pt-12 pb-24 flex-1 flex flex-col">
+ <header className="flex items-center gap-4 mb-8 anim-up">
+ <button
+ onClick={() => router.push('/')}
+ className="w-9 h-9 rounded-xl flex items-center justify-center font-bold bg-[var(--color-surface)] text-[var(--color-text-2)] border border-[var(--color-border)] active:scale-95 transition-transform shrink-0 cursor-pointer"
+ >
+ ←
+ </button>
+ <div>
+ <h1 className="text-lg font-black text-[var(--color-text-1)] leading-tight">Latihan Partikel</h1>
+ <p className="text-xs font-semibold text-[var(--color-text-2)]">Pilih fokus partikel yang ingin kamu latih</p>
+ </div>
+ </header>
+
+ <div className="space-y-4 my-auto">
+ <button
+ onClick={() => startQuizWithParticle('all')}
+ className="w-full text-left bg-[var(--color-accent)] text-white rounded-[24px] p-5 shadow-elevated border-none active:scale-[0.98] transition-transform cursor-pointer"
+ >
+ <div className="flex items-center justify-between">
+ <div>
+ <h3 className="text-base font-black">⚡ Campur Semua</h3>
+ <p className="text-[10px] opacity-85 font-bold mt-1">Latihan gabungan dari seluruh partikel ({particleCounts.all} soal)</p>
+ </div>
+ <span className="text-2xl">🎯</span>
+ </div>
+ </button>
+
+ <div className="grid grid-cols-2 gap-3">
+ {[
+ { key: 'は', title: 'Topik (は)', desc: 'Penunjuk Topik utama', icon: 'は', bg: 'bg-[var(--color-indigo-light)] text-[var(--color-indigo)] border-[var(--color-border)]' },
+ { key: 'が', title: 'Subjek (が)', desc: 'Penunjuk Pelaku/Eksistensi', icon: 'が', bg: 'bg-[var(--color-indigo-light)] text-[var(--color-indigo)] border-[var(--color-border)]' },
+ { key: 'を', title: 'Objek (を)', desc: 'Penunjuk Target tindakan', icon: 'を', bg: 'bg-[var(--color-red-light)] text-[var(--color-red)] border-[var(--color-border)]' },
+ { key: 'に', title: 'Koordinat (に)', desc: 'Waktu spesifik / Tempat diam', icon: 'に', bg: 'bg-[var(--color-amber-light)] text-[var(--color-amber)] border-[var(--color-border)]' },
+ { key: 'で', title: 'Aktivitas (で)', desc: 'Latar aksi / Alat bantu', icon: 'で', bg: 'bg-[var(--color-green-light)] text-[var(--color-green)] border-[var(--color-border)]' },
+ { key: 'の', title: 'Kepunyaan (の)', desc: 'Lem perekat Kata Benda', icon: 'の', bg: 'bg-[var(--color-purple-light)] text-[var(--color-purple)] border-[var(--color-border)]' }
+ ].map(p => (
+ <button
+ key={p.key}
+ onClick={() => startQuizWithParticle(p.key)}
+ className="rounded-[24px] p-4 text-left border flex flex-col justify-between h-32 active:scale-95 transition-transform cursor-pointer bg-[var(--color-surface)] border-[var(--color-border)] shadow-card"
+ >
+ <div className="flex items-center justify-between w-full">
+ <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black jp text-base ${p.bg}`}>
+ {p.icon}
+ </span>
+ <span className="badge bg-[var(--color-bg)] text-[var(--color-text-2)] border border-[var(--color-border)]">
+ {(particleCounts as any)[p.key]} soal
+ </span>
+ </div>
+ <div>
+ <h4 className="text-xs font-black text-[var(--color-text-1)] mt-2">{p.title}</h4>
+ <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-tight">{p.desc}</p>
+ </div>
+ </button>
+ ))}
+
+ <button
+ onClick={() => startQuizWithParticle('lainnya')}
+ className="col-span-2 rounded-[24px] p-4 text-left border flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer bg-[var(--color-surface)] border-[var(--color-border)] shadow-card"
+ >
+ <div className="flex items-center gap-3.5">
+ <span className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg bg-[var(--color-bg)] text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0">
+ 🔗
+ </span>
+ <div>
+ <h4 className="text-xs font-black text-[var(--color-text-1)]">Partikel Lainnya (へ, と, も, から, まで)</h4>
+ <p className="text-[9px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-tight">Menyatakan arah, penyerta, kesamaan, awal/akhir</p>
+ </div>
+ </div>
+ <span className="badge bg-[var(--color-bg)] text-[var(--color-text-2)] border border-[var(--color-border)] shrink-0">
+ {particleCounts.lainnya} soal
+ </span>
+ </button>
+ </div>
+ </div>
+ </div>
+ <BottomNav />
+ </div>
+ )
+ }
+
+ // ── 2. Result Screen ──
+ if (questions.length === 0 || engine.phase === 'result') {
+ return (
+ <ResultScreen
+ correct={engine.sessionCorrect}
+ total={engine.sessionAnswered}
+ emoji="🏆"
+ title="Latihan Partikel Selesai!"
+ subtitle="Hebat! Progres partikel telah disimpan ke SRS."
+ onRetry={() => {
+ setQuestions(generateQuestions(selectedParticle))
+ engine.reset()
+ }}
+ onHome={() => router.push('/particles')}
+ homeLabel="Pilih Partikel Lain"
+ />
+ )
+ }
+
+ // ── 3. Active Quiz Question ──
+ const q = engine.currentItem
+ if (!q) return null
+
+ return (
+ <div className="flex flex-col min-h-dvh max-w-sm md:max-w-2xl mx-auto bg-[var(--color-bg)]">
+ <QuizHeader
+ progress={engine.progress}
+ lives={engine.lives}
+ livesEnabled={engine.livesEnabled}
+ onClose={() => engine.setShowExitConfirm(true)}
+ badges={<span className="badge bg-[var(--color-amber-light)] text-[var(--color-amber)]">Partikel</span>}
+ />
+
+ <div className="flex-1 px-4 flex flex-col justify-between">
+ <div>
+ {/* Top Info Bar */}
+ <div className="flex justify-between items-center mb-3">
+ <button
+ onClick={() => {
+ const newVal = !showFurigana
+ setShowFurigana(newVal)
+ saveShowFurigana(newVal)
+ playTap()
+ }}
+ className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border transition-all cursor-pointer ${
+ showFurigana ? 'bg-[var(--color-accent-light)] text-[var(--color-accent)] border-[var(--color-accent)]' : 'bg-[var(--color-surface)] text-[var(--color-text-3)] border-[var(--color-border)]'
+ }`}
+ >
+ <span>あ</span>
+ <span>Furigana: {showFurigana ? 'ON' : 'OFF'}</span>
+ </button>
+
+ <button
+ onClick={() => { playTap(); router.push('/particles/guide') }}
+ className="text-[10px] font-extrabold text-[var(--color-accent)] hover:underline flex items-center gap-1 cursor-pointer bg-[var(--color-accent-light)] px-2.5 py-1 rounded-full border-none"
+ >
+ 📖 Lihat Panduan
+ </button>
+ </div>
+
+ {/* Question Card */}
+ <div className="bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-[var(--radius-xl)] p-6 shadow-card mb-6 text-center relative overflow-hidden">
+ <div className="flex items-center justify-between mb-3">
+ <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)]">
+ PILIH PARTIKEL YANG TEPAT ({selectedParticle === 'all' ? 'CAMPUR' : `FOKUS ${selectedParticle.toUpperCase()}`})
+ </span>
+ <button
+ onClick={() => speakJapanese(q.sentence.replace('___', q.correct))}
+ className="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-text-2)] cursor-pointer"
+ title="Pelafalan"
+ >
+ <IconVolume size={14} />
+ </button>
+ </div>
+
+ <h2 className="text-2xl font-black jp tracking-wide leading-relaxed text-[var(--color-text-1)] mb-4 select-text">
+ {showFurigana ? (
+ <span dangerouslySetInnerHTML={{
+ __html: addFuriganaToSentence(
+ engine.selected ? q.sentence.replace('___', ` 【 ${q.correct} 】 `) : q.sentence
+ )
+ }} />
+ ) : (
+ engine.selected ? q.sentence.replace('___', ` 【 ${q.correct} 】 `) : q.sentence
+ )}
+ </h2>
+ <div className="h-[1px] w-full bg-[var(--color-border-light)] my-4" />
+ <p className="text-xs font-bold text-[var(--color-text-2)] leading-relaxed">
+ Arti: {q.translation}
+ </p>
+
+ {/* Vocab Reference Breakdown */}
+ {(() => {
+ const refs = extractVocabRefFromSentence(q.sentence)
+ if (refs.length === 0) return null
+ return (
+ <div className="mt-4 pt-3 border-t border-[var(--color-border-light)] text-left">
+ <p className="text-[10px] font-black uppercase tracking-wider text-[var(--color-accent)] mb-2 flex items-center gap-1">
+ <IconLightbulb size={12} /> Kosakata Minna no Nihongo:
+ </p>
+ <div className="flex flex-wrap gap-1.5">
+ {refs.map((v, i) => (
+ <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[var(--color-bg)] text-[10px] font-bold text-[var(--color-text-1)] border border-[var(--color-border-light)]">
+ <span className="jp font-black text-xs">{v.kanji}</span>
+ <span className="text-[var(--color-text-3)] text-[9px]">({v.hiragana})</span>
+ <span className="text-[var(--color-text-2)]">{v.arti}</span>
+ </span>
+ ))}
+ </div>
+ </div>
+ )
+ })()}
+ </div>
+
+ {/* Option Grid */}
+ <div className="grid grid-cols-2 gap-3.5 mb-6">
+ {q.options.map((opt, idx) => {
+ const isSel = engine.selected === opt
+ const isCorrectOpt = opt === q.correct
+
+ let style = "bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-1)] hover:border-[var(--color-accent)]"
+
+ if (engine.selected) {
+ if (isCorrectOpt) {
+ style = "border-[var(--color-green)] bg-[var(--color-green-light)] text-[var(--color-green-dark)] font-extrabold"
+ } else if (isSel && !engine.isCorrect) {
+ style = "border-[var(--color-red)] bg-[var(--color-red-light)] text-[var(--color-red-dark)] font-extrabold"
+ }
+ }
+
+ return (
+ <button
+ key={opt}
+ onClick={() => engine.answer(opt)}
+ disabled={!!engine.selected}
+ className={`rounded-[var(--radius-md)] p-4 border-2 transition-all active:scale-95 flex items-center justify-between min-h-[64px] cursor-pointer shadow-card ${style}`}
+ >
+ <span className="text-xs font-black opacity-50">{String.fromCharCode(65 + idx)}</span>
+ <span className="jp text-2xl font-black">{opt}</span>
+ <span className="w-4 text-right text-xs">
+ {engine.selected && isCorrectOpt ? '✓' : engine.selected && isSel && !engine.isCorrect ? '✕' : ''}
+ </span>
+ </button>
+ )
+ })}
+ </div>
+ </div>
+ </div>
+
+ {/* Feedback Sheet */}
+ {engine.selected && engine.isCorrect !== null && (
+ <FeedbackSheet
+ isCorrect={engine.isCorrect}
+ statusText={engine.isCorrect ? '✨ Jawaban Benar! 正解！' : '❌ Jawaban Kurang Tepat'}
+ detail={<span>💡 {q.explanation}</span>}
+ onNext={engine.next}
+ />
+ )}
+
+ {/* Exit Modal */}
+ <ExitConfirmModal
+ open={engine.showExitConfirm}
+ onCancel={() => engine.setShowExitConfirm(false)}
+ onExit={() => router.push('/particles')}
+ />
+ </div>
+ )
 }

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kotoba Quiz — Mockup: Washi & Torii Redesign</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Noto+Serif+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ────────────────────────────────────────────
+   DESIGN TOKENS — Washi & Torii
+   ──────────────────────────────────────────── */
+:root {
+  --bg: #f5f0e8;
+  --surface: #fffdf8;
+  --surface-hover: #f9f5ed;
+  --text: #2c2620;
+  --text-secondary: #7a7267;
+  --text-muted: #b5ab9e;
+  --border: #e5ddd0;
+  --border-light: #ece6da;
+
+  --accent: #d64541;
+  --accent-hover: #c03a36;
+  --accent-light: #fbeaea;
+  --accent-glow: rgba(214,69,65,0.18);
+
+  --green: #2d8f5a;
+  --green-light: #e6f7ee;
+  --red: #d64541;
+  --red-light: #fbeaea;
+  --amber: #c77f1b;
+  --amber-light: #fef3dc;
+  --indigo: #4f46a5;
+  --indigo-light: #eceafe;
+  --purple: #7c3daa;
+  --purple-light: #f5ecfc;
+
+  --cat-noun: #4f46a5;
+  --cat-noun-bg: #eceafe;
+  --cat-verb: #2d8f5a;
+  --cat-verb-bg: #e6f7ee;
+  --cat-adj: #d64541;
+  --cat-adj-bg: #fbeaea;
+
+  --shadow-card: 0 1px 4px rgba(44,38,32,0.06);
+  --shadow-elevated: 0 6px 24px rgba(44,38,32,0.09);
+  --shadow-float: 0 12px 40px rgba(44,38,32,0.13);
+
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --font-sans: 'Noto Sans JP', -apple-system, sans-serif;
+  --font-serif: 'Noto Serif JP', serif;
+
+  --bottom-nav-h: 88px;
+}
+
+[data-theme="dark"] {
+  --bg: #141210;
+  --surface: #1e1b17;
+  --surface-hover: #28251f;
+  --text: #f0ebe3;
+  --text-secondary: #a09888;
+  --text-muted: #6b6258;
+  --border: #302b24;
+  --border-light: #26221c;
+
+  --accent-light: rgba(214,69,65,0.15);
+  --green-light: rgba(45,143,90,0.12);
+  --red-light: rgba(214,69,65,0.12);
+  --amber-light: rgba(199,127,27,0.12);
+  --indigo-light: rgba(79,70,165,0.12);
+  --purple-light: rgba(124,61,170,0.12);
+  --cat-noun-bg: rgba(79,70,165,0.12);
+  --cat-verb-bg: rgba(45,143,90,0.12);
+  --cat-adj-bg: rgba(214,69,65,0.12);
+
+  --shadow-card: 0 1px 4px rgba(0,0,0,0.25);
+  --shadow-elevated: 0 6px 24px rgba(0,0,0,0.35);
+  --shadow-float: 0 12px 40px rgba(0,0,0,0.45);
+}
+
+/* ────────────────────────────────────────────
+   LAYOUT
+   ──────────────────────────────────────────── */
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-sans);
+  background: #e8e2d8;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0;
+}
+[data-theme="dark"] body { background: #0c0a08; }
+
+.page-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(240,235,228,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+[data-theme="dark"] .page-header { background: rgba(20,18,16,0.92); }
+
+.page-header h1 { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+.page-header .pill { font-size: 11px; font-weight: 700; background: var(--accent); color: #fff; padding: 4px 12px; border-radius: 99px; }
+
+.toggle-bar { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: var(--surface); }
+.toggle-btn {
+  padding: 6px 16px; font-size: 11px; font-weight: 700; cursor: pointer;
+  border: none; background: transparent; color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.toggle-btn.active { background: var(--accent); color: #fff; }
+
+.gallery { display: flex; gap: 32px; padding: 40px 32px 60px; overflow-x: auto; align-items: flex-start; }
+.phone-frame {
+  flex-shrink: 0; width: 375px;
+  background: var(--bg);
+  border-radius: 40px;
+  border: 6px solid #1a1816;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  position: relative;
+}
+[data-theme="dark"] .phone-frame { border-color: #3a3632; }
+
+.phone-label {
+  text-align: center; padding: 14px 8px 6px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: #6b6258;
+}
+[data-theme="dark"] .phone-label { color: #a09888; }
+
+.screen { min-height: 780px; overflow-y: auto; padding-bottom: 96px; position: relative; }
+
+/* ── Shared atoms ── */
+.jp { font-family: var(--font-serif); }
+.jp-sans { font-family: var(--font-sans); }
+.text-accent { color: var(--accent); }
+.text-sec { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.bg-surface { background: var(--surface); }
+.bg-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.section-title { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+.btn-primary { background: var(--accent); color: #fff; border: none; border-radius: var(--radius-md); padding: 14px 24px; font-size: 14px; font-weight: 800; cursor: pointer; width: 100%; text-align: center; box-shadow: 0 4px 16px var(--accent-glow); transition: transform 0.15s; }
+.btn-primary:active { transform: scale(0.97); }
+.btn-ghost { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 14px 24px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 800; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 8px; }
+.divider { border: none; border-top: 1px solid var(--border-light); margin: 0; }
+
+/* SVG icon base */
+svg.icon { width: 18px; height: 18px; stroke-width: 1.8; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+svg.icon-sm { width: 14px; height: 14px; }
+
+/* Stat box */
+.stat-box { border-radius: var(--radius-md); padding: 12px 10px; text-align: center; }
+.stat-box .val { font-size: 20px; font-weight: 900; }
+.stat-box .lbl { font-size: 9px; font-weight: 800; letter-spacing: 0.06em; margin-top: 2px; color: var(--text-secondary); }
+
+/* Progress bar */
+.progress-bar { height: 6px; border-radius: 99px; background: var(--border-light); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+
+/* Bottom nav */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 40;
+  padding: 8px 12px 14px;
+  display: flex; align-items: center; justify-content: space-around;
+  background: var(--surface);
+  border-top: 1px solid var(--border-light);
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 8px; }
+.nav-item .icon { color: var(--text-muted); }
+.nav-item .label { font-size: 9px; font-weight: 700; color: var(--text-muted); }
+.nav-item.active .icon { color: var(--accent); }
+.nav-item.active .label { color: var(--accent); }
+.nav-center {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: -24px; box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+/* ────────────────────────────────────────────
+   SCREEN-SPECIFIC STYLES
+   ──────────────────────────────────────────── */
+.screen-p { padding: 16px 20px; }
+
+/* Home: greeting */
+.greeting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; }
+
+/* WOTD flip card */
+.wotd-card { border-radius: var(--radius-lg); border: 1px solid var(--border-light); background: var(--surface); box-shadow: var(--shadow-card); padding: 16px; min-height: 180px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.wotd-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 56px; background: linear-gradient(135deg, var(--accent-light), transparent 70%); pointer-events: none; }
+.wotd-kanji { font-size: 48px; font-weight: 900; text-align: center; line-height: 1.1; position: relative; }
+
+/* Grid icons */
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.grid-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 12px 6px; text-align: center; border-radius: var(--radius-md);
+  border: 1px solid var(--border-light); background: var(--surface);
+  transition: border-color 0.15s;
+}
+.grid-card:hover { border-color: var(--accent); }
+.grid-card .g-icon { font-size: 22px; margin-bottom: 4px; color: var(--accent); }
+.grid-card .g-label { font-size: 9px; font-weight: 800; color: var(--text); line-height: 1.2; }
+
+/* SRS status cards */
+.srs-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+
+/* Heatmap */
+.heatmap-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.hm-cell { width: 12px; height: 12px; border-radius: 3px; background: var(--border-light); }
+.hm-1 { background: #e8c9a5; }
+.hm-2 { background: #d4a574; }
+.hm-3 { background: var(--accent); }
+[data-theme="dark"] .hm-1 { background: #6b4a2e; }
+[data-theme="dark"] .hm-2 { background: #9b6840; }
+
+/* Quiz cards */
+.quiz-header-bar { display: flex; align-items: center; gap: 12px; padding: 12px 20px 8px; }
+.close-btn { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; flex-shrink: 0; }
+.hearts { display: flex; gap: 4px; }
+.hearts span { font-size: 16px; }
+.hearts .lost { opacity: 0.2; }
+
+.quiz-body { padding: 4px 20px; }
+.q-counter { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.q-category { font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 8px; }
+
+.q-card {
+  border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-card); padding: 28px 20px; text-align: center;
+  position: relative; overflow: hidden; margin-top: 12px; min-height: 160px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.q-card::before { content:''; position:absolute; top:0; left:0; right:0; height: 50px; background: linear-gradient(135deg, var(--accent-light), transparent 70%); pointer-events:none; }
+.q-kanji { font-size: 44px; font-weight: 900; line-height: 1.1; position: relative; }
+.q-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.q-level { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: var(--surface-hover); color: var(--text-secondary); margin-top: 12px; }
+.q-level .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.choice-btn {
+  border-radius: var(--radius-md); padding: 14px 12px; font-size: 13px; font-weight: 700;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--text);
+  text-align: left; cursor: pointer; transition: all 0.15s; line-height: 1.3;
+}
+.choice-btn:active { transform: scale(0.97); }
+.choice-correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+.choice-wrong { background: var(--red-light); border-color: var(--red); color: var(--red); }
+.choice-dim { opacity: 0.35; }
+
+/* Feedback sheet */
+.feedback-sheet {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 50;
+  border-radius: 28px 28px 0 0; padding: 20px 20px 28px;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.15);
+}
+.feedback-sheet.correct { background: var(--green-light); border-top: 2px solid var(--green); }
+.feedback-sheet.wrong { background: var(--red-light); border-top: 2px solid var(--red); }
+.fb-status { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+.fb-detail { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.fb-next {
+  width: 100%; border-radius: var(--radius-md); padding: 14px; font-size: 14px;
+  font-weight: 800; color: #fff; border: none; cursor: pointer; margin-top: 12px;
+}
+.fb-next.correct { background: var(--green); }
+.fb-next.wrong { background: var(--red); }
+
+/* Result screen */
+.result-emoji { font-size: 56px; text-align: center; margin-bottom: 8px; }
+.result-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 16px 0; }
+
+/* Kana chart */
+.kana-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; }
+.kana-cell {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 8px 4px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light); background: var(--surface); cursor: pointer;
+  transition: all 0.15s;
+}
+.kana-cell:hover { border-color: var(--accent); }
+.kana-cell .char { font-size: 22px; font-weight: 900; }
+.kana-cell .rom { font-size: 9px; font-weight: 700; color: var(--accent); text-transform: uppercase; }
+.kana-cell.mastered { border-color: var(--green); background: var(--green-light); }
+.kana-cell.playing { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+/* Tab pills */
+.tabs-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.tab-pill { flex: 1; padding: 10px; text-align: center; border-radius: var(--radius-md); font-size: 11px; font-weight: 800; border: 1px solid var(--border-light); background: var(--surface); color: var(--text-secondary); cursor: pointer; }
+.tab-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Practice list item */
+.practice-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  border-radius: var(--radius-md); border: 1px solid var(--border-light);
+  background: var(--surface); transition: border-color 0.15s;
+}
+.practice-item:hover { border-color: var(--accent); }
+.pi-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pi-arrow { color: var(--text-muted); font-weight: 700; }
+
+/* Progress bars */
+.progress-section { margin-bottom: 16px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+
+/* Settings */
+.settings-group { margin-bottom: 20px; }
+.settings-group-title { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+.settings-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border-light);
+}
+.settings-item:last-child { border-bottom: none; }
+.si-left { display: flex; align-items: center; gap: 10px; }
+.si-icon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.si-label { font-size: 13px; font-weight: 600; }
+.si-desc { font-size: 10px; color: var(--text-muted); }
+/* Toggle switch */
+.toggle-switch { width: 42px; height: 24px; border-radius: 99px; background: var(--border); position: relative; cursor: pointer; transition: background 0.2s; }
+.toggle-switch.on { background: var(--accent); }
+.toggle-switch::after { content:''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+.toggle-switch.on::after { transform: translateX(18px); }
+
+/* Bottom sheet */
+.sheet-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.35); z-index: 60; }
+.sheet {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 70;
+  background: var(--surface); border-radius: 24px 24px 0 0;
+  padding: 12px 20px 20px; box-shadow: var(--shadow-float);
+}
+.sheet-handle { width: 40px; height: 4px; border-radius: 99px; background: var(--border); margin: 0 auto 12px; }
+
+/* Exit confirm modal */
+.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 80; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.modal-box { background: var(--surface); border-radius: var(--radius-xl); padding: 28px 24px; width: 100%; max-width: 300px; text-align: center; box-shadow: var(--shadow-float); }
+.modal-icon { width: 48px; height: 48px; border-radius: 14px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
+.modal-title { font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+.modal-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 20px; }
+
+/* Streak bar */
+.streak-row { display: flex; gap: 4px; }
+.streak-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.streak-dot { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; }
+.streak-dot.active { background: linear-gradient(135deg, #d4a54a, var(--accent)); color: #fff; }
+.streak-dot.inactive { background: var(--surface); border: 1px solid var(--border-light); color: var(--text-muted); }
+.streak-dot.today { border: 2px dashed var(--accent); color: var(--accent); background: var(--surface); }
+.streak-day-label { font-size: 9px; font-weight: 700; color: var(--text-muted); }
+</style>
+</head>
+
+<body>
+<!-- ── HEADER ── -->
+<div class="page-header">
+  <div>
+    <h1>Mockup — Washi & Torii Redesign</h1>
+    <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Kotoba Quiz 2.0</span>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;">
+    <div class="toggle-bar">
+      <button class="toggle-btn active" onclick="setTheme('light')">☀️ Light</button>
+      <button class="toggle-btn" onclick="setTheme('dark')">🌙 Dark</button>
+    </div>
+    <span class="pill">10 LAYAR</span>
+  </div>
+</div>
+
+<!-- ── PHONE GALLERY ── -->
+<div class="gallery" id="gallery">
+
+<!-- ═══════════════════════════════════════
+     LAYAR 1 — BERANDA
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">1 · Beranda</div>
+  <div class="screen screen-p">
+    <!-- Greeting -->
+    <div class="greeting-row">
+      <div>
+        <p style="font-size:12px;font-weight:600;color:var(--text-secondary);">おかえり、Kautsar</p>
+        <h2 style="font-size:22px;font-weight:900;line-height:1.15;">Siap berlatih<br>hari ini?</h2>
+      </div>
+      <div class="avatar">K</div>
+    </div>
+
+    <!-- Streak Widget -->
+    <div class="bg-card" style="padding:16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#e8973a,var(--accent));display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;">&#x1F525;</div>
+        <div style="flex:1;">
+          <div style="font-size:15px;font-weight:900;display:flex;align-items:center;gap:6px;">14 Hari Beruntun <span class="badge" style="background:var(--green-light);color:var(--green);">Aktif Hari Ini</span></div>
+          <p style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Streak harianmu aman! Pertahankan ritme.</p>
+        </div>
+      </div>
+      <div class="streak-row" style="background:var(--bg);padding:10px;border-radius:var(--radius-md);border:1px solid var(--border-light);">
+        <div class="streak-day"><span class="streak-day-label">Sen</span><span class="streak-dot active">&#10003;</span></div>
+        <div class="streak-day"><span class="streak-day-label">Sel</span><span class="streak-dot active">&#10003;</span></div>
+        <div class="streak-day"><span class="streak-day-label">Rab</span><span class="streak-dot active">&#10003;</span></div>
+        <div class="streak-day"><span class="streak-day-label">Kam</span><span class="streak-dot active">&#10003;</span></div>
+        <div class="streak-day"><span class="streak-day-label">Jum</span><span class="streak-dot today">&bull;</span></div>
+        <div class="streak-day"><span class="streak-day-label">Sab</span><span class="streak-dot inactive">&#9675;</span></div>
+        <div class="streak-day"><span class="streak-day-label">Min</span><span class="streak-dot inactive">&#9675;</span></div>
+      </div>
+    </div>
+
+    <!-- Word of the Day -->
+    <div class="section-title" style="padding:0 2px;">Kata Hari Ini</div>
+    <div class="wotd-card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;position:relative;">
+        <span class="badge" style="background:var(--accent-light);color:var(--accent);">&#10024; WOTD</span>
+        <span class="badge" style="background:var(--bg);color:var(--text-secondary);">Ungkapan</span>
+      </div>
+      <div class="wotd-kanji jp" style="margin:16px 0 8px;">木漏れ日</div>
+      <p style="text-align:center;font-size:11px;color:var(--text-muted);">こもれび</p>
+      <button style="margin-top:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:10px 24px;font-size:12px;font-weight:800;cursor:pointer;width:100%;box-shadow:0 3px 12px var(--accent-glow);">Lihat Arti</button>
+    </div>
+
+    <!-- Quick Access -->
+    <div class="bg-card" style="padding:14px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span class="section-title" style="margin-bottom:0;">Modul Latihan</span>
+        <span style="font-size:10px;font-weight:700;color:var(--accent);">Semua &rarr;</span>
+      </div>
+      <div class="grid-4">
+        <div class="grid-card"><span class="g-icon">&#128214;</span><span class="g-label">Kuis<br>Per Bab</span></div>
+        <div class="grid-card"><span class="g-icon jp" style="color:var(--amber);font-weight:900;">助</span><span class="g-label">Partikel</span></div>
+        <div class="grid-card"><span class="g-icon jp" style="color:var(--green);font-weight:900;">文</span><span class="g-label">Susun<br>Kalimat</span></div>
+        <div class="grid-card"><span class="g-icon jp" style="color:var(--indigo);font-weight:900;">あ</span><span class="g-label">Kana</span></div>
+      </div>
+    </div>
+
+    <!-- SRS Status -->
+    <div class="bg-card" style="padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span class="section-title" style="margin-bottom:0;">Status Kosakata</span>
+        <span style="font-size:10px;font-weight:700;color:var(--accent);">Lihat semua &rarr;</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div class="progress-bar" style="flex:1;"><div class="progress-fill" style="width:68%;background:var(--accent);"></div></div>
+        <span style="font-size:11px;font-weight:800;color:var(--accent);">68%</span>
+      </div>
+      <div class="srs-grid">
+        <div class="stat-box" style="background:var(--amber-light);"><div class="val" style="color:var(--amber);">12</div><div class="lbl">Review</div></div>
+        <div class="stat-box" style="background:var(--accent-light);"><div class="val" style="color:var(--accent);">24</div><div class="lbl">Baru</div></div>
+        <div class="stat-box" style="background:var(--purple-light);"><div class="val" style="color:var(--purple);">8</div><div class="lbl">Proses</div></div>
+        <div class="stat-box" style="background:var(--green-light);"><div class="val" style="color:var(--green);">156</div><div class="lbl">Hafal</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span class="label">Beranda</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span class="label">Kosakata</span></div>
+    <div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="label">Pengaturan</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 2 — KOSAKATA
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">2 · Kosakata</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="close-btn" style="font-size:14px;font-weight:800;">&#8592;</div>
+      <div>
+        <h2 style="font-size:18px;font-weight:900;">Kosakata</h2>
+        <p style="font-size:11px;color:var(--text-secondary);">200 kata terelola</p>
+      </div>
+      <div style="flex:1;"></div>
+      <div class="close-btn" style="font-size:14px;font-weight:800;color:var(--accent);">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div style="position:relative;margin-bottom:12px;">
+      <svg class="icon" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);width:16px;height:16px;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input style="width:100%;padding:11px 12px 11px 36px;border-radius:var(--radius-md);border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;color:var(--text);font-family:inherit;" placeholder="Cari kosakata..." />
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="tabs-row">
+      <div class="tab-pill active">Semua</div>
+      <div class="tab-pill">Kata Benda</div>
+      <div class="tab-pill">Kata Kerja</div>
+      <div class="tab-pill">Kata Sifat</div>
+    </div>
+
+    <!-- Vocab items -->
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div class="practice-item" style="padding:12px 14px;">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <span class="jp" style="font-size:18px;font-weight:900;">食べる</span>
+            <span style="font-size:11px;color:var(--text-muted);">たべる</span>
+          </div>
+          <p style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Makan</p>
+        </div>
+        <div style="flex:1;"></div>
+        <span class="badge" style="background:var(--cat-verb-bg);color:var(--cat-verb);">Kata Kerja</span>
+        <div class="q-level" style="margin:0;"><div class="dot" style="background:var(--green);"></div> Lv.5</div>
+      </div>
+      <div class="practice-item" style="padding:12px 14px;">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <span class="jp" style="font-size:18px;font-weight:900;">読書</span>
+            <span style="font-size:11px;color:var(--text-muted);">どくしょ</span>
+          </div>
+          <p style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Membaca buku</p>
+        </div>
+        <div style="flex:1;"></div>
+        <span class="badge" style="background:var(--cat-noun-bg);color:var(--cat-noun);">Kata Benda</span>
+        <div class="q-level" style="margin:0;"><div class="dot" style="background:var(--accent);"></div> Lv.2</div>
+      </div>
+      <div class="practice-item" style="padding:12px 14px;">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <span class="jp" style="font-size:18px;font-weight:900;">美しい</span>
+            <span style="font-size:11px;color:var(--text-muted);">うつくしい</span>
+          </div>
+          <p style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Indah</p>
+        </div>
+        <div style="flex:1;"></div>
+        <span class="badge" style="background:var(--cat-adj-bg);color:var(--cat-adj);">Kata Sifat</span>
+        <div class="q-level" style="margin:0;"><div class="dot" style="background:var(--amber);"></div> Lv.3</div>
+      </div>
+      <div class="practice-item" style="padding:12px 14px;">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <span class="jp" style="font-size:18px;font-weight:900;">元気</span>
+            <span style="font-size:11px;color:var(--text-muted);">げんき</span>
+          </div>
+          <p style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Sehat / Bersemangat</p>
+        </div>
+        <div style="flex:1;"></div>
+        <span class="badge" style="background:var(--cat-adj-bg);color:var(--cat-adj);">Kata Sifat</span>
+        <div class="q-level" style="margin:0;"><div class="dot" style="background:var(--text-muted);"></div> Baru</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span class="label">Beranda</span></div>
+    <div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span class="label">Kosakata</span></div>
+    <div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="label">Pengaturan</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 3 — LATIHAN HUB
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">3 · Latihan</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="close-btn" style="font-size:14px;font-weight:800;">&#8592;</div>
+      <h2 style="font-size:18px;font-weight:900;">Pilih Latihan</h2>
+      <div style="flex:1;"></div>
+      <div class="close-btn" style="font-size:12px;font-weight:800;color:var(--text-muted);">&#10005;</div>
+    </div>
+
+    <div class="section-title">Latihan Utama</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+      <div class="practice-item">
+        <div class="pi-icon" style="background:var(--accent-light);color:var(--accent);">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </div>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:800;">Kosakata Harian (SRS)</div><div style="font-size:10px;color:var(--text-secondary);margin-top:1px;">12 kata siap direview</div></div>
+        <span style="color:var(--text-muted);font-weight:700;font-size:16px;">&#8250;</span>
+      </div>
+    </div>
+
+    <div class="section-title">Materi &amp; Tata Bahasa</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;">
+      <div class="practice-item" style="flex-direction:column;align-items:center;padding:14px 8px;gap:6px;">
+        <div class="pi-icon" style="background:var(--cat-noun-bg);color:var(--cat-noun);width:36px;height:36px;">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div style="text-align:center;"><div style="font-size:11px;font-weight:800;">Kuis<br>Per Bab</div></div>
+      </div>
+      <div class="practice-item" style="flex-direction:column;align-items:center;padding:14px 8px;gap:6px;">
+        <div class="pi-icon" style="background:var(--amber-light);color:var(--amber);width:36px;height:36px;">
+          <span class="jp" style="font-size:18px;font-weight:900;">助</span>
+        </div>
+        <div style="text-align:center;"><div style="font-size:11px;font-weight:800;">Kuis<br>Partikel</div></div>
+      </div>
+      <div class="practice-item" style="flex-direction:column;align-items:center;padding:14px 8px;gap:6px;">
+        <div class="pi-icon" style="background:var(--green-light);color:var(--green);width:36px;height:36px;">
+          <span class="jp" style="font-size:18px;font-weight:900;">文</span>
+        </div>
+        <div style="text-align:center;"><div style="font-size:11px;font-weight:800;">Susun<br>Kalimat</div></div>
+      </div>
+      <div class="practice-item" style="flex-direction:column;align-items:center;padding:14px 8px;gap:6px;">
+        <div class="pi-icon" style="background:var(--indigo-light);color:var(--indigo);width:36px;height:36px;">
+          <span class="jp" style="font-size:18px;font-weight:900;">あ</span>
+        </div>
+        <div style="text-align:center;"><div style="font-size:11px;font-weight:800;">Hiragana &amp;<br>Katakana</div></div>
+      </div>
+    </div>
+
+    <div class="section-title" style="border-top:1px solid var(--border-light);padding-top:12px;">Latihan Tambahan</div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div class="practice-item">
+        <div class="pi-icon" style="background:var(--amber-light);color:var(--amber);">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
+        </div>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:800;">Latihan Khusus</div><div style="font-size:10px;color:var(--text-secondary);margin-top:1px;">Angka, Waktu & Uang</div></div>
+        <span style="color:var(--text-muted);font-weight:700;font-size:16px;">&#8250;</span>
+      </div>
+      <div class="practice-item">
+        <div class="pi-icon" style="background:var(--red-light);color:var(--red);">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:800;">Tinjau Salah</div><div style="font-size:10px;color:var(--text-secondary);margin-top:1px;">8 kata salah siap diperbaiki</div></div>
+        <span style="color:var(--text-muted);font-weight:700;font-size:16px;">&#8250;</span>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span class="label">Beranda</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span class="label">Kosakata</span></div>
+    <div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div>
+    <div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="label">Pengaturan</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 4 — QUIZ VOCAB (SOAL)
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">4 · Quiz — Soal</div>
+  <div class="screen" style="position:relative;">
+    <div class="quiz-header-bar">
+      <div class="close-btn">
+        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <div style="flex:1;">
+        <div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:40%;background:var(--accent);"></div></div>
+      </div>
+    </div>
+
+    <div style="padding:4px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+      <div class="hearts"><span>&#10084;&#65039;</span><span>&#10084;&#65039;</span><span class="lost">&#10084;&#65039;</span></div>
+      <div style="display:flex;gap:6px;">
+        <span class="badge" style="background:var(--cat-verb-bg);color:var(--cat-verb);">Kata Kerja</span>
+        <span class="badge" style="background:var(--accent-light);color:var(--accent);">Bab 3</span>
+      </div>
+    </div>
+
+    <div class="quiz-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span class="q-counter">3 / 10</span>
+      </div>
+      <p style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">Artinya apa?</p>
+
+      <div class="q-card">
+        <div class="q-kanji jp">読みます</div>
+        <div class="q-sub jp-sans" style="font-size:11px;color:var(--text-muted);">よみます</div>
+        <div class="q-level">
+          <div class="dot" style="background:var(--accent);"></div>
+          <span>Lv.2</span>
+        </div>
+      </div>
+
+      <div class="choices">
+        <button class="choice-btn">Membaca</button>
+        <button class="choice-btn choice-dim">Makan</button>
+        <button class="choice-btn choice-correct">Membaca</button>
+        <button class="choice-btn choice-dim">Minum</button>
+      </div>
+      <p style="font-size:10px;text-align:center;color:var(--text-muted);margin-top:10px;">Pilih jawaban yang benar</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 5 — QUIZ (FEEDBACK)
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">5 · Quiz — Feedback</div>
+  <div class="screen" style="position:relative;">
+    <div class="quiz-header-bar">
+      <div class="close-btn">
+        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <div style="flex:1;"><div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:40%;background:var(--accent);"></div></div></div>
+    </div>
+    <div style="padding:4px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+      <div class="hearts"><span>&#10084;&#65039;</span><span>&#10084;&#65039;</span><span class="lost">&#10084;&#65039;</span></div>
+      <span class="badge" style="background:var(--accent-light);color:var(--accent);">🔥 2x</span>
+    </div>
+    <div class="quiz-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span class="q-counter">3 / 10</span></div>
+      <p style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">Artinya apa?</p>
+      <div class="q-card">
+        <div class="q-kanji jp">読みます</div>
+        <div class="q-sub jp-sans" style="font-size:11px;color:var(--text-muted);">よみます</div>
+      </div>
+      <div class="choices" style="margin-bottom:120px;">
+        <button class="choice-btn choice-correct">Membaca</button>
+        <button class="choice-btn choice-dim">Makan</button>
+        <button class="choice-btn choice-dim">Minum</button>
+        <button class="choice-btn choice-dim">Tidur</button>
+      </div>
+    </div>
+    <!-- Feedback Sheet -->
+    <div class="feedback-sheet correct">
+      <div class="fb-status" style="color:var(--green);">
+        <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Bener! 🔥 2x Streak!
+      </div>
+      <div class="fb-detail">Naik level &rarr; review 3 hari lagi</div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(45,143,90,0.2);">
+        <div style="font-size:9px;font-weight:800;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">Contoh Kalimat</div>
+        <p style="font-size:12px;font-weight:700;line-height:1.5;">毎朝ニュースを<span style="color:var(--accent);font-weight:900;">読みます</span>。</p>
+        <p style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Setiap pagi saya membaca berita.</p>
+      </div>
+      <button class="fb-next correct">Lanjut &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 6 — QUIZ RESULT
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">6 · Quiz — Hasil</div>
+  <div class="screen screen-p" style="display:flex;flex-direction:column;padding-top:48px;">
+    <div class="result-emoji">&#127881;</div>
+    <h2 style="font-size:22px;font-weight:900;text-align:center;margin-bottom:4px;">すごい！ Luar Biasa!</h2>
+    <p style="font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:20px;">Pertahankan terus ya!</p>
+
+    <div class="result-grid">
+      <div class="stat-box" style="background:var(--green-light);">
+        <div class="val" style="color:var(--green);">8/10</div>
+        <div class="lbl">Benar</div>
+      </div>
+      <div class="stat-box" style="background:var(--amber-light);">
+        <div class="val" style="color:var(--amber);">+1</div>
+        <div class="lbl">Sesi</div>
+      </div>
+      <div class="stat-box" style="background:var(--accent-light);">
+        <div class="val" style="color:var(--accent);">80%</div>
+        <div class="lbl">Akurasi</div>
+      </div>
+    </div>
+
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-primary">Berlatih Lagi</button>
+      <button class="btn-ghost">Kembali ke Beranda</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 7 — KANA HUB
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">7 · Kana Hub</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div class="close-btn" style="font-size:14px;font-weight:800;">&#8592;</div>
+      <div><h2 style="font-size:18px;font-weight:900;">Hiragana &amp; Katakana</h2><p style="font-size:11px;color:var(--text-secondary);">208 Karakter & Suara</p></div>
+    </div>
+
+    <div class="tabs-row" style="background:var(--surface);padding:4px;border:1px solid var(--border-light);border-radius:var(--radius-md);">
+      <div class="tab-pill active" style="border:none;">Berlatih</div>
+      <div class="tab-pill" style="border:none;">Tabel &amp; Audio</div>
+    </div>
+
+    <div class="tabs-row" style="margin-bottom:14px;">
+      <div class="tab-pill active">Hiragana あ</div>
+      <div class="tab-pill">Katakana ア</div>
+      <div class="tab-pill">Gabungan</div>
+    </div>
+
+    <div class="srs-grid" style="margin-bottom:14px;">
+      <div class="stat-box" style="background:var(--green-light);"><div class="val" style="color:var(--green);">82</div><div class="lbl">Hafal</div></div>
+      <div class="stat-box" style="background:var(--purple-light);"><div class="val" style="color:var(--purple);">12</div><div class="lbl">Proses</div></div>
+      <div class="stat-box" style="background:var(--accent-light);"><div class="val" style="color:var(--accent);">10</div><div class="lbl">Baru</div></div>
+      <div class="stat-box" style="background:var(--amber-light);"><div class="val" style="color:var(--amber);">0</div><div class="lbl">Review</div></div>
+    </div>
+
+    <!-- Kana chart preview -->
+    <div class="bg-card" style="padding:14px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span class="section-title" style="margin-bottom:0;">Tabel Hiragana</span>
+        <span style="font-size:10px;font-weight:700;color:var(--accent);">Semua Baris &rarr;</span>
+      </div>
+      <div class="kana-grid">
+        <div class="kana-cell mastered"><span class="char jp">あ</span><span class="rom">a</span></div>
+        <div class="kana-cell mastered"><span class="char jp">い</span><span class="rom">i</span></div>
+        <div class="kana-cell mastered"><span class="char jp">う</span><span class="rom">u</span></div>
+        <div class="kana-cell mastered"><span class="char jp">え</span><span class="rom">e</span></div>
+        <div class="kana-cell mastered"><span class="char jp">お</span><span class="rom">o</span></div>
+        <div class="kana-cell"><span class="char jp">か</span><span class="rom">ka</span></div>
+        <div class="kana-cell"><span class="char jp">き</span><span class="rom">ki</span></div>
+        <div class="kana-cell"><span class="char jp">く</span><span class="rom">ku</span></div>
+        <div class="kana-cell"><span class="char jp">け</span><span class="rom">ke</span></div>
+        <div class="kana-cell"><span class="char jp">こ</span><span class="rom">ko</span></div>
+        <div class="kana-cell"><span class="char jp">さ</span><span class="rom">sa</span></div>
+        <div class="kana-cell"><span class="char jp">し</span><span class="rom">shi</span></div>
+        <div class="kana-cell"><span class="char jp">す</span><span class="rom">su</span></div>
+        <div class="kana-cell"><span class="char jp">せ</span><span class="rom">se</span></div>
+        <div class="kana-cell"><span class="char jp">そ</span><span class="rom">so</span></div>
+      </div>
+    </div>
+
+    <button class="btn-primary">Mulai Kuis Kana &rarr;</button>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span class="label">Beranda</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span class="label">Kosakata</span></div>
+    <div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="label">Pengaturan</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 8 — PROGRESS TERPADU
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">8 · Progress Terpadu</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="close-btn" style="font-size:14px;font-weight:800;">&#8592;</div>
+      <h2 style="font-size:18px;font-weight:900;">Progress</h2>
+    </div>
+
+    <!-- Tab -->
+    <div class="tabs-row" style="background:var(--surface);padding:4px;border:1px solid var(--border-light);border-radius:var(--radius-md);margin-bottom:16px;">
+      <div class="tab-pill active" style="border:none;">Kosakata</div>
+      <div class="tab-pill" style="border:none;">Kanji</div>
+      <div class="tab-pill" style="border:none;">Kana</div>
+      <div class="tab-pill" style="border:none;">Partikel</div>
+      <div class="tab-pill" style="border:none;">Kalimat</div>
+    </div>
+
+    <!-- Overall -->
+    <div class="bg-card" style="padding:16px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:14px;font-weight:900;">Status Kosakata</span>
+        <span style="font-size:20px;font-weight:900;color:var(--accent);">68%</span>
+      </div>
+      <div class="progress-bar" style="height:8px;margin-bottom:12px;"><div class="progress-fill" style="width:68%;background:var(--accent);"></div></div>
+      <div class="srs-grid">
+        <div class="stat-box" style="background:var(--green-light);"><div class="val" style="color:var(--green);">156</div><div class="lbl">Hafal</div></div>
+        <div class="stat-box" style="background:var(--purple-light);"><div class="val" style="color:var(--purple);">8</div><div class="lbl">Proses</div></div>
+        <div class="stat-box" style="background:var(--accent-light);"><div class="val" style="color:var(--accent);">24</div><div class="lbl">Baru</div></div>
+        <div class="stat-box" style="background:var(--amber-light);"><div class="val" style="color:var(--amber);">12</div><div class="lbl">Due</div></div>
+      </div>
+    </div>
+
+    <!-- Per-bab -->
+    <div class="bg-card" style="padding:14px;margin-bottom:12px;">
+      <span class="section-title">Progress Per Bab</span>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div><div class="progress-label"><span>Bab 1</span><span style="color:var(--green);">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--green);"></div></div></div>
+        <div><div class="progress-label"><span>Bab 2</span><span style="color:var(--accent);">85%</span></div><div class="progress-bar"><div class="progress-fill" style="width:85%;background:var(--accent);"></div></div></div>
+        <div><div class="progress-label"><span>Bab 3</span><span style="color:var(--accent);">62%</span></div><div class="progress-bar"><div class="progress-fill" style="width:62%;background:var(--accent);"></div></div></div>
+        <div><div class="progress-label"><span>Bab 4</span><span style="color:var(--amber);">30%</span></div><div class="progress-bar"><div class="progress-fill" style="width:30%;background:var(--amber);"></div></div></div>
+        <div><div class="progress-label"><span>Bab 5</span><span style="color:var(--text-muted);">0%</span></div><div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--text-muted);"></div></div></div>
+      </div>
+    </div>
+
+    <!-- Partikel & Kalimat overview -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="bg-card" style="padding:14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div class="pi-icon" style="background:var(--amber-light);color:var(--amber);width:32px;height:32px;">
+            <span class="jp" style="font-size:16px;font-weight:900;">助</span>
+          </div>
+          <span style="font-size:12px;font-weight:800;">Partikel</span>
+        </div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:45%;background:var(--amber);"></div></div>
+        <p style="font-size:10px;color:var(--text-secondary);">18/40 dikuasai</p>
+      </div>
+      <div class="bg-card" style="padding:14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div class="pi-icon" style="background:var(--green-light);color:var(--green);width:32px;height:32px;">
+            <span class="jp" style="font-size:16px;font-weight:900;">文</span>
+          </div>
+          <span style="font-size:12px;font-weight:800;">Kalimat</span>
+        </div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:30%;background:var(--green);"></div></div>
+        <p style="font-size:10px;color:var(--text-secondary);">8/26 dikuasai</p>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span class="label">Beranda</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span class="label">Kosakata</span></div>
+    <div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div>
+    <div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="label">Pengaturan</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 9 — PARTICLE QUIZ
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">9 · Partikel</div>
+  <div class="screen" style="position:relative;">
+    <div class="quiz-header-bar">
+      <div class="close-btn">
+        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <div style="flex:1;"><div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:60%;background:var(--amber);"></div></div></div>
+    </div>
+    <div style="padding:4px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+      <div class="hearts"><span>&#10084;&#65039;</span><span>&#10084;&#65039;</span><span>&#10084;&#65039;</span></div>
+      <span class="badge" style="background:var(--amber-light);color:var(--amber);">Partikel</span>
+    </div>
+    <div class="quiz-body">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span class="q-counter">6 / 10</span></div>
+      <p style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;">Pilih partikel yang tepat:</p>
+
+      <div class="q-card" style="min-height:100px;">
+        <p class="jp" style="font-size:20px;font-weight:900;line-height:1.5;">私 <span style="color:var(--accent);">&#9646;&#9646;</span> 学校 <span style="color:var(--accent);">&#9646;&#9646;</span> 行きます。</p>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Saya pergi ke sekolah.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;">
+        <button class="choice-btn" style="text-align:center;">は</button>
+        <button class="choice-btn" style="text-align:center;">が</button>
+        <button class="choice-btn" style="text-align:center;">を</button>
+        <button class="choice-btn choice-correct" style="text-align:center;">に</button>
+        <button class="choice-btn choice-dim" style="text-align:center;">で</button>
+        <button class="choice-btn choice-dim" style="text-align:center;">と</button>
+      </div>
+      <p style="font-size:10px;text-align:center;color:var(--text-muted);margin-top:12px;">Isi bagian yang kosong dengan partikel yang benar</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     LAYAR 10 — SENTENCE BUILDING
+     ═══════════════════════════════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">10 · Susun Kalimat</div>
+  <div class="screen" style="position:relative;">
+    <div class="quiz-header-bar">
+      <div class="close-btn">
+        <svg class="icon-sm" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <div style="flex:1;"><div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:30%;background:var(--green);"></div></div></div>
+    </div>
+    <div style="padding:4px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+      <div class="hearts"><span>&#10084;&#65039;</span><span>&#10084;&#65039;</span><span>&#10084;&#65039;</span></div>
+      <span class="badge" style="background:var(--green-light);color:var(--green);">Kalimat</span>
+    </div>
+    <div class="quiz-body">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span class="q-counter">3 / 10</span></div>
+      <p style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:12px;">Susun kalimat ini:</p>
+      <p style="font-size:14px;font-weight:800;margin-bottom:16px;">Saya pergi ke sekolah.</p>
+
+      <!-- Drop zone -->
+      <div style="min-height:52px;border:2px dashed var(--border);border-radius:var(--radius-md);padding:10px;display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+        <span style="padding:8px 14px;border-radius:var(--radius-sm);background:var(--accent-light);color:var(--accent);font-size:13px;font-weight:800;">私は</span>
+        <span style="padding:8px 14px;border-radius:var(--radius-sm);background:var(--accent-light);color:var(--accent);font-size:13px;font-weight:800;">学校に</span>
+      </div>
+
+      <!-- Word bank -->
+      <p style="font-size:10px;font-weight:800;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;">Ketuk untuk menambahkan</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <span style="padding:10px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:800;cursor:pointer;">行きます。</span>
+        <span style="padding:10px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:800;cursor:pointer;opacity:0.35;text-decoration:line-through;">学校に</span>
+        <span style="padding:10px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:800;cursor:pointer;opacity:0.35;text-decoration:line-through;">私は</span>
+      </div>
+
+      <p style="font-size:10px;color:var(--text-muted);margin-top:12px;text-align:center;">Susun blok kata menjadi kalimat yang benar</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /gallery -->
+
+<!-- ── THEME TOGGLE SCRIPT ── -->
+<script>
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.toggle-btn[onclick*="${t}"]`).classList.add('active');
+}
+</script>
+
+</body>
+</html>

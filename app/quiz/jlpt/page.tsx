@@ -4,10 +4,10 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function JLPTPage() {
-  const router = useRouter()
-  useEffect(() => {
-    router.replace('/practice')
-  }, [router])
+ const router = useRouter()
+ useEffect(() => {
+ router.replace('/practice')
+ }, [router])
 
-  return null
+ return null
 }

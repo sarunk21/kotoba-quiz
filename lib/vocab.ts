@@ -84,11 +84,7 @@ export function parseCSVToVocab(csvText: string, defaultSource: 'standard' | 'cu
 
     // Minimal requirement: Must have 'arti' and at least one Japanese form
     if (arti && (hiragana || kanji)) {
-      // Generate stable ID based on content (Exclude chapter to keep progress if word moves chapters)
-      const rawId = `${category}|${hiragana}|${kanji}|${arti}`
-      // Simple hash to avoid non-ascii issues in some IDs
-      const id = Array.from(rawId).reduce((h, c) => (h = (h << 5) - h + c.charCodeAt(0)) | 0, 0).toString(36) + 
-                 btoa(unescape(encodeURIComponent(rawId.substring(0, 10)))).substring(0, 8)
+      const id = generateVocabId(category, hiragana, kanji, arti)
 
       items.push({
         id,
@@ -104,6 +100,12 @@ export function parseCSVToVocab(csvText: string, defaultSource: 'standard' | 'cu
     }
   }
   return items
+}
+
+export function generateVocabId(category: string, hiragana: string, kanji: string, arti: string): string {
+  const rawId = `${category}|${hiragana}|${kanji}|${arti}`
+  return Array.from(rawId).reduce((h, c) => (h = (h << 5) - h + c.charCodeAt(0)) | 0, 0).toString(36) +
+         btoa(unescape(encodeURIComponent(rawId.substring(0, 10)))).substring(0, 8)
 }
 
 // ── Global Cache ──
@@ -175,7 +177,7 @@ export const FURIGANA_DICT: Record<string, string> = {
   '郵便局': 'ゆうびんきょく',
   '月曜日': 'げつようび',
   '金曜日': 'きんようび',
-  '日曜日': 'にchようび', // wait: にちようび
+  '日曜日': 'にちようび',
   '土曜日': 'どようび',
   'お父さん': 'おとうさん',
   'お母さん': 'おかあさん',
@@ -185,7 +187,7 @@ export const FURIGANA_DICT: Record<string, string> = {
   '自転車': 'じてんしゃ',
   '買い物': 'かいもの',
   '毎日': 'まいにち',
-  '毎週': 'まいshu', // wait: まいしゅう
+  '毎週': 'まいしゅう',
   '毎晩': 'まいばん',
   '毎朝': 'まいあさ',
   '来週': 'らいしゅう',
@@ -218,7 +220,7 @@ export const FURIGANA_DICT: Record<string, string> = {
   
   // Single Kanji Nouns / Common Words
   '部屋': 'へや',
-  '妹': 'いもうto', // wait: いもうと
+  '妹': 'いもうと',
   '兄': 'あに',
   '姉': 'あね',
   '弟': 'おとうと',
@@ -306,11 +308,6 @@ export const FURIGANA_DICT: Record<string, string> = {
   '引': 'ひ',
 }
 
-// Correct typo fixes in dict values
-FURIGANA_DICT['日曜日'] = 'にちようび'
-FURIGANA_DICT['毎週'] = 'まいしゅう'
-FURIGANA_DICT['妹'] = 'いもうと'
-
 // Pre-sorted keys for furigana dictionary
 let PRE_SORTED_FURIGANA_KEYS: string[] | null = null
 
@@ -323,13 +320,18 @@ function getSortedFuriganaKeys(): string[] {
 
 const furiganaCache = new Map<string, string>()
 
+function escapeHtmlBasic(s: string): string {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
+}
+
 export function addFuriganaToSentence(sentence: string): string {
   if (!sentence) return ''
   if (furiganaCache.has(sentence)) {
     return furiganaCache.get(sentence)!
   }
 
-  let html = sentence
+  // Escape HTML dulu untuk cegah XSS dari Sheets (bank data user-controlled)
+  let html = escapeHtmlBasic(sentence)
   const sortedKeys = getSortedFuriganaKeys()
   
   // Temporarily replace ___ and spaces around it to protect it from replacement

@@ -3,14 +3,16 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.kotobaquiz.app',
   appName: 'Kotoba Quiz',
+  // Next.js App Router output di .next (bukan public) — public hanya static.
+  // Saat server.url diisi, native load dari URL live (hybrid), webDir tidak dipakai tapi tetap wajib.
   webDir: 'public',
   server: {
-    // Ganti URL ini dengan URL website Anda yang sudah di-deploy di Vercel/hosting lain.
-    // Contoh: 'https://kotoba-quiz.vercel.app'
-    // Untuk development lokal di emulator Android, gunakan IP komputer lokal atau 'http://10.0.2.2:3000'
-    url: 'https://kotoba-quiz-gilt.vercel.app',
+    // URL live — ganti via env CAPACITOR_SERVER_URL jika deploy pindah.
+    // Untuk emulator lokal: 'http://10.0.2.2:3000'
+    url: process.env.CAPACITOR_SERVER_URL || 'https://kotoba-quiz-gilt.vercel.app',
     allowNavigation: [
       'kotoba-quiz-gilt.vercel.app',
+      '*.vercel.app',
       'accounts.google.com',
       '*.googleusercontent.com'
     ]

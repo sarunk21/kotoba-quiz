@@ -1,10 +1,10 @@
-const CACHE_NAME = 'kotoba-quiz-cache-v1';
+const CACHE_NAME = 'kotoba-quiz-cache-v2';
 
-// Static resources to cache on install (app skeleton)
+// Static resources to cache on install (app skeleton) — favicon di /icons/
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.json',
-  '/favicon.ico',
+  '/icons/favicon-32x32.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -15,12 +15,17 @@ self.addEventListener('install', (event) => {
   );
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting()
+});
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
+          // hapus cache lama kotoba-quiz-cache-* dan audio yang kebesaran
+          if (cache !== CACHE_NAME && cache.startsWith('kotoba-quiz-cache-')) {
             return caches.delete(cache);
           }
         })
@@ -42,7 +47,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stale-While-Revalidate Strategy
+  // Network-first untuk navigasi (HTML) agar tidak stale setelah deploy
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).then((res) => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate untuk asset lain dengan limit 50
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.match(event.request).then((cachedResponse) => {
@@ -50,11 +69,14 @@ self.addEventListener('fetch', (event) => {
           .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
               cache.put(event.request, networkResponse.clone());
+              // batasi 50 entries
+              cache.keys().then(keys => {
+                if (keys.length > 50) cache.delete(keys[0]);
+              });
             }
             return networkResponse;
           })
           .catch(() => {
-            // Return cached response as offline fallback
             return cachedResponse;
           });
 
@@ -67,6 +89,11 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
-    self.clients.openWindow('/')
+    self.clients.matchAll({ type: 'window' }).then(clients => {
+      for (const c of clients) {
+        if ('focus' in c) return c.focus();
+      }
+      return self.clients.openWindow('/');
+    })
   );
 });

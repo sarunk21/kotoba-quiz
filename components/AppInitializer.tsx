@@ -4,72 +4,72 @@ import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
 export default function AppInitializer() {
-  const router = useRouter()
-  const pathname = usePathname()
+ const router = useRouter()
+ const pathname = usePathname()
 
-  // Keep a mutable reference to the latest pathname
-  const pathnameRef = useRef(pathname)
-  pathnameRef.current = pathname
+ // Keep a mutable reference to the latest pathname
+ const pathnameRef = useRef(pathname)
+ pathnameRef.current = pathname
 
-  useEffect(() => {
-    let active = true
+ useEffect(() => {
+ let active = true
 
-    async function initCapacitor() {
-      try {
-        const { Capacitor } = await import('@capacitor/core')
-        if (!Capacitor.isNativePlatform()) return
+ async function initCapacitor() {
+ try {
+ const { Capacitor } = await import('@capacitor/core')
+ if (!Capacitor.isNativePlatform()) return
 
-        const { App } = await import('@capacitor/app')
+ const { App } = await import('@capacitor/app')
 
-        // Clean up listeners for App before registering our single stable listener
-        await App.removeAllListeners()
+ // Clean up listeners for App before registering our single stable listener
+ await App.removeAllListeners()
 
-        await App.addListener('backButton', () => {
-          if (!active) return
+ await App.addListener('backButton', () => {
+ if (!active) return
 
-          const currentPath = pathnameRef.current
-          if (currentPath === '/') {
-            if (window.history.state?.modal === 'practice') {
-              window.history.back()
-            } else {
-              App.exitApp()
-            }
-          } else {
-            // For other subpages, navigate back in the browser history stack
-            window.history.back()
-          }
-        })
+ const currentPath = pathnameRef.current
+ if (currentPath === '/') {
+ if (window.history.state?.modal === 'practice') {
+ window.history.back()
+ } else {
+ App.exitApp()
+ }
+ } else {
+ // For other subpages, navigate back in the browser history stack
+ window.history.back()
+ }
+ })
 
-        // Reschedule daily reminder on start
-        import('@/lib/notifications').then(({ rescheduleDailyReminderIfNeeded }) => {
-          rescheduleDailyReminderIfNeeded()
-        }).catch(err => {
-          console.error('Failed to load notifications module in AppInitializer start:', err)
-        })
+ // Reschedule daily reminder on start
+ import('@/lib/notifications').then(({ rescheduleDailyReminderIfNeeded }) => {
+ rescheduleDailyReminderIfNeeded()
+ }).catch(err => {
+ console.error('Failed to load notifications module in AppInitializer start:', err)
+ })
 
-        // Listen for app coming to foreground (resume) to update reminder
-        await App.addListener('appStateChange', ({ isActive }) => {
-          if (!active) return
-          if (isActive) {
-            import('@/lib/notifications').then(({ rescheduleDailyReminderIfNeeded }) => {
-              rescheduleDailyReminderIfNeeded()
-            }).catch(err => {
-              console.error('Failed to load notifications module in AppInitializer appStateChange:', err)
-            })
-          }
-        })
-      } catch (e) {
-        console.error('[Capacitor App Listener Error]', e)
-      }
-    }
+ // Listen for app coming to foreground (resume) to update reminder
+ await App.addListener('appStateChange', ({ isActive }) => {
+ if (!active) return
+ if (isActive) {
+ import('@/lib/notifications').then(({ rescheduleDailyReminderIfNeeded }) => {
+ rescheduleDailyReminderIfNeeded()
+ }).catch(err => {
+ console.error('Failed to load notifications module in AppInitializer appStateChange:', err)
+ })
+ }
+ })
+ } catch (e) {
+ console.error('[Capacitor App Listener Error]', e)
+ }
+ }
 
-    initCapacitor()
+ initCapacitor()
 
-    return () => {
-      active = false
-    }
-  }, []) // Empty dependency array: runs only once on mount!
+ return () => {
+ active = false
+ }
+ }, []) // Empty dependency array: runs only once on mount!
 
-  return null
+ return null
 }
 

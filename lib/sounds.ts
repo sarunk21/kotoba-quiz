@@ -1,5 +1,7 @@
 'use client'
 
+import { getCachedAudioBlob, fetchAndCacheAudio, preloadAudio, stopAllAudioFetch } from './audioCache'
+
 let ctx: AudioContext | null = null
 let currentAudio: HTMLAudioElement | null = null
 
@@ -10,6 +12,7 @@ function stopCurrentAudio() {
     } catch (e) {}
     currentAudio = null
   }
+  stopAllAudioFetch()
   if (typeof window !== 'undefined' && window.speechSynthesis) {
     window.speechSynthesis.cancel()
   }
@@ -151,37 +154,21 @@ export function playLoseHeart() {
 /** Pre-fetch and cache Japanese audio in the background for zero-latency instant playback */
 export function preloadJapaneseAudio(text: string) {
   if (typeof window === 'undefined' || !text || !navigator.onLine) return
-  const localProxyUrl = `/api/audio?text=${encodeURIComponent(text)}`
-  
-  ;(async () => {
-    try {
-      if ('caches' in window) {
-        const cache = await caches.open('kotoba-audio-cache')
-        const match = await cache.match(localProxyUrl)
-        if (match) return // already cached
-        
-        const res = await fetch(localProxyUrl)
-        if (res.ok) {
-          await cache.put(localProxyUrl, res)
-        }
-      }
-    } catch (e) {
-      // silent background prefetch error handling
-    }
-  })()
+  // pakai audioCache terpusat dengan LRU & timeout
+  preloadAudio(text)
 }
 
-/** Speak Japanese text using Web Speech API with caching */
+/** Speak Japanese text using Web Speech API with caching — work untuk semua bank data */
 export function speakJapanese(text: string, slow = false) {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined' || !text) return
+  const trimmed = text.trim().slice(0, 200) // batasi 200 chars sesuai API
+  if (!trimmed) return
 
   // Stop any currently playing audio or speech synthesis
   stopCurrentAudio()
 
   // Run async code in IIFE to keep the outer signature synchronous
   ;(async () => {
-    const localProxyUrl = `/api/audio?text=${encodeURIComponent(text)}`
-    
     // Helper to setup and play HTMLAudioElement
     const playAudioElement = async (blob: Blob) => {
       const blobUrl = URL.createObjectURL(blob)
@@ -200,40 +187,26 @@ export function speakJapanese(text: string, slow = false) {
           currentAudio = null
         }
       }
-      await audio.play()
+      try { await audio.play() } catch { URL.revokeObjectURL(blobUrl); currentAudio = null }
     }
     
-    // 1. Try to find audio in Cache Storage
+    // 1. Try cache dulu (audioCache terpusat)
     try {
-      if ('caches' in window) {
-        const cache = await caches.open('kotoba-audio-cache')
-        const cachedResponse = await cache.match(localProxyUrl)
-        if (cachedResponse) {
-          const blob = await cachedResponse.blob()
-          await playAudioElement(blob)
-          return
-        }
+      const cached = await getCachedAudioBlob(trimmed)
+      if (cached) {
+        await playAudioElement(cached)
+        return
       }
     } catch (e) {
       console.warn('[Audio Cache] Failed to load from cache:', e)
     }
 
-    // 2. Fetch via proxy and save to cache if online
+    // 2. Fetch via proxy dan cache jika online
     if (navigator.onLine) {
       try {
-        const res = await fetch(localProxyUrl)
-        if (res.ok) {
-          const resClone = res.clone()
-          
-          // Play audio first
-          const blob = await res.blob()
+        const blob = await fetchAndCacheAudio(trimmed)
+        if (blob) {
           await playAudioElement(blob)
-
-          // Store in cache asynchronously
-          if ('caches' in window) {
-            const cache = await caches.open('kotoba-audio-cache')
-            await cache.put(localProxyUrl, resClone)
-          }
           return
         }
       } catch (e) {
@@ -241,8 +214,8 @@ export function speakJapanese(text: string, slow = false) {
       }
     }
 
-    // 3. Fallback if offline & uncached, or if fetch failed
-    speakLocal(text, slow)
+    // 3. Fallback speechSynthesis lokal (offline)
+    speakLocal(trimmed, slow)
   })()
 }
 
