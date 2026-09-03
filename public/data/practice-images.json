@@ -1,0 +1,1122 @@
+[
+  {
+    "slotKey": "h0-g1",
+    "halaman": "0",
+    "gambar": "1",
+    "babList": "Bab 1",
+    "count": 1,
+    "sampleTitle": "3.1)　Gambar 1. はじめまして。（　　）です。ブラジルエアーの しゃいん です。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 1, 3.1)　 はじめまして。（　　）です。ブラジルエアーの しゃいん です。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h0-g1.png"
+  },
+  {
+    "slotKey": "h0-g2",
+    "halaman": "0",
+    "gambar": "2",
+    "babList": "Bab 1",
+    "count": 1,
+    "sampleTitle": "3.2)　Gambar 2. はじめまして。シュミット です。（　　） の しゃいん です。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 1, 3.2)　 はじめまして。シュミット です。（　　） の しゃいん です。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h0-g2.png"
+  },
+  {
+    "slotKey": "h102-g1",
+    "halaman": "102",
+    "gambar": "1",
+    "babList": "Bab 12",
+    "count": 1,
+    "sampleTitle": "スポーツで　なにが　いちばん　おもしろいですか。: Paling suka apa di antara olahraga",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 12, スポーツで　なにが　いちばん　おもしろいですか。: Paling suka apa di antara olahraga -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h102-g1.png"
+  },
+  {
+    "slotKey": "h102-g2",
+    "halaman": "102",
+    "gambar": "2",
+    "babList": "Bab 12",
+    "count": 1,
+    "sampleTitle": "いちねんで　いつが　いちばん　あついですか。: Dalam satu tahun paling panas kapan?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 12, いちねんで　いつが　いちばん　あついですか。: Dalam satu tahun paling panas kapan? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h102-g2.png"
+  },
+  {
+    "slotKey": "h102-g3",
+    "halaman": "102",
+    "gambar": "3",
+    "babList": "Bab 12",
+    "count": 1,
+    "sampleTitle": "かぞくで　だれが　いちばん　うたが じょうずですか。: Siapa yang paling pintar nyanyi ",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 12, かぞくで　だれが　いちばん　うたが じょうずですか。: Siapa yang paling pintar nyanyi -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h102-g3.png"
+  },
+  {
+    "slotKey": "h102-g4",
+    "halaman": "102",
+    "gambar": "4",
+    "babList": "Bab 12",
+    "count": 1,
+    "sampleTitle": "スーパーで　どこが　いちばん　やすいですか。: Mana yang paling murah di antara sup",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 12, スーパーで　どこが　いちばん　やすいですか。: Mana yang paling murah di antara sup -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h102-g4.png"
+  },
+  {
+    "slotKey": "h103-g1",
+    "halaman": "103",
+    "gambar": "1",
+    "babList": "Bab 12",
+    "count": 6,
+    "sampleTitle": "きのうはじめて（　　　）。: Kemarin pertama kali nonton Kabuki.",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 12, きのうはじめて（　　　）。: Kemarin pertama kali nonton Kabuki. -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h103-g1.png"
+  },
+  {
+    "slotKey": "h103-g2",
+    "halaman": "103",
+    "gambar": "2",
+    "babList": "Bab 12",
+    "count": 6,
+    "sampleTitle": "きのうはじめて（　　　）。: Kemarin pertama kali melakukan seni merangkai",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 12, きのうはじめて（　　　）。: Kemarin pertama kali melakukan seni merangkai -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h103-g2.png"
+  },
+  {
+    "slotKey": "h122-g0",
+    "halaman": "122",
+    "gambar": "0",
+    "babList": "Bab 14",
+    "count": 10,
+    "sampleTitle": "なにをしていますか。: Sedang apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 14, なにをしていますか。: Sedang apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h122-g0.png"
+  },
+  {
+    "slotKey": "h139-g1",
+    "halaman": "139",
+    "gambar": "1",
+    "babList": "Bab 16",
+    "count": 1,
+    "sampleTitle": "にほんごが  じょうずですね。どのくらい べんきょうしましたか。: Pintar yaa Bahasa Jepangny",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 16, にほんごが  じょうずですね。どのくらい べんきょうしましたか。: Pintar yaa Bahasa Jepangny -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h139-g1.png"
+  },
+  {
+    "slotKey": "h139-g2",
+    "halaman": "139",
+    "gambar": "2",
+    "babList": "Bab 16",
+    "count": 1,
+    "sampleTitle": "にほんごが  じょうずですね。どのくらい べんきょうしましたか。: Pintar yaa Bahasa Jepangny",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 16, にほんごが  じょうずですね。どのくらい べんきょうしましたか。: Pintar yaa Bahasa Jepangny -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h139-g2.png"
+  },
+  {
+    "slotKey": "h147-g1",
+    "halaman": "147",
+    "gambar": "1",
+    "babList": "Bab 17",
+    "count": 1,
+    "sampleTitle": "ここに くるまを（　　　）ください。: Jangan parkir mobil di sini",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 17, ここに くるまを（　　　）ください。: Jangan parkir mobil di sini -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h147-g1.png"
+  },
+  {
+    "slotKey": "h147-g2",
+    "halaman": "147",
+    "gambar": "2",
+    "babList": "Bab 17",
+    "count": 1,
+    "sampleTitle": "ここに（　　　）ください。: Jangan masuk ke sini",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 17, ここに（　　　）ください。: Jangan masuk ke sini -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h147-g2.png"
+  },
+  {
+    "slotKey": "h147-g3",
+    "halaman": "147",
+    "gambar": "3",
+    "babList": "Bab 17",
+    "count": 1,
+    "sampleTitle": "ここで しゃしんを（　　　）ください。: Jangan mengambil foto di sini",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 17, ここで しゃしんを（　　　）ください。: Jangan mengambil foto di sini -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h147-g3.png"
+  },
+  {
+    "slotKey": "h147-g4",
+    "halaman": "147",
+    "gambar": "4",
+    "babList": "Bab 17",
+    "count": 1,
+    "sampleTitle": "ここで やきゅうを（　　　）ください。: Jangan main baseball di sini",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 17, ここで やきゅうを（　　　）ください。: Jangan main baseball di sini -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h147-g4.png"
+  },
+  {
+    "slotKey": "h149-g1",
+    "halaman": "149",
+    "gambar": "1",
+    "babList": "Bab 17",
+    "count": 5,
+    "sampleTitle": "２，３じかん ごはんを（　　　　）くださいね。: Jangan makan nasi selama dua, tiga ",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 17, ２，３じかん ごはんを（　　　　）くださいね。: Jangan makan nasi selama dua, tiga -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h149-g1.png"
+  },
+  {
+    "slotKey": "h149-g2",
+    "halaman": "149",
+    "gambar": "2",
+    "babList": "Bab 17",
+    "count": 5,
+    "sampleTitle": "１しゅうかんぐらい おさけを（　　　　）くださいね。: Jangan minum minuman beralkohol ",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 17, １しゅうかんぐらい おさけを（　　　　）くださいね。: Jangan minum minuman beralkohol -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h149-g2.png"
+  },
+  {
+    "slotKey": "h155-g3",
+    "halaman": "155",
+    "gambar": "3",
+    "babList": "Bab 18",
+    "count": 1,
+    "sampleTitle": "およぐことが  できますか。: Bisa berenang tidak?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, およぐことが  できますか。: Bisa berenang tidak? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h155-g3.png"
+  },
+  {
+    "slotKey": "h155-g4",
+    "halaman": "155",
+    "gambar": "4",
+    "babList": "Bab 18",
+    "count": 1,
+    "sampleTitle": "ビールを  のむ  ことが  できますか。: Bisa minum bir tidak?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, ビールを  のむ  ことが  できますか。: Bisa minum bir tidak? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h155-g4.png"
+  },
+  {
+    "slotKey": "h156-g1",
+    "halaman": "156",
+    "gambar": "1",
+    "babList": "Bab 18",
+    "count": 2,
+    "sampleTitle": "しゅみは  なんですか。：Hobinya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, しゅみは  なんですか。：Hobinya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h156-g1.png"
+  },
+  {
+    "slotKey": "h156-g2",
+    "halaman": "156",
+    "gambar": "2",
+    "babList": "Bab 18",
+    "count": 2,
+    "sampleTitle": "しゅみは  なんですか。：Hobinya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, しゅみは  なんですか。：Hobinya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h156-g2.png"
+  },
+  {
+    "slotKey": "h156-g3",
+    "halaman": "156",
+    "gambar": "3",
+    "babList": "Bab 18",
+    "count": 2,
+    "sampleTitle": "しゅみは  なんですか。：Hobinya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, しゅみは  なんですか。：Hobinya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h156-g3.png"
+  },
+  {
+    "slotKey": "h156-g4",
+    "halaman": "156",
+    "gambar": "4",
+    "babList": "Bab 18",
+    "count": 2,
+    "sampleTitle": "しゅみは  なんですか。：Hobinya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, しゅみは  なんですか。：Hobinya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h156-g4.png"
+  },
+  {
+    "slotKey": "h157-g1",
+    "halaman": "157",
+    "gambar": "1",
+    "babList": "Bab 18",
+    "count": 5,
+    "sampleTitle": "A: しゅみは  なんですか。：Hobinya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, A: しゅみは  なんですか。：Hobinya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h157-g1.png"
+  },
+  {
+    "slotKey": "h157-g2",
+    "halaman": "157",
+    "gambar": "2",
+    "babList": "Bab 18",
+    "count": 5,
+    "sampleTitle": "A: しゅみは  なんですか。：Hobinya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 18, A: しゅみは  なんですか。：Hobinya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h157-g2.png"
+  },
+  {
+    "slotKey": "h163-g1",
+    "halaman": "163",
+    "gambar": "1",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "よるは おふろに（　　　　）、テレビを（　　　　）します。: Kalau malam hari biasanya man",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, よるは おふろに（　　　　）、テレビを（　　　　）します。: Kalau malam hari biasanya man -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h163-g1.png"
+  },
+  {
+    "slotKey": "h163-g2",
+    "halaman": "163",
+    "gambar": "2",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "やすみの ひは デパートに（　　　　）、むすこと（　　　　）します。: Kalau hari libur, biasan",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, やすみの ひは デパートに（　　　　）、むすこと（　　　　）します。: Kalau hari libur, biasan -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h163-g2.png"
+  },
+  {
+    "slotKey": "h163-g3",
+    "halaman": "163",
+    "gambar": "3",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "きのうは べんきょうを（　　　　）、レポートをかいたり（　　　）。: Kemarin belajar dan juga ",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, きのうは べんきょうを（　　　　）、レポートをかいたり（　　　）。: Kemarin belajar dan juga -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h163-g3.png"
+  },
+  {
+    "slotKey": "h163-g4",
+    "halaman": "163",
+    "gambar": "4",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "きょねんの なつやすみは（　　　　）、やまを（　　　　）しました。: Musim panas tahun lalu be",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, きょねんの なつやすみは（　　　　）、やまを（　　　　）しました。: Musim panas tahun lalu be -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h163-g4.png"
+  },
+  {
+    "slotKey": "h164-g1",
+    "halaman": "164",
+    "gambar": "1",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "（　　　）なりました。: Menjadi gelap",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, （　　　）なりました。: Menjadi gelap -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h164-g1.png"
+  },
+  {
+    "slotKey": "h164-g2",
+    "halaman": "164",
+    "gambar": "2",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "（　　　）なりました。: Menjadi Kuat",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, （　　　）なりました。: Menjadi Kuat -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h164-g2.png"
+  },
+  {
+    "slotKey": "h164-g3",
+    "halaman": "164",
+    "gambar": "3",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "（　　　）なりました。: Menjadi ngantuk",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, （　　　）なりました。: Menjadi ngantuk -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h164-g3.png"
+  },
+  {
+    "slotKey": "h164-g4",
+    "halaman": "164",
+    "gambar": "4",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "（　　　）なりました。: Menjadi bersih",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, （　　　）なりました。: Menjadi bersih -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h164-g4.png"
+  },
+  {
+    "slotKey": "h164-g5",
+    "halaman": "164",
+    "gambar": "5",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "（　　　）なりました。: Menjadi pintar/pandai",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, （　　　）なりました。: Menjadi pintar/pandai -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h164-g5.png"
+  },
+  {
+    "slotKey": "h164-g6",
+    "halaman": "164",
+    "gambar": "6",
+    "babList": "Bab 19",
+    "count": 1,
+    "sampleTitle": "（　　　）になりました。: Menjadi Kepala Bagian",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, （　　　）になりました。: Menjadi Kepala Bagian -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h164-g6.png"
+  },
+  {
+    "slotKey": "h165-g1",
+    "halaman": "165",
+    "gambar": "1",
+    "babList": "Bab 19",
+    "count": 6,
+    "sampleTitle": "かぶきを（　　　）ありますか。: Pernah nonton Kabuki ngga?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, かぶきを（　　　）ありますか。: Pernah nonton Kabuki ngga? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h165-g1.png"
+  },
+  {
+    "slotKey": "h165-g2",
+    "halaman": "165",
+    "gambar": "2",
+    "babList": "Bab 19",
+    "count": 6,
+    "sampleTitle": "なべを（　　　）ありますか。: Pernah makan Nabe ngga?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 19, なべを（　　　）ありますか。: Pernah makan Nabe ngga? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h165-g2.png"
+  },
+  {
+    "slotKey": "h17-g1",
+    "halaman": "17",
+    "gambar": "1",
+    "babList": "Bab 2",
+    "count": 3,
+    "sampleTitle": "（　　）はかばんです：Itu adalah tas",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, （　　）はかばんです：Itu adalah tas -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h17-g1.png"
+  },
+  {
+    "slotKey": "h17-g2",
+    "halaman": "17",
+    "gambar": "2",
+    "babList": "Bab 2",
+    "count": 3,
+    "sampleTitle": "（　　）はかぎです：Ini adalah kunci",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, （　　）はかぎです：Ini adalah kunci -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h17-g2.png"
+  },
+  {
+    "slotKey": "h17-g3",
+    "halaman": "17",
+    "gambar": "3",
+    "babList": "Bab 2",
+    "count": 3,
+    "sampleTitle": "（　　）はテレビです：Itu adalah Televisi",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, （　　）はテレビです：Itu adalah Televisi -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h17-g3.png"
+  },
+  {
+    "slotKey": "h17-g4",
+    "halaman": "17",
+    "gambar": "4",
+    "babList": "Bab 2",
+    "count": 2,
+    "sampleTitle": "これは いす ですか。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, これは いす ですか。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h17-g4.png"
+  },
+  {
+    "slotKey": "h175-g2",
+    "halaman": "175",
+    "gambar": "2",
+    "babList": "Bab 20",
+    "count": 1,
+    "sampleTitle": "ことばは  わからなかったけど、（　　　　）。: Ngga mengerti bahasanya, tapi indah",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 20, ことばは  わからなかったけど、（　　　　）。: Ngga mengerti bahasanya, tapi indah -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h175-g2.png"
+  },
+  {
+    "slotKey": "h18-g1",
+    "halaman": "18",
+    "gambar": "1",
+    "babList": "Bab 2",
+    "count": 3,
+    "sampleTitle": "それは なんの ざっし ですか。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, それは なんの ざっし ですか。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h18-g1.png"
+  },
+  {
+    "slotKey": "h18-g2",
+    "halaman": "18",
+    "gambar": "2",
+    "babList": "Bab 2",
+    "count": 3,
+    "sampleTitle": "それは なんの CD ですか。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, それは なんの CD ですか。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h18-g2.png"
+  },
+  {
+    "slotKey": "h18-g3",
+    "halaman": "18",
+    "gambar": "3",
+    "babList": "Bab 2",
+    "count": 3,
+    "sampleTitle": "それは なんの ざっし ですか。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, それは なんの ざっし ですか。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h18-g3.png"
+  },
+  {
+    "slotKey": "h18-g4",
+    "halaman": "18",
+    "gambar": "4",
+    "babList": "Bab 2",
+    "count": 3,
+    "sampleTitle": "それは なんの ほん ですか。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 2, それは なんの ほん ですか。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h18-g4.png"
+  },
+  {
+    "slotKey": "h201-g21",
+    "halaman": "201",
+    "gambar": "21",
+    "babList": "Bab 23",
+    "count": 5,
+    "sampleTitle": "5275XXXXに（　　　　）。：Telepon ke 5275XXXX",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 23, 5275XXXXに（　　　　）。：Telepon ke 5275XXXX -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h201-g21.png"
+  },
+  {
+    "slotKey": "h207-g0",
+    "halaman": "207",
+    "gambar": "0",
+    "babList": "Bab 24",
+    "count": 4,
+    "sampleTitle": "マリアさんは（　　　）を  くれました。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, マリアさんは（　　　）を  くれました。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h207-g0.png"
+  },
+  {
+    "slotKey": "h207-g1",
+    "halaman": "207",
+    "gambar": "1",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "すてきな（　　　　）ですね。：Topi yang indah ya",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, すてきな（　　　　）ですね。：Topi yang indah ya -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h207-g1.png"
+  },
+  {
+    "slotKey": "h207-g2",
+    "halaman": "207",
+    "gambar": "2",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "あたらしい（　　　　）ですね。：Kamus baru ya",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, あたらしい（　　　　）ですね。：Kamus baru ya -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h207-g2.png"
+  },
+  {
+    "slotKey": "h207-g3",
+    "halaman": "207",
+    "gambar": "3",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "サッカーの（　　　　）ですね。：Tiket sepak bola ya",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, サッカーの（　　　　）ですね。：Tiket sepak bola ya -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h207-g3.png"
+  },
+  {
+    "slotKey": "h207-g4",
+    "halaman": "207",
+    "gambar": "4",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "きれいな（　　　　）ですね。：Bunga yang indah ya",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, きれいな（　　　　）ですね。：Bunga yang indah ya -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h207-g4.png"
+  },
+  {
+    "slotKey": "h208-g1",
+    "halaman": "208",
+    "gambar": "1",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "母は  セーターを（　　　　　）くれました。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, 母は  セーターを（　　　　　）くれました。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h208-g1.png"
+  },
+  {
+    "slotKey": "h208-g2",
+    "halaman": "208",
+    "gambar": "2",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "かいしゃの人は  おおさかじょうへ（　　　　　）くれました。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, かいしゃの人は  おおさかじょうへ（　　　　　）くれました。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h208-g2.png"
+  },
+  {
+    "slotKey": "h208-g3",
+    "halaman": "208",
+    "gambar": "3",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "ともだちは  えきまで（　　　　　）くれました。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, ともだちは  えきまで（　　　　　）くれました。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h208-g3.png"
+  },
+  {
+    "slotKey": "h208-g4",
+    "halaman": "208",
+    "gambar": "4",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "サントスさんは  にもつを（　　　　　）くれました。",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, サントスさんは  にもつを（　　　　　）くれました。 -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h208-g4.png"
+  },
+  {
+    "slotKey": "h209-g1",
+    "halaman": "209",
+    "gambar": "1",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "たのしかったです。お母さんは  おなべを（つくる）くれました。: Menyenangkan. Ibu membuatka",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, たのしかったです。お母さんは  おなべを（つくる）くれました。: Menyenangkan. Ibu membuatka -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h209-g1.png"
+  },
+  {
+    "slotKey": "h209-g2",
+    "halaman": "209",
+    "gambar": "2",
+    "babList": "Bab 24",
+    "count": 2,
+    "sampleTitle": "お母さんは  てんぷらを  つくって（くれます）。: Ibu telah membuatkan tempura.",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 24, お母さんは  てんぷらを  つくって（くれます）。: Ibu telah membuatkan tempura. -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h209-g2.png"
+  },
+  {
+    "slotKey": "h215-g1",
+    "halaman": "215",
+    "gambar": "1",
+    "babList": "Bab 25",
+    "count": 1,
+    "sampleTitle": "にちようび てんきが よかったら、なにをしますか？",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 25, にちようび てんきが よかったら、なにをしますか？ -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h215-g1.png"
+  },
+  {
+    "slotKey": "h215-g2",
+    "halaman": "215",
+    "gambar": "2",
+    "babList": "Bab 25",
+    "count": 1,
+    "sampleTitle": "やすみが 1か月 あったら、なにをしますか？",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 25, やすみが 1か月 あったら、なにをしますか？ -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h215-g2.png"
+  },
+  {
+    "slotKey": "h215-g3",
+    "halaman": "215",
+    "gambar": "3",
+    "babList": "Bab 25",
+    "count": 1,
+    "sampleTitle": "かいぎのとき、ねむくなったら、どうしますか？",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 25, かいぎのとき、ねむくなったら、どうしますか？ -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h215-g3.png"
+  },
+  {
+    "slotKey": "h215-g4",
+    "halaman": "215",
+    "gambar": "4",
+    "babList": "Bab 25",
+    "count": 1,
+    "sampleTitle": "かいもの のとき、お金が たりなかったら、どうしますか？",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 25, かいもの のとき、お金が たりなかったら、どうしますか？ -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h215-g4.png"
+  },
+  {
+    "slotKey": "h26-g1",
+    "halaman": "26",
+    "gambar": "1",
+    "babList": "Bab 3",
+    "count": 2,
+    "sampleTitle": "サントスさんの おくには どちらですか。：Di mana negara asal Bapak Santos?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 3, サントスさんの おくには どちらですか。：Di mana negara asal Bapak Santos? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h26-g1.png"
+  },
+  {
+    "slotKey": "h26-g2",
+    "halaman": "26",
+    "gambar": "2",
+    "babList": "Bab 3",
+    "count": 2,
+    "sampleTitle": "ワットさんの おくには どちらですか。：Di mana negara asal Bapak Watt?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 3, ワットさんの おくには どちらですか。：Di mana negara asal Bapak Watt? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h26-g2.png"
+  },
+  {
+    "slotKey": "h26-g3",
+    "halaman": "26",
+    "gambar": "3",
+    "babList": "Bab 3",
+    "count": 2,
+    "sampleTitle": "シュミットさんの おくには どちらですか。：Di mana negara asal Bapak Schmidt?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 3, シュミットさんの おくには どちらですか。：Di mana negara asal Bapak Schmidt? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h26-g3.png"
+  },
+  {
+    "slotKey": "h26-g4",
+    "halaman": "26",
+    "gambar": "4",
+    "babList": "Bab 3",
+    "count": 2,
+    "sampleTitle": "カリナさんの おくには どちらですか。：Di mana negara asal Sdr. Karina?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 3, カリナさんの おくには どちらですか。：Di mana negara asal Sdr. Karina? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h26-g4.png"
+  },
+  {
+    "slotKey": "h27-g1",
+    "halaman": "27",
+    "gambar": "1",
+    "babList": "Bab 3",
+    "count": 7,
+    "sampleTitle": "すみません。（　　）は  どこですか。: Permisi, lift dimana ya?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 3, すみません。（　　）は  どこですか。: Permisi, lift dimana ya? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h27-g1.png"
+  },
+  {
+    "slotKey": "h27-g2",
+    "halaman": "27",
+    "gambar": "2",
+    "babList": "Bab 3",
+    "count": 6,
+    "sampleTitle": "すみません。かばんうりば は  どこですか。: Permisi, (         ) dimana ya?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 3, すみません。かばんうりば は  どこですか。: Permisi, (         ) dimana ya? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h27-g2.png"
+  },
+  {
+    "slotKey": "h35-g0",
+    "halaman": "35",
+    "gambar": "0",
+    "babList": "Bab 4",
+    "count": 8,
+    "sampleTitle": "ペキンは  いま  なんじですか。: Jam berapa sekarang di Beijing?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 4, ペキンは  いま  なんじですか。: Jam berapa sekarang di Beijing? -- precise analog clock, clear dial, legible numbers, no text",
+    "imageUrl": "/practice-images/h35-g0.png"
+  },
+  {
+    "slotKey": "h35-g1",
+    "halaman": "35",
+    "gambar": "1",
+    "babList": "Bab 4",
+    "count": 2,
+    "sampleTitle": "Pukul 7 lewat 30 menit",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 4, Pukul 7 lewat 30 menit -- precise analog clock, clear dial, legible numbers, no text",
+    "imageUrl": "/practice-images/h35-g1.png"
+  },
+  {
+    "slotKey": "h35-g2",
+    "halaman": "35",
+    "gambar": "2",
+    "babList": "Bab 4",
+    "count": 2,
+    "sampleTitle": "Pukul 12 lewat 15 menit",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 4, Pukul 12 lewat 15 menit -- precise analog clock, clear dial, legible numbers, no text",
+    "imageUrl": "/practice-images/h35-g2.png"
+  },
+  {
+    "slotKey": "h35-g3",
+    "halaman": "35",
+    "gambar": "3",
+    "babList": "Bab 4",
+    "count": 2,
+    "sampleTitle": "Pukul 2 lewat 45 menit",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 4, Pukul 2 lewat 45 menit -- precise analog clock, clear dial, legible numbers, no text",
+    "imageUrl": "/practice-images/h35-g3.png"
+  },
+  {
+    "slotKey": "h35-g4",
+    "halaman": "35",
+    "gambar": "4",
+    "babList": "Bab 4",
+    "count": 2,
+    "sampleTitle": "Pukul 10 lewat 20 menit",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 4, Pukul 10 lewat 20 menit -- precise analog clock, clear dial, legible numbers, no text",
+    "imageUrl": "/practice-images/h35-g4.png"
+  },
+  {
+    "slotKey": "h43-g1",
+    "halaman": "43",
+    "gambar": "1",
+    "babList": "Bab 5",
+    "count": 2,
+    "sampleTitle": "せんげつ どこへ いきましたか。: Bulan lalu pergi kemana?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, せんげつ どこへ いきましたか。: Bulan lalu pergi kemana? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h43-g1.png"
+  },
+  {
+    "slotKey": "h43-g2",
+    "halaman": "43",
+    "gambar": "2",
+    "babList": "Bab 5",
+    "count": 2,
+    "sampleTitle": "きのうの ごご どこへ いきましたか。: Kemarin sore pergi kemana?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, きのうの ごご どこへ いきましたか。: Kemarin sore pergi kemana? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h43-g2.png"
+  },
+  {
+    "slotKey": "h43-g3",
+    "halaman": "43",
+    "gambar": "3",
+    "babList": "Bab 5",
+    "count": 2,
+    "sampleTitle": "らいしゅうの げつようび どこへ いきますか。: Hari Senin minggu depan mau pergi k",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, らいしゅうの げつようび どこへ いきますか。: Hari Senin minggu depan mau pergi k -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h43-g3.png"
+  },
+  {
+    "slotKey": "h43-g4",
+    "halaman": "43",
+    "gambar": "4",
+    "babList": "Bab 5",
+    "count": 2,
+    "sampleTitle": "せんしゅうの にちようび どこへ いきましたか。: Hari Minggu pekan lalu pergi keman",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, せんしゅうの にちようび どこへ いきましたか。: Hari Minggu pekan lalu pergi keman -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h43-g4.png"
+  },
+  {
+    "slotKey": "h44-g0",
+    "halaman": "44",
+    "gambar": "0",
+    "babList": "Bab 5",
+    "count": 8,
+    "sampleTitle": "だれと にほんへ きましたか。: Datang ke Jepang dengan siapa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, だれと にほんへ きましたか。: Datang ke Jepang dengan siapa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h44-g0.png"
+  },
+  {
+    "slotKey": "h44-g1",
+    "halaman": "44",
+    "gambar": "1",
+    "babList": "Bab 5",
+    "count": 1,
+    "sampleTitle": "やまださん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Yamada?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, やまださん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Yamada? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h44-g1.png"
+  },
+  {
+    "slotKey": "h44-g2",
+    "halaman": "44",
+    "gambar": "2",
+    "babList": "Bab 5",
+    "count": 1,
+    "sampleTitle": "カリナさん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Karina?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, カリナさん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Karina? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h44-g2.png"
+  },
+  {
+    "slotKey": "h44-g3",
+    "halaman": "44",
+    "gambar": "3",
+    "babList": "Bab 5",
+    "count": 1,
+    "sampleTitle": "サントスさん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Santos?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, サントスさん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Santos? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h44-g3.png"
+  },
+  {
+    "slotKey": "h44-g4",
+    "halaman": "44",
+    "gambar": "4",
+    "babList": "Bab 5",
+    "count": 1,
+    "sampleTitle": "マリアさん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Maria?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, マリアさん の たんじょうびは いつですか。: Kapan ulang tahun Sdr. Maria? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h44-g4.png"
+  },
+  {
+    "slotKey": "h45-g1",
+    "halaman": "45",
+    "gambar": "1",
+    "babList": "Bab 5",
+    "count": 6,
+    "sampleTitle": "わたしは（　　　）へ いきます。: Saya akan pergi ke Gedung kesenian.",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, わたしは（　　　）へ いきます。: Saya akan pergi ke Gedung kesenian. -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h45-g1.png"
+  },
+  {
+    "slotKey": "h45-g2",
+    "halaman": "45",
+    "gambar": "2",
+    "babList": "Bab 5",
+    "count": 6,
+    "sampleTitle": "わたしは（　　）へ いきます。: Saya akan pergi ke Kyoto",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 5, わたしは（　　）へ いきます。: Saya akan pergi ke Kyoto -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h45-g2.png"
+  },
+  {
+    "slotKey": "h51-g1",
+    "halaman": "51",
+    "gambar": "1",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "みずを（　　　）。: Minum air",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, みずを（　　　）。: Minum air -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h51-g1.png"
+  },
+  {
+    "slotKey": "h51-g2",
+    "halaman": "51",
+    "gambar": "2",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "ほんを（　　　）。: Membaca buku",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, ほんを（　　　）。: Membaca buku -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h51-g2.png"
+  },
+  {
+    "slotKey": "h51-g3",
+    "halaman": "51",
+    "gambar": "3",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "てがみを（　　　）。: Menulis surat",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, てがみを（　　　）。: Menulis surat -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h51-g3.png"
+  },
+  {
+    "slotKey": "h51-g4",
+    "halaman": "51",
+    "gambar": "4",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "しゃしんを（　　　）。: Mengambil foto",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, しゃしんを（　　　）。: Mengambil foto -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h51-g4.png"
+  },
+  {
+    "slotKey": "h52-g1",
+    "halaman": "52",
+    "gambar": "1",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "あした  IMCで（　　　）。それから  にほんごを（　　　）: Besok bekerja di IMC. Setel",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, あした  IMCで（　　　）。それから  にほんごを（　　　）: Besok bekerja di IMC. Setel -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h52-g1.png"
+  },
+  {
+    "slotKey": "h52-g2",
+    "halaman": "52",
+    "gambar": "2",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "らいしゅうの  どようび（　　　）ひるごはんを  たべます。それから（　　　）をみます。: Hari Sabtu pek",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, らいしゅうの  どようび（　　　）ひるごはんを  たべます。それから（　　　）をみます。: Hari Sabtu pek -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h52-g2.png"
+  },
+  {
+    "slotKey": "h52-g3",
+    "halaman": "52",
+    "gambar": "3",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "きのうの  ごご  ロビーで  テレビを（　　　）。それから  てがみを（　　　）: Kemarin sore nont",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, きのうの  ごご  ロビーで  テレビを（　　　）。それから  てがみを（　　　）: Kemarin sore nont -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h52-g3.png"
+  },
+  {
+    "slotKey": "h52-g4",
+    "halaman": "52",
+    "gambar": "4",
+    "babList": "Bab 6",
+    "count": 2,
+    "sampleTitle": "せんしゅうの  にちようび  にわで  サッカーを（　　　）。それから  ビールを（　　　）: Hari Minggu ",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, せんしゅうの  にちようび  にわで  サッカーを（　　　）。それから  ビールを（　　　）: Hari Minggu -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h52-g4.png"
+  },
+  {
+    "slotKey": "h53-g1",
+    "halaman": "53",
+    "gambar": "1",
+    "babList": "Bab 6",
+    "count": 4,
+    "sampleTitle": "にほんごを（　　　）。それから  ともだちに（　　　）: Belajar Bahasa Jepang. Setelah ",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, にほんごを（　　　）。それから  ともだちに（　　　）: Belajar Bahasa Jepang. Setelah -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h53-g1.png"
+  },
+  {
+    "slotKey": "h53-g2",
+    "halaman": "53",
+    "gambar": "2",
+    "babList": "Bab 6",
+    "count": 6,
+    "sampleTitle": "しゅくだいを（　　　）。それから  サントスさんの いえに（　　　）: Mengerjakan PR. Setelah ",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 6, しゅくだいを（　　　）。それから  サントスさんの いえに（　　　）: Mengerjakan PR. Setelah -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h53-g2.png"
+  },
+  {
+    "slotKey": "h59-g1",
+    "halaman": "59",
+    "gambar": "1",
+    "babList": "Bab 7",
+    "count": 3,
+    "sampleTitle": "（　　　）で  てがみを  かきます。: Menulis surat menggunakan ballpoint",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, （　　　）で  てがみを  かきます。: Menulis surat menggunakan ballpoint -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h59-g1.png"
+  },
+  {
+    "slotKey": "h59-g2",
+    "halaman": "59",
+    "gambar": "2",
+    "babList": "Bab 7",
+    "count": 2,
+    "sampleTitle": "（　　　）で  かみを  きります。: Menggunting kertas menggunakan gunting",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, （　　　）で  かみを  きります。: Menggunting kertas menggunakan gunting -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h59-g2.png"
+  },
+  {
+    "slotKey": "h59-g3",
+    "halaman": "59",
+    "gambar": "3",
+    "babList": "Bab 7",
+    "count": 3,
+    "sampleTitle": "（　　　）で  ごはんを  たべます。: Makan nasi menggunakan tangan",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, （　　　）で  ごはんを  たべます。: Makan nasi menggunakan tangan -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h59-g3.png"
+  },
+  {
+    "slotKey": "h59-g4",
+    "halaman": "59",
+    "gambar": "4",
+    "babList": "Bab 7",
+    "count": 3,
+    "sampleTitle": "（　　　）で  しゃしんを  とります。: Mengambil foto menggunakan HP.",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, （　　　）で  しゃしんを  とります。: Mengambil foto menggunakan HP. -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h59-g4.png"
+  },
+  {
+    "slotKey": "h60-g1",
+    "halaman": "60",
+    "gambar": "1",
+    "babList": "Bab 7",
+    "count": 2,
+    "sampleTitle": "カリナさんに（　　　）を（　　　）。: Sudah meminjam CD dari Sdr. Karina",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, カリナさんに（　　　）を（　　　）。: Sudah meminjam CD dari Sdr. Karina -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h60-g1.png"
+  },
+  {
+    "slotKey": "h60-g2",
+    "halaman": "60",
+    "gambar": "2",
+    "babList": "Bab 7",
+    "count": 2,
+    "sampleTitle": "ワンさんに（　　　）を（　　　）。: Sudah belajar Bahasa Cina dari Sdr. Wang",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, ワンさんに（　　　）を（　　　）。: Sudah belajar Bahasa Cina dari Sdr. Wang -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h60-g2.png"
+  },
+  {
+    "slotKey": "h60-g3",
+    "halaman": "60",
+    "gambar": "3",
+    "babList": "Bab 7",
+    "count": 2,
+    "sampleTitle": "きむらさんに（　　　）を（　　　）。: Sudah dapat e-mail dari Sdr. Kimura",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, きむらさんに（　　　）を（　　　）。: Sudah dapat e-mail dari Sdr. Kimura -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h60-g3.png"
+  },
+  {
+    "slotKey": "h60-g4",
+    "halaman": "60",
+    "gambar": "4",
+    "babList": "Bab 7",
+    "count": 2,
+    "sampleTitle": "サントスさんに（　　　）を（　　　）。: Sudah terima telfon dari Sdr. Santos",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, サントスさんに（　　　）を（　　　）。: Sudah terima telfon dari Sdr. Santos -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h60-g4.png"
+  },
+  {
+    "slotKey": "h61-g1",
+    "halaman": "61",
+    "gambar": "1",
+    "babList": "Bab 7",
+    "count": 4,
+    "sampleTitle": "（　　　）は  にほんごで  なんですか。: Stapler Bahasa Jepangnya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, （　　　）は  にほんごで  なんですか。: Stapler Bahasa Jepangnya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h61-g1.png"
+  },
+  {
+    "slotKey": "h61-g2",
+    "halaman": "61",
+    "gambar": "2",
+    "babList": "Bab 7",
+    "count": 4,
+    "sampleTitle": "（　　　）は  にほんごで  なんですか。: Selotip Bahasa Jepangnya apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 7, （　　　）は  にほんごで  なんですか。: Selotip Bahasa Jepangnya apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h61-g2.png"
+  },
+  {
+    "slotKey": "h85-g0",
+    "halaman": "85",
+    "gambar": "0",
+    "babList": "Bab 10",
+    "count": 4,
+    "sampleTitle": "ベッドの  したに  なにが  ありますか。: Di bawah tempat tidur ada apa?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, ベッドの  したに  なにが  ありますか。: Di bawah tempat tidur ada apa? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h85-g0.png"
+  },
+  {
+    "slotKey": "h86-g0",
+    "halaman": "86",
+    "gambar": "0",
+    "babList": "Bab 10",
+    "count": 4,
+    "sampleTitle": "レストランは どこに ありますか。: Restoran ada dimana?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, レストランは どこに ありますか。: Restoran ada dimana? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h86-g0.png"
+  },
+  {
+    "slotKey": "h86-g1",
+    "halaman": "86",
+    "gambar": "1",
+    "babList": "Bab 10",
+    "count": 1,
+    "sampleTitle": "じてんしゃは  どこに  ありますか。: Sepeda ada di mana?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, じてんしゃは  どこに  ありますか。: Sepeda ada di mana? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h86-g1.png"
+  },
+  {
+    "slotKey": "h86-g2",
+    "halaman": "86",
+    "gambar": "2",
+    "babList": "Bab 10",
+    "count": 1,
+    "sampleTitle": "おとこのこは  どこに  いますか。: Anak laki-laki ada dimana?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, おとこのこは  どこに  いますか。: Anak laki-laki ada dimana? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h86-g2.png"
+  },
+  {
+    "slotKey": "h86-g3",
+    "halaman": "86",
+    "gambar": "3",
+    "babList": "Bab 10",
+    "count": 1,
+    "sampleTitle": "しゃしんは  どこに  ありますか。: Foto ada dimana?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, しゃしんは  どこに  ありますか。: Foto ada dimana? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h86-g3.png"
+  },
+  {
+    "slotKey": "h86-g4",
+    "halaman": "86",
+    "gambar": "4",
+    "babList": "Bab 10",
+    "count": 1,
+    "sampleTitle": "いぬは  どこに  いますか。: Anjingnya ada dimana?",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, いぬは  どこに  いますか。: Anjingnya ada dimana? -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h86-g4.png"
+  },
+  {
+    "slotKey": "h87-g1",
+    "halaman": "87",
+    "gambar": "1",
+    "babList": "Bab 10",
+    "count": 4,
+    "sampleTitle": "あのう、ちかくに（　　　）が ありますか。: Permisi, apakah di dekat sini ada min",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, あのう、ちかくに（　　　）が ありますか。: Permisi, apakah di dekat sini ada min -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h87-g1.png"
+  },
+  {
+    "slotKey": "h87-g2",
+    "halaman": "87",
+    "gambar": "2",
+    "babList": "Bab 10",
+    "count": 4,
+    "sampleTitle": "あのう、ちかくに（　　　）が ありますか。: Permisi, apakah di dekat sini ada kan",
+    "imagePrompt": "Minna no Nihongo practice, Bab Bab 10, あのう、ちかくに（　　　）が ありますか。: Permisi, apakah di dekat sini ada kan -- flat 2D anime illustration, simple, pastel colors, no text, clean background, Studio Ghibli style",
+    "imageUrl": "/practice-images/h87-g2.png"
+  }
+]

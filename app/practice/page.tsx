@@ -6,6 +6,7 @@ import { playTap, speakJapanese } from '@/lib/sounds'
   import { addFuriganaToSentence } from '@/lib/vocab'
   import { getShowFurigana, setShowFurigana as saveShowFurigana } from '@/lib/storage'
   import { getChapterImage } from '@/lib/chapterImages'
+  import { getPracticeImageUrl } from '@/lib/practice-images'
   import BottomNav from '@/components/BottomNav'
 
 interface PracticeQuestion {
@@ -178,16 +179,24 @@ export default function PracticeHubPage() {
  </div>
  </div>
 
- {/* Question Title */}
- <h3 className="text-base font-extrabold text-[var(--color-text-1)] mb-3 leading-relaxed">
- {showFurigana ? (
- <span dangerouslySetInnerHTML={{ 
- __html: addFuriganaToSentence(activeQuiz.questions[currentQIndex].title) 
- }} />
- ) : (
- activeQuiz.questions[currentQIndex].title
- )}
- </h3>
+  {/* Question Image — konteks dari buku (Gambar) */}
+  {(() => {
+  const q = activeQuiz.questions[currentQIndex]
+  const img = getPracticeImageUrl(q)
+  return img ? (
+  <img src={img} alt={`Konteks ${q.bab} Gambar`} loading="lazy" decoding="async" className="w-full rounded-2xl object-cover border border-[var(--color-border)] mb-3 max-h-48" onError={(e) => (e.currentTarget.style.display='none')} />
+  ) : null
+  })()}
+  {/* Question Title */}
+  <h3 className="text-base font-extrabold text-[var(--color-text-1)] mb-3 leading-relaxed">
+  {showFurigana ? (
+  <span dangerouslySetInnerHTML={{ 
+  __html: addFuriganaToSentence(activeQuiz.questions[currentQIndex].title) 
+  }} />
+  ) : (
+  activeQuiz.questions[currentQIndex].title
+  )}
+  </h3>
 
  {activeQuiz.questions[currentQIndex].description && (
  <div className="mb-4 p-3 rounded-xl bg-[var(--color-subtle)] border border-[var(--color-border)] text-xs font-semibold text-[var(--color-text-2)]">
