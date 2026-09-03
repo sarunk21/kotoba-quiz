@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { playTap, speakJapanese } from '@/lib/sounds'
  import { addFuriganaToSentence } from '@/lib/vocab'
- import { getShowFurigana } from '@/lib/storage'
+ import { getShowFurigana, setShowFurigana as saveShowFurigana } from '@/lib/storage'
  import BottomNav from '@/components/BottomNav'
 
 interface PracticeQuestion {
@@ -142,11 +142,11 @@ export default function PracticeHubPage() {
  {activeQuiz.bab} • Soal {currentQIndex + 1} / {activeQuiz.questions.length}
  </span>
  {/* Furigana Toggle */}
- <button 
+  <button 
  onClick={() => {
  const newVal = !showFurigana
  setShowFurigana(newVal)
- localStorage.setItem('kotoba_show_furigana', String(newVal))
+ saveShowFurigana(newVal)
  playTap()
  }}
  className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black border transition-all active:scale-95 cursor-pointer ${
@@ -236,7 +236,7 @@ export default function PracticeHubPage() {
  onClick={playTap}
  className="col-span-2 block no-underline active:scale-[0.98] transition-transform"
  >
- <div className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 rounded-[28px] p-5 text-white shadow-lg hover:shadow-xl transition-all relative overflow-hidden border border-indigo-400/30">
+ <div className="bg-[var(--color-accent)] rounded-[28px] p-5 text-white shadow-lg hover:shadow-xl transition-all relative overflow-hidden border border-indigo-400/30">
  {/* Background glow */}
  <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-[var(--color-surface)]/10 rounded-full blur-xl pointer-events-none" />
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">

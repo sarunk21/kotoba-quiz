@@ -420,7 +420,7 @@ export default function VocabPage() {
  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
  <Link
  href="/quiz/chapters"
- className="text-xs font-black px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white no-underline active:scale-95 transition-all flex items-center gap-1.5 shadow-sm shrink-0"
+ className="text-xs font-black px-3.5 py-2 rounded-xl bg-[var(--color-accent)] text-white no-underline active:scale-95 transition-all flex items-center gap-1.5 shadow-sm shrink-0"
  >
  📖 Kuis Per Bab
  </Link>
@@ -657,7 +657,7 @@ export default function VocabPage() {
  {/* Floating Action Button for Add Word */}
  <button 
  onClick={openAddModal}
- className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] right-5 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 shadow-[0_8px_25px_var(--color-accent-glow)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white border-2 border-[var(--color-surface)]/40/20 cursor-pointer"
+ className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] right-5 z-40 w-14 h-14 rounded-full bg-[var(--color-accent)] shadow-[0_8px_25px_var(--color-accent-glow)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center text-white border-2 border-[var(--color-surface)]/40/20 cursor-pointer"
  title="Tambah Kosakata Baru"
  >
  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">

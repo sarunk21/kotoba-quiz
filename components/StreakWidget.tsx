@@ -128,7 +128,7 @@ export default function StreakWidget({ onStartPractice }: StreakWidgetProps) {
  ? 'bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 text-white border-amber-300 shadow-orange-500/20 scale-105'
  : currentStreak > 0
  ? 'bg-[var(--color-amber-light)] text-amber-500 border-amber-200 dark:border-amber-900/40'
- : 'bg-gray-100 dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700'
+ : 'bg-[var(--color-border-light)] text-[var(--color-text-3)] border-[var(--color-border)]'
  }`}
  >
  <span className={isTodayDone ? 'animate-pulse' : ''}>🔥</span>
@@ -148,7 +148,7 @@ export default function StreakWidget({ onStartPractice }: StreakWidgetProps) {
  Perlu Latihan ⚠️
  </span>
  ) : (
- <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[var(--color-text-3)] border border-[var(--color-border)]">
+ <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-[var(--color-border-light)] text-[var(--color-text-3)] border border-[var(--color-border)]">
  Mulai Streak
  </span>
  )}
