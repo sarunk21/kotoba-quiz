@@ -19,20 +19,7 @@ function removeItem(key: string) {
   try { localStorage.removeItem(key) } catch {}
 }
 
-// ── Sheets URL ──
-const SHEETS_URL_KEY = 'kotoba_sheets_url'
-export function getSheetsUrl(fallback: string): string {
-  return getItem(SHEETS_URL_KEY) || fallback
-}
-export function setSheetsUrl(url: string) { setItem(SHEETS_URL_KEY, url) }
 
-// Sheets sync timestamp (throttle)
-const SHEETS_TS_KEY = 'kotoba_sheets_sync_timestamp'
-export function getSheetsSyncTimestamp(): number | null {
-  const v = getItem(SHEETS_TS_KEY)
-  return v ? parseInt(v, 10) : null
-}
-export function setSheetsSyncTimestamp(ts: number) { setItem(SHEETS_TS_KEY, String(ts)) }
 
 // ── Show Furigana ──
 const FURI_KEY = 'kotoba_show_furigana'
@@ -61,10 +48,7 @@ export function setReminderEnabled(v: boolean) { setItem(REMINDER_ENABLED, Strin
 export function getReminderTime(): string { return getItem(REMINDER_TIME) || '20:00' }
 export function setReminderTime(v: string) { setItem(REMINDER_TIME, v) }
 
-// ── Stories cache ──
-const STORIES_KEY = 'kotoba_stories'
-export function getStoriesRaw(): string | null { return getItem(STORIES_KEY) }
-export function setStoriesRaw(json: string) { setItem(STORIES_KEY, json) }
+
 
 // ── Vocab updatedAt ──
 const VOCAB_UPDATED_KEY = 'kotoba_vocab_updated_at'
@@ -89,19 +73,14 @@ const FAILED_KEY = 'kotoba_failed_words'
 export function getFailedRaw(): string | null { return getItem(FAILED_KEY) }
 export function setFailedRaw(json: string) { setItem(FAILED_KEY, json) }
 
-// ── Groq key (legacy support) ──
-const GROQ_KEY = 'kotoba_groq_key'
-const GEMINI_KEY = 'kotoba_gemini_key'
-export function getStoredGroqKey(): string | null { return getItem(GROQ_KEY) || getItem(GEMINI_KEY) }
+
 
 // ── Bulk clear for account isolation / logout ──
 const KOTOBA_PREFIX = 'kotoba_'
 export function clearAllKotobaStorage() {
   if (!isBrowser()) return
   try {
-    // Hapus semua key kotoba_* kecuali theme & sheets_url yang bisa dipertahankan? 
-    // Untuk isolasi akun, hapus data user saja, pertahankan sheets_url & theme.
-    const keep = new Set([THEME_KEY, SHEETS_URL_KEY])
+    const keep = new Set([THEME_KEY])
     const toRemove: string[] = []
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
@@ -113,5 +92,7 @@ export function clearAllKotobaStorage() {
 
 export function clearAccountData() {
   if (!isBrowser()) return
-  ;['kotoba_srs','kotoba_stats','kotoba_vocab','kotoba_vocab_updated_at','kotoba_study_history','kotoba_failed_words','kotoba_stories','kotoba_last_user','kotoba_sheets_sync_timestamp'].forEach(removeItem)
+  ;['kotoba_srs','kotoba_stats','kotoba_vocab','kotoba_vocab_updated_at','kotoba_study_history','kotoba_failed_words','kotoba_last_user'].forEach(removeItem)
+  // Auto-clear legacy Sheets/AI keys (Hapus Total)
+  ;['kotoba_sheets_url','kotoba_sheets_sync_timestamp','kotoba_stories','kotoba_groq_key','kotoba_gemini_key'].forEach(removeItem)
 }

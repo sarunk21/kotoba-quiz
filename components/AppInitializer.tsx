@@ -63,13 +63,20 @@ export default function AppInitializer() {
  }
  }
 
- initCapacitor()
+  initCapacitor()
 
- return () => {
- active = false
- }
- }, []) // Empty dependency array: runs only once on mount!
+  return () => {
+  active = false
+  }
+  }, []) // Empty dependency array: runs only once on mount!
 
- return null
+  // Auto-clear legacy Sheets/AI keys (Hapus Total) — Firebase + lokal only
+  useEffect(() => {
+  try {
+  ;['kotoba_sheets_url','kotoba_sheets_sync_timestamp','kotoba_stories','kotoba_groq_key','kotoba_gemini_key'].forEach(k => localStorage.removeItem(k))
+  } catch {}
+  }, [])
+
+  return null
 }
 

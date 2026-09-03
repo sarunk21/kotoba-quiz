@@ -174,14 +174,18 @@ export default function BottomNav() {
  { name: 'Pengaturan', path: '/settings', Icon: IconSettings },
  ]
 
- const noVocab = vocab.length === 0
+  const noVocab = vocab.length === 0
+  const isQuizRoute = pathname.startsWith('/quiz') || pathname === '/kana/quiz' || pathname.startsWith('/sentences') || pathname.startsWith('/story')
+  const navContainerClass = isQuizRoute
+  ? "w-full max-w-sm md:max-w-2xl flex items-center justify-between py-2 px-3 border-t border-[var(--color-border-light)] bg-[var(--color-surface)] transition-all duration-300 relative"
+  : "w-full max-w-sm md:max-w-2xl rounded-[28px] flex items-center justify-between py-2 px-3 border border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)] transition-all duration-300 relative"
 
- return (
- <>
- <div className="fixed bottom-0 left-0 right-0 z-[130] flex justify-center px-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] select-none">
- <div 
- className="w-full max-w-sm md:max-w-2xl rounded-[28px] flex items-center justify-between py-2 px-3 border border-[var(--color-border)] bg-[var(--color-surface)]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)] transition-all duration-300 relative"
- >
+  return (
+  <>
+  <div className={`fixed bottom-0 left-0 right-0 z-[130] flex justify-center select-none ${isQuizRoute ? 'px-0 pb-0' : 'px-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]'}`}>
+  <div 
+  className={navContainerClass}
+  >
  {/* Left Tabs */}
  <div className="flex-1 flex justify-around">
  {leftTabs.map((tab) => {

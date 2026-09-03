@@ -13,9 +13,8 @@ import { checkNotificationNeeds, showLocalNotification, rescheduleDailyReminderI
 import BottomNav from '@/components/BottomNav'
 import StreakWidget from '@/components/StreakWidget'
 import { speakJapanese } from '@/lib/sounds'
-import { DEFAULT_SHEETS_URL, CURRENT_VERSION } from '@/lib/constants'
-import { syncSheetsFromUrl } from '@/lib/sheetsSync'
-import { getSheetsUrl, getHistoryRaw, getLastUser, setLastUser, clearAccountData, isAutoSync } from '@/lib/storage'
+import { CURRENT_VERSION } from '@/lib/constants'
+import { getHistoryRaw, getLastUser, setLastUser, clearAccountData, isAutoSync } from '@/lib/storage'
 import { StudyHeatmap } from '@/components/home/StudyHeatmap'
 import { WordOfTheDay } from '@/components/home/WordOfTheDay'
 import { QuickAccess } from '@/components/home/QuickAccess'
@@ -72,15 +71,7 @@ export default function Home() {
  const touchStartY = useRef(0)
  const scrollRef = useRef<HTMLDivElement>(null)
 
- const silentSyncFromSheets = async (url: string) => {
- const result = await syncSheetsFromUrl(url, { sessionEmail: session?.user?.email || null })
- if (result && (result.newItems > 0 || result.hasChanges)) {
- // syncSheetsFromUrl sudah save + stories, tinggal refresh state lokal
- setVocab(loadLocalVocab())
- }
- }
-
- useEffect(() => {
+  useEffect(() => {
  const s = loadStats(); setStats(s)
  const store = loadSRS(); setSrsStore(store)
  
@@ -98,17 +89,13 @@ export default function Home() {
  }
  }
 
- // Check notifications
- const need = checkNotificationNeeds()
- if (need) {
- setNotificationNeed(need)
- }
+  // Check notifications
+  const need = checkNotificationNeeds()
+  if (need) {
+  setNotificationNeed(need)
+  }
 
- // Silent background fetch to update words from Sheets URL (bank data)
- const savedUrl = getSheetsUrl(DEFAULT_SHEETS_URL)
- silentSyncFromSheets(savedUrl)
-
- // Check for updates if running natively
+  // Check for updates if running natively
  const checkAppUpdate = async () => {
  try {
  const { Capacitor } = await import('@capacitor/core')

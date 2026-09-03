@@ -118,41 +118,4 @@ export async function resetCloudData(): Promise<boolean> {
   }
 }
 
-export async function importFromDrive(): Promise<{ success: boolean; error?: string }> {
-  try {
-    const localData = collectLocalData()
-    const res = await fetch('/api/sync/import-drive', { cache: 'no-store' })
-    if (res.status === 401) return { success: false, error: 'auth_required' }
-    if (res.status === 404) return { success: false, error: 'backup_not_found' }
-    if (!res.ok) {
-      const errBody = await res.json()
-      return { success: false, error: errBody.error || 'Server error' }
-    }
-    const body = await res.json()
-    if (!body || !body.data) return { success: false, error: 'Data kosong' }
-    const driveCloudData: CloudData = {
-      srs: body.data.srs || {},
-      stats: body.data.stats || { updatedAt: '' } as any,
-      vocab: body.data.vocab || undefined,
-      vocabUpdatedAt: body.data.vocabUpdatedAt || '',
-      updatedAt: body.data.updatedAt || '',
-    }
-    const finalData = mergeCloudData(localData, driveCloudData)
-    saveMergedLocal(finalData)
-    const now = new Date().toISOString()
-    finalData.updatedAt = now
-    finalData.stats.updatedAt = now
-    saveStats(finalData.stats)
-    const pushRes = await fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(finalData),
-      cache: 'no-store',
-    })
-    return pushRes.ok ? { success: true } : { success: false, error: 'Gagal push ke Firestore' }
-  } catch (e) {
-    return { success: false, error: (e as Error).message }
-  }
-}
-
 export { collectLocalData, mergeCloudData }

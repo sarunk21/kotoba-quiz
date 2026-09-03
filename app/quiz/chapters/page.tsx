@@ -6,27 +6,16 @@ import { useRouter } from 'next/navigation'
 import { loadSRS, calculateChapterProgress, type SRSStore } from '@/lib/srs'
  import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
  import { playTap } from '@/lib/sounds'
- import { type ChapterStory } from '@/lib/stories'
- import { getStoriesRaw } from '@/lib/storage'
 
-function ChaptersSelectContent() {
- const router = useRouter()
- const [vocab, setVocab] = useState<VocabItem[]>([])
- const [srsStore, setSrsStore] = useState<SRSStore>({})
- const [stories, setStories] = useState<ChapterStory[]>([])
+ function ChaptersSelectContent() {
+  const router = useRouter()
+  const [vocab, setVocab] = useState<VocabItem[]>([])
+  const [srsStore, setSrsStore] = useState<SRSStore>({})
 
- useEffect(() => {
- setVocab(loadLocalVocab())
- setSrsStore(loadSRS())
- try {
- const stored = getStoriesRaw()
- if (stored) {
- setStories(JSON.parse(stored) as ChapterStory[])
- }
- } catch (e) {
- console.error('[Stories Load Error]', e)
- }
- }, [])
+  useEffect(() => {
+  setVocab(loadLocalVocab())
+  setSrsStore(loadSRS())
+  }, [])
 
  const chapters = useMemo(() => {
  const map = new Map<string, string[]>()
@@ -64,8 +53,8 @@ function ChaptersSelectContent() {
  ←
  </button>
  <div>
- <h1 className="text-lg font-black text-[var(--color-text-1)] leading-tight">Latihan Per Bab</h1>
- <p className="text-xs font-semibold text-[var(--color-text-2)]">Daftar bab kosakata yang di-import dari Google Sheets</p>
+  <h1 className="text-lg font-black text-[var(--color-text-1)] leading-tight">Latihan Per Bab</h1>
+  <p className="text-xs font-semibold text-[var(--color-text-2)]">Daftar Bab 1–25 dari bank data lokal</p>
  </div>
  </header>
 
@@ -84,23 +73,22 @@ function ChaptersSelectContent() {
  <div className="rounded-3xl p-6 text-center border border-[var(--color-border)] bg-[var(--color-surface)]">
  <span className="text-4xl mb-2 block">📋</span>
  <p className="font-black text-sm text-[var(--color-text-1)]">Belum Ada Bab</p>
- <p className="text-xs font-semibold text-[var(--color-text-2)] mt-1 mb-4">
- Pastiin kamu udah men-sync Google Sheets dengan benar atau masukkan url di tab pengaturan.
- </p>
- <Link 
- href="/settings"
- onClick={playTap}
- className="inline-block rounded-xl px-4 py-2.5 text-xs font-black text-white no-underline bg-[var(--color-accent)] active:scale-95 transition-transform"
- >
- Pengaturan Google Sheets ⚙️
- </Link>
+  <p className="text-xs font-semibold text-[var(--color-text-2)] mt-1 mb-4">
+  Belum ada bab di bank data. Tambah kosakata di Kelola Kosakata.
+  </p>
+  <Link 
+  href="/vocab"
+  onClick={playTap}
+  className="inline-block rounded-xl px-4 py-2.5 text-xs font-black text-white no-underline bg-[var(--color-accent)] active:scale-95 transition-transform"
+  >
+  Kelola Kosakata ⚙️
+  </Link>
  </div>
  ) : (
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- {chapters.map((ch) => {
- const pct = ch.pct
- const hasStory = stories.some(s => s.chapter === ch.name)
- return (
+  {chapters.map((ch) => {
+  const pct = ch.pct
+  return (
  <div
  key={ch.name}
  className="flex flex-col p-4.5 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xs hover:border-[var(--color-accent)] transition-all"

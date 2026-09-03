@@ -6,18 +6,13 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { 
- loadLocalVocab, 
- saveLocalVocab, 
- parseCSVToVocab, 
- generateVocabId,
- type VocabItem, 
- type Category 
+  loadLocalVocab, 
+  saveLocalVocab, 
+  generateVocabId,
+  type VocabItem, 
+  type Category 
 } from '@/lib/vocab'
-import { fetchStories } from '@/lib/stories'
 import { syncToCloud } from '@/lib/cloud'
-import { DEFAULT_SHEETS_URL } from '@/lib/constants'
-import { syncSheetsFromUrl, forceSyncSheetsFromUrl } from '@/lib/sheetsSync'
-import { getSheetsUrl, setSheetsUrl } from '@/lib/storage'
 import BottomNav from '@/components/BottomNav'
 
 const CATEGORIES: Category[] = [
@@ -49,11 +44,10 @@ export default function VocabPage() {
  // Modals State
  const [showAddEditModal, setShowAddEditModal] = useState(false)
  const [editingItem, setEditingItem] = useState<VocabItem | null>(null) // null = Add mode
- const [showDeleteModal, setShowDeleteModal] = useState(false)
- const [deletingItem, setDeletingItem] = useState<VocabItem | null>(null)
- const [showCsvModal, setShowCsvModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletingItem, setDeletingItem] = useState<VocabItem | null>(null)
 
- // Form Fields
+  // Form Fields
  const [formCategory, setFormCategory] = useState<Category>('Kata Benda')
  const [formHiragana, setFormHiragana] = useState('')
  const [formKanji, setFormKanji] = useState('')
@@ -61,56 +55,16 @@ export default function VocabPage() {
  const [formChapter, setFormChapter] = useState('')
  const [formError, setFormError] = useState('')
 
- // CSV Import State
- const [csvInput, setCsvInput] = useState('')
- const [csvError, setCsvError] = useState('')
- const [importTab, setImportTab] = useState<'text' | 'link'>('text')
- const [sheetsUrlInput, setSheetsUrlInput] = useState('')
- const [loadingImportLink, setLoadingImportLink] = useState(false)
+  // Bulk Delete State
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [isBulkDelete, setIsBulkDelete] = useState(false)
 
- // Bulk Delete State
- const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
- const [isBulkDelete, setIsBulkDelete] = useState(false)
-
- // Load Initial Vocab & Google Sheets URL — pakai bank data terpusat
- useEffect(() => {
- const list = loadLocalVocab()
- setVocabList(list)
-
- const savedUrl = getSheetsUrl(DEFAULT_SHEETS_URL)
- setSheetsUrlInput(savedUrl)
- // Silent background fetch terpusat (throttle + dedup)
- syncSheetsFromUrl(savedUrl, { sessionEmail: session?.user?.email || null }).then(res => {
- if (res && (res.newItems > 0 || res.hasChanges)) setVocabList(loadLocalVocab())
- })
- }, [session?.user?.email])
-
- const handleSyncFromSavedLink = async () => {
- const savedUrl = getSheetsUrl(DEFAULT_SHEETS_URL)
- setLoadingImportLink(true)
- setSyncStatusMsg('Menyinkronkan Sheet...')
- try {
- const result = await forceSyncSheetsFromUrl(savedUrl, session?.user?.email || null)
- if (!result) {
- setSyncStatusMsg('Gagal Sinkron Sheet ✗')
- } else if (result.newItems === 0 && !result.hasChanges) {
- setSyncStatusMsg('Sheet Sudah Sinkron ✓')
- } else {
- setVocabList(loadLocalVocab())
- await triggerSync(loadLocalVocab())
- setSyncStatusMsg(result.newItems > 0 ? `Berhasil Impor ${result.newItems} Kata Baru ✓` : 'Bab Kosakata Terupdate ✓')
- }
- setTimeout(() => setSyncStatusMsg(''), 3000)
- } catch (e: any) {
- alert(`Gagal sinkronisasi Google Sheets: ${e.message || e}`)
- setSyncStatusMsg('Gagal Sinkron Sheet ✗')
- setTimeout(() => setSyncStatusMsg(''), 3000)
- } finally {
- setLoadingImportLink(false)
- }
- }
-
- // Auto-sync function — pakai storage helper agar TTS & bank data konsisten
+  // Load Initial Vocab — hanya Firebase + lokal 958
+  useEffect(() => {
+  const list = loadLocalVocab()
+  setVocabList(list)
+  }, [])
+  // Auto-sync function — pakai storage helper agar TTS & bank data konsisten
  const triggerSync = async (updatedList: VocabItem[]) => {
  saveLocalVocab(updatedList)
  const { setVocabUpdatedAt } = await import('@/lib/storage')
@@ -274,84 +228,7 @@ export default function VocabPage() {
  setIsBulkDelete(false)
  }
 
- // CSV Import handling
- const handleImportCSV = async () => {
- if (!csvInput.trim()) {
- setCsvError('Teks CSV tidak boleh kosong!')
- return
- }
-
- try {
- const parsed = parseCSVToVocab(csvInput)
- if (parsed.length === 0) {
- setCsvError('Tidak ada data yang valid yang berhasil diimpor. Periksa format kolom!')
- return
- }
-
- // Merge dengan vocab yang sudah ada (menghindari duplikasi ID)
- const existingIds = new Set(vocabList.map(v => v.id))
- const newItems = parsed.filter(item => !existingIds.has(item.id))
-
- if (newItems.length === 0) {
- alert('Semua kosakata dalam CSV sudah ada di database!')
- setShowCsvModal(false)
- setCsvInput('')
- setCsvError('')
- return
- }
-
- const updatedList = [...newItems, ...vocabList]
- setVocabList(updatedList)
- setShowCsvModal(false)
- setCsvInput('')
- setCsvError('')
- await triggerSync(updatedList)
- alert(`Berhasil mengimpor ${newItems.length} kosakata baru!`)
- } catch (e: any) {
- setCsvError(`Gagal membaca CSV: ${e.message || e}`)
- }
- }
-
- // Google Sheets URL Import Handling — terpusat via sheetsSync + storage
- const handleImportFromLink = async () => {
- if (!sheetsUrlInput.trim()) {
- setCsvError('Link Google Sheets tidak boleh kosong!')
- return
- }
-
- if (!sheetsUrlInput.includes('docs.google.com') && !sheetsUrlInput.includes('spreadsheets')) {
- setCsvError('Link harus berupa URL Google Sheets yang valid!')
- return
- }
-
- setLoadingImportLink(true)
- setCsvError('')
- 
- try {
- const result = await forceSyncSheetsFromUrl(sheetsUrlInput.trim(), session?.user?.email || null)
- if (!result) {
- setCsvError('Gagal mengambil data dari Google Sheets. Periksa format kolom!')
- return
- }
- if (result.newItems === 0 && !result.hasChanges) {
- alert('Semua kosakata dari link Sheets sudah ada di database dan sudah sinkron!')
- setSheetsUrl(sheetsUrlInput.trim())
- setShowCsvModal(false)
- return
- }
- setSheetsUrl(sheetsUrlInput.trim())
- setVocabList(loadLocalVocab())
- await triggerSync(loadLocalVocab())
- setShowCsvModal(false)
- alert(result.newItems > 0 ? `Berhasil mengimpor ${result.newItems} kosakata baru dari Google Sheets!` : 'Berhasil mengupdate bab kosakata!')
- } catch (e: any) {
- setCsvError(`Gagal mengambil data dari Google Sheets: ${e.message || e}`)
- } finally {
- setLoadingImportLink(false)
- }
- }
-
- // CSV Export handling
+  // CSV Export handling — lokal only
  const handleExportCSV = () => {
  // Generate CSV string: Kategori, Hiragana, Kanji, Arti, Bab
  const headers = 'Kategori,Hiragana,Kanji,Arti,Bab\n'
@@ -417,37 +294,21 @@ export default function VocabPage() {
  <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-3)] block">Database Kosakata</span>
  <p className="text-xs font-extrabold text-[var(--color-text-1)] mt-0.5">Kelola & Kuis Hafalan Per Bab</p>
  </div>
- <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
- <Link
- href="/quiz/chapters"
- className="text-xs font-black px-3.5 py-2 rounded-xl bg-[var(--color-accent)] text-white no-underline active:scale-95 transition-all flex items-center gap-1.5 shadow-sm shrink-0"
- >
- 📖 Kuis Per Bab
- </Link>
- {sheetsUrlInput && (
- <button 
- onClick={handleSyncFromSavedLink}
- className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-green-light)] text-[var(--color-green)] border border-[var(--color-border)] active:scale-95 transition-all flex items-center gap-1 shrink-0"
- title="Tarik ulang dari Google Sheets"
- disabled={loadingImportLink}
- >
- {loadingImportLink ? '⏳' : '🔄'} Sync
- </button>
- )}
- <button 
- onClick={() => { setCsvError(''); setShowCsvModal(true) }}
- className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-accent-light)] text-[var(--color-accent)] active:scale-95 transition-all shrink-0"
- >
- 📥 Impor
- </button>
- <button 
- onClick={handleExportCSV}
- className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-all shrink-0"
- disabled={vocabList.length === 0}
- >
- 📤 Ekspor
- </button>
- </div>
+  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+  <Link
+  href="/quiz/chapters"
+  className="text-xs font-black px-3.5 py-2 rounded-xl bg-[var(--color-accent)] text-white no-underline active:scale-95 transition-all flex items-center gap-1.5 shadow-sm shrink-0"
+  >
+  📖 Kuis Per Bab
+  </Link>
+  <button 
+  onClick={handleExportCSV}
+  className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[var(--color-subtle)] text-[var(--color-text-2)] active:scale-95 transition-all shrink-0"
+  disabled={vocabList.length === 0}
+  >
+  📤 Ekspor
+  </button>
+  </div>
  </section>
 
  {/* Filters & Search */}
@@ -829,118 +690,7 @@ export default function VocabPage() {
  </div>
  )}
 
- {/* ── MODAL: CSV Importer ── */}
- {showCsvModal && (
- <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
- <div 
- className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" 
- onClick={() => {
- setShowCsvModal(false)
- setCsvError('')
- }}
- />
- <div className="bg-[var(--color-surface)] rounded-[28px] p-6 w-full max-w-sm relative shadow-2xl z-10 border border-[var(--color-border)] animate-pop flex flex-col gap-4">
- <div>
- <h3 className="text-lg font-extrabold text-[var(--color-text-1)]">Impor Kosakata</h3>
- <p className="text-[10px] font-semibold text-[var(--color-text-2)] mt-0.5 leading-relaxed">
- Tambahkan data kosakata massal ke database Anda menggunakan metode di bawah ini.
- </p>
- </div>
 
- {/* Impor Tabs */}
- <div className="flex bg-[var(--color-bg)] p-1 rounded-xl gap-1">
- <button 
- onClick={() => { setImportTab('text'); setCsvError('') }}
- className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all ${
- importTab === 'text' 
- ? 'bg-[var(--color-surface)] text-[var(--color-accent)] shadow-sm' 
- : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)]'
- }`}
- >
- 📝 Tempel Teks CSV
- </button>
- <button 
- onClick={() => { setImportTab('link'); setCsvError('') }}
- className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all ${
- importTab === 'link' 
- ? 'bg-[var(--color-surface)] text-[var(--color-accent)] shadow-sm' 
- : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)]'
- }`}
- >
- 🔗 Link Google Sheets
- </button>
- </div>
-
- {importTab === 'text' ? (
- <div className="flex flex-col gap-1.5 animate-fade-in">
- <textarea 
- placeholder='Format: Kategori, Hiragana, Kanji, Arti, Bab&#10;Contoh:&#10;Kata Benda,わたし,私,Saya,Bab 1&#10;Kata Kerja,ねます,寝ます,Tidur,Bab 1'
- value={csvInput}
- onChange={(e) => setCsvInput(e.target.value)}
- className="w-full h-44 text-xs font-mono p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-1)] focus:outline-none focus:border-[var(--color-accent)] resize-none"
- />
- {csvError && (
- <p className="text-[10px] font-bold text-[var(--color-red)] px-1 leading-normal">{csvError}</p>
- )}
- </div>
- ) : (
- <div className="flex flex-col gap-3 animate-fade-in">
- <div className="flex flex-col gap-1">
- <label className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-2)] px-1">Link Google Sheets (Published CSV)</label>
- <input 
- type="text"
- placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"
- value={sheetsUrlInput}
- onChange={(e) => setSheetsUrlInput(e.target.value)}
- className="w-full text-xs px-3 py-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text-1)] focus:outline-none focus:border-[var(--color-accent)]"
- />
- </div>
- <div className="rounded-xl p-3 bg-[var(--color-bg)] border border-[var(--color-border)]">
- <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-2)] mb-1">💡 Cara Membuat Link CSV:</p>
- <ol className="text-[9px] font-semibold text-[var(--color-text-3)] leading-relaxed list-decimal pl-4 space-y-0.5">
- <li>Buka spreadsheet Anda di Google Sheets.</li>
- <li>Pilih menu <strong>File &gt; Share &gt; Publish to web</strong>.</li>
- <li>Ubah format publish dari "Web page" menjadi <strong>Comma-separated values (.csv)</strong>.</li>
- <li>Klik <strong>Publish</strong> dan salin link CSV yang dihasilkan.</li>
- </ol>
- </div>
- {csvError && (
- <p className="text-[10px] font-bold text-[var(--color-red)] px-1 leading-normal">{csvError}</p>
- )}
- </div>
- )}
-
- <div className="flex gap-2">
- <button
- onClick={() => {
- setShowCsvModal(false)
- setCsvError('')
- }}
- className="flex-1 text-xs font-black py-2.5 rounded-xl border border-[var(--color-border)] text-[var(--color-text-2)] active:scale-95 transition-transform"
- disabled={loadingImportLink}
- >
- Batal
- </button>
- {importTab === 'text' ? (
- <button
- onClick={handleImportCSV}
- className="flex-1 text-xs font-black py-2.5 rounded-xl bg-[var(--color-accent)] text-white shadow-btn active:scale-95 transition-transform"
- >
- Impor Teks
- </button>
- ) : (
- <button
- onClick={handleImportFromLink}
- className="flex-1 text-xs font-black py-2.5 rounded-xl bg-[var(--color-accent)] text-white shadow-btn active:scale-95 transition-transform flex items-center justify-center gap-1.5"
- disabled={loadingImportLink}
- >
- {loadingImportLink ? '⏳ Mengunduh...' : 'Impor dari Link'}
- </button>
- )}
- </div>
- </div>
- </div>
- )}
  </>
  )
 }

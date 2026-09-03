@@ -6,11 +6,8 @@ import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { loadStats, touchStats } from '@/lib/stats'
 import { loadSRS } from '@/lib/srs'
-import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud, importFromDrive } from '@/lib/cloud'
-import { parseCSVToVocab, loadLocalVocab, saveLocalVocab } from '@/lib/vocab'
-import { DEFAULT_SHEETS_URL } from '@/lib/constants'
-import { forceSyncSheetsFromUrl } from '@/lib/sheetsSync'
-import { getSheetsUrl, setSheetsUrl, getTheme, setTheme as setThemeStorage, getReminderEnabled, setReminderEnabled as setReminderEnabledStorage, getReminderTime, setReminderTime as setReminderTimeStorage, getSyncMode as getSyncModeStorage, setSyncMode as setSyncModeStorage } from '@/lib/storage'
+import { syncToCloud, pushToCloud, resetCloudData, pullFromCloud, forcePushToCloud } from '@/lib/cloud'
+import { getTheme, setTheme as setThemeStorage, getReminderEnabled, setReminderEnabled as setReminderEnabledStorage, getReminderTime, setReminderTime as setReminderTimeStorage, getSyncMode as getSyncModeStorage, setSyncMode as setSyncModeStorage } from '@/lib/storage'
 import BottomNav from '@/components/BottomNav'
 import { 
  checkNotificationPermission, 
@@ -22,12 +19,7 @@ import {
 export default function SettingsPage() {
  const router = useRouter()
  const { data: session, status } = useSession()
- // Sheets state vars
- const [sheetsUrl, setSheetsUrl] = useState<string>('')
- const [syncStatusMsg, setSyncStatusMsg] = useState<string>('')
- const [loadingSync, setLoadingSync] = useState<boolean>(false)
- 
- const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
+  const [notifStatus, setNotifStatus] = useState<'idle' | 'granted' | 'denied'>('idle')
  const [reminderEnabled, setReminderEnabled] = useState<boolean>(true)
  const [reminderTime, setReminderTime] = useState<string>('20:00')
  const [showResetConfirm, setShowResetConfirm] = useState(false)
@@ -36,38 +28,7 @@ export default function SettingsPage() {
  const [syncMode, setSyncMode] = useState<'auto' | 'manual'>('auto')
  const [syncActionStatus, setSyncActionStatus] = useState<string>('')
 
- // Sync Sheets manual — terpusat via sheetsSync (force)
- async function handleSyncSheets() {
- if (!sheetsUrl) return
- setLoadingSync(true)
- setSyncStatusMsg('Menyinkronkan Sheet...')
- try {
- const result = await forceSyncSheetsFromUrl(sheetsUrl, session?.user?.email || null)
- if (!result) {
- setSyncStatusMsg('Format Salah ✗')
- setTimeout(() => setSyncStatusMsg(''), 3000)
- return
- }
- if (result.newItems === 0 && !result.hasChanges) {
- setSyncStatusMsg('Sheet Sudah Sinkron ✓')
- } else if (session?.user?.email) {
- setSyncStatusMsg('Menyinkronkan ke Cloud...')
- const ok = await syncToCloud()
- setSyncStatusMsg(ok ? 'Tersinkronisasi ke Cloud ✓' : 'Gagal Sinkronisasi Cloud ✗')
- } else {
- setSyncStatusMsg(result.newItems > 0 ? `Berhasil Impor ${result.newItems} Kata Baru ✓` : 'Bab Kosakata Terupdate ✓')
- }
- setTimeout(() => setSyncStatusMsg(''), 3000)
- } catch (e: any) {
- console.error(e)
- setSyncStatusMsg('Gagal Sinkron Sheet ✗')
- setTimeout(() => setSyncStatusMsg(''), 3000)
- } finally {
- setLoadingSync(false)
- }
- }
-
- useEffect(() => {
+  useEffect(() => {
  if (status === 'unauthenticated') router.push('/')
  }, [status, router])
 
@@ -80,13 +41,10 @@ export default function SettingsPage() {
  setTheme(isDark ? 'dark' : 'light')
  }
 
- const savedSync = getSyncModeStorage() as 'auto' | 'manual' | null
- if (savedSync) setSyncMode(savedSync)
+  const savedSync = getSyncModeStorage() as 'auto' | 'manual' | null
+  if (savedSync) setSyncMode(savedSync)
 
- const savedUrl = getSheetsUrl(DEFAULT_SHEETS_URL)
- setSheetsUrl(savedUrl)
-
- async function initNotifications() {
+  async function initNotifications() {
  const status = await checkNotificationPermission()
  if (status === 'default' || status === 'prompt') {
  setNotifStatus('idle')
@@ -120,41 +78,7 @@ export default function SettingsPage() {
  setTimeout(() => setSyncActionStatus(''), 3000)
  }
 
- async function handleImportGoogleDrive() {
- setSyncActionStatus('importing_drive')
- const result = await importFromDrive()
- if (result.success) {
- setSyncActionStatus('Migrasi Berhasil ✓')
- setTimeout(() => {
- setSyncActionStatus('')
- window.location.reload()
- }, 3000)
- } else {
- if (result.error === 'auth_required') {
- const confirmGrant = window.confirm(
- 'Izin Google Drive diperlukan untuk memuat file backup kotoba_data.json Anda.\n\nKlik OK untuk masuk kembali dan memberikan izin akses Google Drive.'
- )
- if (confirmGrant) {
- await signOut({ redirect: false })
- signIn('google', {
- authorizationParams: {
- scope: 'openid email profile https://www.googleapis.com/auth/drive.appdata',
- prompt: 'consent',
- access_type: 'offline'
- }
- })
- } else {
- setSyncActionStatus('')
- }
- } else if (result.error === 'backup_not_found') {
- setSyncActionStatus('Backup tidak ditemukan di Drive ✗')
- setTimeout(() => setSyncActionStatus(''), 4000)
- } else {
- setSyncActionStatus(`Migrasi Gagal: ${result.error} ✗`)
- setTimeout(() => setSyncActionStatus(''), 4000)
- }
- }
- }
+
 
  function toggleTheme(newTheme: 'light' | 'dark') {
  setTheme(newTheme)
@@ -328,46 +252,9 @@ export default function SettingsPage() {
  style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 4px 12px var(--color-accent-glow)' }}>
  ⚙️ Kelola Kosakata
  </Link>
- </div>
+  </div>
 
- {/* Google Sheets Sync Section */}
- <div className="rounded-3xl p-6 anim-up d2" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
- <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Google Sheets</p>
- 
- {sheetsUrl ? (
- <div className="space-y-4">
- <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
- Tarik paksa pembaruan kosakata atau bab baru langsung dari spreadsheet Google Sheets kamu yang terhubung.
- </p>
- <button 
- onClick={handleSyncSheets}
- disabled={loadingSync}
- className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold active:scale-95 transition-transform"
- style={{ background: 'var(--color-accent)', color: '#fff', boxShadow: '0 4px 12px var(--color-accent-glow)' }}
- >
- {loadingSync ? '⏳ Menyinkronkan...' : '🔄 Sinkron Google Sheets'}
- </button>
- {syncStatusMsg && (
- <p className="text-center text-xs font-bold animate-pulse" style={{ color: 'var(--color-accent)' }}>
- {syncStatusMsg}
- </p>
- )}
- </div>
- ) : (
- <div className="space-y-3">
- <p className="text-xs font-semibold leading-relaxed" style={{ color: 'var(--color-text-2)' }}>
- Hubungkan Google Sheets kamu untuk mempermudah impor kosakata dan manajemen bab secara massal.
- </p>
- <Link href="/vocab" className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 text-xs font-bold no-underline active:scale-95 transition-transform border border-[var(--color-border)]"
- style={{ background: 'var(--color-bg)', color: 'var(--color-text-2)' }}>
- 🔗 Hubungkan Google Sheets
- </Link>
- </div>
- )}
- </div>
-
-
- <div className="rounded-3xl p-6 anim-up d3" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+  <div className="rounded-3xl p-6 anim-up d3" style={{ background: 'var(--color-white)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
  <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-3)' }}>Notifikasi</p>
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3">

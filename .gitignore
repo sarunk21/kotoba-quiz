@@ -53,3 +53,6 @@ next-env.d.ts
 /tools/gen-content/.env
 /tools/gen-content/input/
 /tools/gen-content/output/
+
+*storybook.log
+storybook-static

@@ -21,8 +21,11 @@
 
   --accent: #d64541;
   --accent-hover: #c03a36;
+  --accent-dark: #c03a36;
   --accent-light: #fbeaea;
   --accent-glow: rgba(214,69,65,0.18);
+  --subtle: #ece6da;
+  --white: #ffffff;
 
   --green: #2d8f5a;
   --green-light: #e6f7ee;
@@ -68,6 +71,10 @@
   --border-light: #26221c;
 
   --accent-light: rgba(214,69,65,0.15);
+  --accent-dark: #a5524f;
+  --accent-glow: rgba(214,69,65,0.25);
+  --subtle: #26221c;
+  --white: #1e1b17;
   --green-light: rgba(45,143,90,0.12);
   --red-light: rgba(214,69,65,0.12);
   --amber-light: rgba(199,127,27,0.12);
@@ -368,7 +375,7 @@ svg.icon-sm { width: 14px; height: 14px; }
       <button class="toggle-btn active" onclick="setTheme('light')">☀️ Light</button>
       <button class="toggle-btn" onclick="setTheme('dark')">🌙 Dark</button>
     </div>
-    <span class="pill">10 LAYAR</span>
+    <span class="pill">16 LAYAR — Firebase + Lokal Only</span>
   </div>
 </div>
 
@@ -985,6 +992,74 @@ svg.icon-sm { width: 14px; height: 14px; }
       <p style="font-size:10px;color:var(--text-muted);margin-top:12px;text-align:center;">Susun blok kata menjadi kalimat yang benar</p>
     </div>
   </div>
+</div>
+
+<!-- 11 · Pengaturan (Baru) -->
+<div class="phone-frame">
+  <div class="phone-label">11 · Pengaturan</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div class="close-btn">←</div><div><h2 style="font-size:18px;font-weight:900;">Pengaturan</h2><p style="font-size:11px;color:var(--text-secondary);">Firebase & Lokal Only</p></div></div>
+    <div class="bg-card" style="padding:14px;margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:700;">Tema</span><div class="toggle-bar"><span class="toggle-btn active">Terang</span><span class="toggle-btn">Gelap</span></div></div></div>
+    <div class="bg-card" style="padding:14px;margin-bottom:12px;"><p style="font-size:11px;color:var(--text-secondary);">Kelola kosakata & sinkronisasi Firebase otomatis.</p><div style="margin-top:10px;padding:10px;background:var(--accent-light);border-radius:var(--radius-md);text-align:center;font-size:11px;font-weight:800;color:var(--accent);"> sheetsUrl dihapus — var(--color-white) → var(--color-surface)</div></div>
+    <div class="bg-card" style="padding:14px;"><div style="display:flex;justify-content:space-between;"><span style="font-size:13px;font-weight:700;">Notifikasi 20:00</span><div class="toggle-switch on"></div></div></div>
+  </div>
+  <div class="bottom-nav"><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span class="label">Beranda</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/></svg><span class="label">Kosakata</span></div><div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#fff"/></svg></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div><div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15"/></svg><span class="label">Pengaturan</span></div></div>
+</div>
+
+<!-- 12 · Cerita Dihapus (Placeholder) -->
+<div class="phone-frame">
+  <div class="phone-label">12 · Cerita — Dihapus</div>
+  <div class="screen screen-p" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+    <div style="width:64px;height:64px;border-radius:20px;background:var(--border-light);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;">📖</div>
+    <h2 style="font-size:18px;font-weight:900;">Cerita AI Dihapus</h2>
+    <p style="font-size:11px;color:var(--text-secondary);margin-top:6px;max-width:220px;">Fitur cerita Groq & kotoba_stories dihapus — hanya Firebase + lokal 958 kata. Route /story dihapus.</p>
+    <div style="margin-top:16px;padding:8px 14px;background:var(--accent-light);border-radius:var(--radius-md);font-size:11px;font-weight:800;color:var(--accent);">Hapus Total</div>
+  </div>
+  <div class="bottom-nav"><div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg><span class="label">Beranda</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg><span class="label">Kosakata</span></div><div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/></svg></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82"/></svg><span class="label">Pengaturan</span></div></div>
+</div>
+
+<!-- 13 · Partikel Guide -->
+<div class="phone-frame">
+  <div class="phone-label">13 · Partikel Guide</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><div class="close-btn">←</div><div><h2 style="font-size:18px;font-weight:900;">Panduan Partikel</h2><p style="font-size:11px;color:var(--text-secondary);">11 partikel + SOP/SKP</p></div></div>
+    <div style="position:relative;margin-bottom:12px;"><svg class="icon" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);width:16px;height:16px;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input style="width:100%;padding:11px 12px 11px 36px;border-radius:var(--radius-md);border:1.5px solid var(--border);background:var(--surface);font-size:12px;" placeholder="Cari partikel..."/></div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;"><span class="badge" style="background:var(--accent);color:#fff;">Semua</span><span class="badge" style="background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);">は</span><span class="badge" style="background:var(--surface);border:1px solid var(--border);">が</span></div>
+    <div class="bg-card" style="padding:14px;"><h3 style="font-size:14px;font-weight:800;">は (wa) — Topik</h3><p style="font-size:11px;color:var(--text-secondary);margin-top:4px;">私は学生です — Saya adalah murid (topik: saya)</p></div>
+  </div>
+  <div class="bottom-nav"><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7"/></svg><span class="label">Beranda</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg><span class="label">Kosakata</span></div><div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/></svg></div><div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg><span class="label">Pengaturan</span></div></div>
+</div>
+
+<!-- 14 · Quiz Chapters -->
+<div class="phone-frame">
+  <div class="phone-label">14 · Quiz Chapters</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><div class="close-btn">←</div><div><h2 style="font-size:18px;font-weight:900;">Latihan Per Bab</h2><p style="font-size:11px;color:var(--text-secondary);">Bab 1–25 bank data lokal</p></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div class="bg-card" style="padding:14px;text-align:center;"><div style="font-size:20px;">📖</div><p style="font-size:12px;font-weight:800;margin-top:4px;">Bab 3</p><div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:68%;background:var(--accent);"></div></div><p style="font-size:10px;color:var(--text-muted);margin-top:4px;">68% • 24 kata</p></div><div class="bg-card" style="padding:14px;text-align:center;"><div style="font-size:20px;">📖</div><p style="font-size:12px;font-weight:800;margin-top:4px;">Bab 4</p><div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:12%;background:var(--amber);"></div></div><p style="font-size:10px;color:var(--text-muted);margin-top:4px;">12% • 18 kata</p></div></div>
+  </div>
+  <div class="bottom-nav"><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7"/></svg><span class="label">Beranda</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg><span class="label">Kosakata</span></div><div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/></svg></div><div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg><span class="label">Pengaturan</span></div></div>
+</div>
+
+<!-- 15 · Quiz Special -->
+<div class="phone-frame">
+  <div class="phone-label">15 · Quiz Special</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><div class="close-btn">←</div><div><h2 style="font-size:18px;font-weight:900;">Latihan Khusus</h2><p style="font-size:11px;color:var(--text-secondary);">Angka/Hari/Uang/Tubuh</p></div></div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;"><span class="badge" style="background:var(--accent);color:#fff;">Angka</span><span class="badge" style="background:var(--surface);border:1px solid var(--border);">Hari</span><span class="badge" style="background:var(--surface);border:1px solid var(--border);">Uang</span></div>
+    <div class="bg-card" style="padding:14px;"><p style="font-size:13px;font-weight:800;">Angka 1–100</p><p style="font-size:11px;color:var(--text-secondary);">Hitung + unit counter</p><div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:30%;background:var(--amber);"></div></div></div>
+  </div>
+  <div class="bottom-nav"><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7"/></svg><span class="label">Beranda</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg><span class="label">Kosakata</span></div><div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/></svg></div><div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg><span class="label">Pengaturan</span></div></div>
+</div>
+
+<!-- 16 · Kanji/JLPT -->
+<div class="phone-frame">
+  <div class="phone-label">16 · Kanji & JLPT</div>
+  <div class="screen screen-p">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><div class="close-btn">←</div><div><h2 style="font-size:18px;font-weight:900;">Kanji & JLPT</h2><p style="font-size:11px;color:var(--text-secondary);">N5–N1 + Campur</p></div></div>
+    <div class="bg-card" style="padding:14px;margin-bottom:10px;background:linear-gradient(135deg,var(--accent-light),var(--surface));"><h3 style="font-size:14px;font-weight:800;">Campur Semua Kanji</h3><p style="font-size:11px;color:var(--text-secondary);">208 kata kanji</p></div>
+    <div style="display:flex;flex-direction:column;gap:8px;"><div class="bg-card" style="padding:12px;display:flex;justify-content:space-between;"><span style="font-size:13px;font-weight:700;">N5</span><span class="badge" style="background:var(--green-light);color:var(--green);">42</span></div><div class="bg-card" style="padding:12px;display:flex;justify-content:space-between;opacity:0.5;"><span style="font-size:13px;font-weight:700;">N1</span><span class="badge" style="background:var(--border-light);">0 🔒</span></div></div>
+  </div>
+  <div class="bottom-nav"><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7"/></svg><span class="label">Beranda</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><path d="M12 6.253v13"/></svg><span class="label">Kosakata</span></div><div class="nav-center"><svg class="icon" viewBox="0 0 24 24" style="width:22px;height:22px;color:#fff;"><circle cx="12" cy="12" r="10"/></svg></div><div class="nav-item active"><svg class="icon" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="label">Latihan</span></div><div class="nav-item"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg><span class="label">Pengaturan</span></div></div>
 </div>
 
 </div><!-- /gallery -->
