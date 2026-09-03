@@ -458,7 +458,7 @@ export default function PracticeHubPage() {
 
  <button 
  onClick={nextQuestion}
- className="w-full rounded-2xl py-3.5 text-base font-extrabold active:scale-95 transition-transform text-white bg-green-500 shadow-[0_8px_20px_rgba(34,197,94,0.28)] cursor-pointer"
+ className="w-full rounded-2xl py-3.5 text-base font-extrabold active:scale-95 transition-transform text-white bg-[var(--color-green)] shadow-[0_8px_20px_var(--color-accent-glow)] cursor-pointer"
  >
  {currentQIndex < activeQuiz.questions.length - 1 ? 'Soal Berikutnya ➔' : 'Lihat Hasil 🎉'}
  </button>

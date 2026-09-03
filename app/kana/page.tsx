@@ -211,7 +211,7 @@ export default function KanaPage() {
  <div className="flex gap-2 mb-5 anim-up d1">
  {[
  { key: 'hiragana', label: 'Hiragana あ', color: 'var(--color-accent)' },
- { key: 'katakana', label: 'Katakana ア', color: '#a855f7' },
+ { key: 'katakana', label: 'Katakana ア', color: 'var(--color-purple)' },
  { key: 'both', label: 'Gabungan あ/ア', color: 'var(--color-green)' },
  ].map(t => {
  const isActive = activeType === t.key
@@ -238,7 +238,7 @@ export default function KanaPage() {
  <div className="grid grid-cols-4 gap-2 mb-5 anim-up d1">
  {[
  { label: 'Hafal', val: stats.mastered, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
- { label: 'Proses', val: stats.learning, color: '#a855f7', bg: '#faf0ff' },
+ { label: 'Proses', val: stats.learning, color: 'var(--color-purple)', bg: 'var(--color-purple-light)' },
  { label: 'Baru', val: stats.new, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
  { label: 'Review', val: stats.due, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
  ].map(s => (

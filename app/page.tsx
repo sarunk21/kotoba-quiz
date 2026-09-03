@@ -500,7 +500,7 @@ export default function Home() {
  {[
  { label: 'Review', val: currentSrs.dueCount, color: 'var(--color-amber)', bg: 'var(--color-amber-light)' },
  { label: 'Baru', val: currentSrs.newCount, color: 'var(--color-accent)', bg: 'var(--color-accent-light)' },
- { label: 'Proses', val: currentSrs.learningCount, color: '#a855f7', bg: '#faf0ff' },
+ { label: 'Proses', val: currentSrs.learningCount, color: 'var(--color-purple)', bg: 'var(--color-purple-light)' },
  { label: 'Hafal', val: currentSrs.masteredCount, color: 'var(--color-green)', bg: 'var(--color-green-light)' },
  ].map(s => (
  <div key={s.label} className="rounded-2xl py-3 text-center transition-all duration-200" style={{ background: s.bg }}>
