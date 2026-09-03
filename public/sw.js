@@ -1,10 +1,20 @@
 const CACHE_NAME = 'kotoba-quiz-cache-v2';
 
-// Static resources to cache on install (app skeleton) — favicon di /icons/
+// Static resources to cache on install (app skeleton) — favicon di /icons/ + Bab 1-10 covers
 const PRECACHE_ASSETS = [
   '/',
   '/manifest.json',
   '/icons/favicon-32x32.png',
+  '/stories/bab1/cover.png',
+  '/stories/bab2/cover.png',
+  '/stories/bab3/cover.png',
+  '/stories/bab4/cover.png',
+  '/stories/bab5/cover.png',
+  '/stories/bab6/cover.png',
+  '/stories/bab7/cover.png',
+  '/stories/bab8/cover.png',
+  '/stories/bab9/cover.png',
+  '/stories/bab10/cover.png',
 ];
 
 self.addEventListener('install', (event) => {

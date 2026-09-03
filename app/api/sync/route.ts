@@ -25,15 +25,18 @@ export async function GET() {
  const vocabData = vocabDoc.exists ? vocabDoc.data()?.items : null
  const vocabUpdatedAt = vocabDoc.exists ? vocabDoc.data()?.updatedAt : null
 
- return NextResponse.json({
- data: {
- srs: progressData?.srs ?? {},
- stats: progressData?.stats ?? null,
- updatedAt: progressData?.updatedAt ?? '',
- vocab: vocabData ?? null,
- vocabUpdatedAt: vocabUpdatedAt ?? '',
- }
- })
+  return NextResponse.json({
+  data: {
+  srs: progressData?.srs ?? {},
+  stats: progressData?.stats ?? null,
+  updatedAt: progressData?.updatedAt ?? '',
+  vocab: vocabData ?? null,
+  vocabUpdatedAt: vocabUpdatedAt ?? '',
+  studyHistory: progressData?.studyHistory ?? null,
+  failedWords: progressData?.failedWords ?? null,
+  chapterImages: progressData?.chapterImages ?? null,
+  }
+  })
  } catch (e: unknown) {
  const error = e as Error
  return NextResponse.json({ error: error.message }, { status: 500 })
@@ -51,20 +54,23 @@ export async function POST(req: NextRequest) {
  return NextResponse.json({ error: 'Firebase is not initialized' }, { status: 500 })
  }
 
- const email = session.user.email
- const body = await req.json()
- const { srs, stats, vocab, vocabUpdatedAt, updatedAt } = body
+  const email = session.user.email
+  const body = await req.json()
+  const { srs, stats, vocab, vocabUpdatedAt, updatedAt, studyHistory, failedWords, chapterImages } = body
 
- try {
- const batch = db.batch()
+  try {
+  const batch = db.batch()
 
- // 1. Simpan progress (srs + stats) ke dokumen user
- const userRef = db.collection('users').doc(email)
- batch.set(userRef, {
- srs: srs ?? {},
- stats: stats ?? {},
- updatedAt: updatedAt ?? new Date().toISOString(),
- }, { merge: true })
+  // 1. Simpan progress (srs + stats + history + chapterImages) ke dokumen user
+  const userRef = db.collection('users').doc(email)
+  batch.set(userRef, {
+  srs: srs ?? {},
+  stats: stats ?? {},
+  updatedAt: updatedAt ?? new Date().toISOString(),
+  ...(studyHistory !== undefined && { studyHistory }),
+  ...(failedWords !== undefined && { failedWords }),
+  ...(chapterImages !== undefined && { chapterImages }),
+  }, { merge: true })
 
  // 2. Simpan vocab jika disertakan
  if (vocab !== undefined) {

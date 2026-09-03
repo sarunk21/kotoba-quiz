@@ -47,6 +47,8 @@ export function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
   const cloudFailed = cloud.failedWords || []
   const mergedFailed = Array.from(new Set([...localFailed, ...cloudFailed]))
 
+  const mergedChapterImages = { ...(local.chapterImages || {}), ...(cloud.chapterImages || {}) }
+
   return {
     srs: mergedSRS,
     stats: mergedStats,
@@ -54,6 +56,7 @@ export function mergeCloudData(local: CloudData, cloud: CloudData): CloudData {
     vocabUpdatedAt: mergedVocabUpdatedAt,
     studyHistory: mergedHistory,
     failedWords: mergedFailed,
+    chapterImages: mergedChapterImages,
     updatedAt: cloudIsNewer ? (cloud.updatedAt || '') : (local.updatedAt || ''),
   }
 }

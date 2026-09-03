@@ -10,12 +10,15 @@ function collectLocalData(): CloudData {
   const stats = loadStats()
   let studyHistory: Record<string, number> = {}
   let failedWords: string[] = []
+  let chapterImages: Record<string, string> = {}
   if (typeof window !== 'undefined') {
     try {
       const sh = localStorage.getItem('kotoba_study_history')
       if (sh) studyHistory = JSON.parse(sh)
       const fw = localStorage.getItem('kotoba_failed_words')
       if (fw) failedWords = JSON.parse(fw)
+      const ci = localStorage.getItem('kotoba_chapter_images')
+      if (ci) chapterImages = JSON.parse(ci)
     } catch {}
   }
   return {
@@ -25,6 +28,7 @@ function collectLocalData(): CloudData {
     vocabUpdatedAt: typeof window !== 'undefined' ? localStorage.getItem('kotoba_vocab_updated_at') || '' : '',
     studyHistory,
     failedWords,
+    chapterImages,
     updatedAt: stats.updatedAt || '',
   }
 }
@@ -36,6 +40,7 @@ function saveMergedLocal(finalData: CloudData) {
   if (finalData.vocabUpdatedAt) localStorage.setItem('kotoba_vocab_updated_at', finalData.vocabUpdatedAt)
   if (finalData.studyHistory) localStorage.setItem('kotoba_study_history', JSON.stringify(finalData.studyHistory))
   if (finalData.failedWords) localStorage.setItem('kotoba_failed_words', JSON.stringify(finalData.failedWords))
+  if (finalData.chapterImages) localStorage.setItem('kotoba_chapter_images', JSON.stringify(finalData.chapterImages))
 }
 
 export async function syncToCloud(): Promise<boolean> {

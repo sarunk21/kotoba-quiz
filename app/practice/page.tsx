@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { playTap, speakJapanese } from '@/lib/sounds'
- import { addFuriganaToSentence } from '@/lib/vocab'
- import { getShowFurigana, setShowFurigana as saveShowFurigana } from '@/lib/storage'
- import BottomNav from '@/components/BottomNav'
+  import { addFuriganaToSentence } from '@/lib/vocab'
+  import { getShowFurigana, setShowFurigana as saveShowFurigana } from '@/lib/storage'
+  import { getChapterImage } from '@/lib/chapterImages'
+  import BottomNav from '@/components/BottomNav'
 
 interface PracticeQuestion {
  id: string
@@ -412,15 +413,19 @@ export default function PracticeHubPage() {
  </div>
  ) : (
  exercises.map((ex, idx) => (
- <div
- key={idx}
- onClick={() => startChapterQuiz(ex)}
- className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-3.5 flex items-center justify-between cursor-pointer hover:border-[var(--color-accent)] transition-all active:scale-[0.98]"
- >
- <div>
- <span className="text-xs font-black text-[var(--color-accent)] block">
- {ex.bab}
- </span>
+  <div
+  key={idx}
+  onClick={() => startChapterQuiz(ex)}
+  className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-3 flex items-center gap-3 cursor-pointer hover:border-[var(--color-accent)] transition-all active:scale-[0.98]"
+  >
+  {(() => {
+  const cover = getChapterImage(ex.bab)
+  return cover ? <img src={cover} alt={ex.bab} loading="lazy" className="w-9 h-9 rounded-lg object-cover border border-[var(--color-border-light)] shrink-0" onError={(e) => (e.currentTarget.style.display='none')} /> : <div className="w-9 h-9 rounded-lg bg-[var(--color-subtle)] flex items-center justify-center text-[10px] font-black text-[var(--color-text-3)] shrink-0">📖</div>
+  })()}
+  <div className="flex-1 min-w-0">
+  <span className="text-xs font-black text-[var(--color-accent)] block">
+  {ex.bab}
+  </span>
  <p className="text-[11px] font-bold text-[var(--color-text-2)] line-clamp-1">
  {ex.title}
  </p>

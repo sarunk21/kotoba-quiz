@@ -11,5 +11,6 @@ export interface CloudData {
   vocabUpdatedAt?: string
   studyHistory?: Record<string, number>
   failedWords?: string[]
+  chapterImages?: Record<string, string>
   updatedAt: string
 }

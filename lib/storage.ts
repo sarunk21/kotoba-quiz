@@ -73,6 +73,11 @@ const FAILED_KEY = 'kotoba_failed_words'
 export function getFailedRaw(): string | null { return getItem(FAILED_KEY) }
 export function setFailedRaw(json: string) { setItem(FAILED_KEY, json) }
 
+// ── Chapter Images OTA (Bab 11-25 future) ──
+const CHAPTER_IMAGES_KEY = 'kotoba_chapter_images'
+export function getChapterImagesRaw(): string | null { return getItem(CHAPTER_IMAGES_KEY) }
+export function setChapterImagesRaw(json: string) { setItem(CHAPTER_IMAGES_KEY, json) }
+
 
 
 // ── Bulk clear for account isolation / logout ──

@@ -4,8 +4,9 @@ import { useEffect, useState, useMemo, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { loadSRS, calculateChapterProgress, type SRSStore } from '@/lib/srs'
- import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
- import { playTap } from '@/lib/sounds'
+  import { loadLocalVocab, type VocabItem } from '@/lib/vocab'
+  import { playTap } from '@/lib/sounds'
+  import { getChapterImage } from '@/lib/chapterImages'
 
  function ChaptersSelectContent() {
   const router = useRouter()
@@ -94,10 +95,17 @@ import { loadSRS, calculateChapterProgress, type SRSStore } from '@/lib/srs'
  className="flex flex-col p-4.5 rounded-3xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xs hover:border-[var(--color-accent)] transition-all"
  >
  <div className="flex items-center justify-between w-full mb-3.5">
- <div className="flex items-center gap-3">
- <div className="w-10 h-10 rounded-2xl bg-[var(--color-indigo-light)] text-[var(--color-indigo)] flex items-center justify-center text-xl shrink-0">
- 📖
- </div>
+  <div className="flex items-center gap-3">
+  {(() => {
+  const cover = getChapterImage(ch.name)
+  return cover ? (
+  <img src={cover} alt={`Cover ${ch.name}`} loading="lazy" decoding="async" className="w-10 h-10 rounded-xl object-cover border border-[var(--color-border-light)] shrink-0" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+  ) : (
+  <div className="w-10 h-10 rounded-2xl bg-[var(--color-indigo-light)] text-[var(--color-indigo)] flex items-center justify-center text-xl shrink-0">
+  📖
+  </div>
+  )
+  })()}
  <div>
  <h4 className="text-xs font-extrabold text-[var(--color-text-1)] truncate w-36" title={ch.name}>{ch.name}</h4>
  <p className="text-[10px] font-bold text-[var(--color-text-3)] mt-0.5">
